@@ -1,1 +1,2 @@
-# This is a test comment. See Truth/Lie-Indicator-Enhancement-Tool file for more info. 
+# This is a comment for testing
+# See Truth/Lie-Indicator-Enhancement-Tool.py for more details
