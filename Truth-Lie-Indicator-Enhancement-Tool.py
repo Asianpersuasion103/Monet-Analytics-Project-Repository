@@ -1,6 +1,13 @@
+import os
+
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
 import cv2
 import time
 
+print("Opening camera...")
+
+start_time = time.time()
 cam = cv2.VideoCapture(0, cv2.CAP_MSMF)
 
 cam.set(
@@ -36,7 +43,6 @@ out = cv2.VideoWriter(
 # print(f"Camera FPS: {fps}")
 
 frame_count = 0
-start_time = time.time()
 
 cv2.namedWindow("Camera")
 
