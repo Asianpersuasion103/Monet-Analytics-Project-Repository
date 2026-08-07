@@ -1,53 +1,45 @@
 import * as pdfjsLib from "../pdfjs/pdf.mjs";
 
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "../pdfjs/pdf.worker.mjs";
+"../pdfjs/pdf.worker.mjs";
 
 
+// ===============================
+// HTML Elements
+// ===============================
 
 const fileInput =
-    document.getElementById("pdf-input");
-
+document.getElementById("pdf-input");
 
 const fileNameDiv =
-    document.getElementById("file-name");
-
+document.getElementById("file-name");
 
 const previewContainer =
-    document.getElementById("preview-container");
-
+document.getElementById("preview-container");
 
 const pdfViewer =
-    document.getElementById("pdf-viewer");
-
-
+document.getElementById("pdf-viewer");
 
 const textContainer =
-    document.getElementById("text-container");
-
+document.getElementById("text-container");
 
 const resumeText =
-    document.getElementById("resume-text");
+document.getElementById("resume-text");
 
 
 
 
-
-// =====================================
-// Upload Handler
-// =====================================
-
+// ===============================
+// Upload Resume
+// ===============================
 
 fileInput.addEventListener(
 "change",
 function(event){
 
 
-
     const file =
-        event.target.files[0];
-
+    event.target.files[0];
 
 
     if(!file){
@@ -58,23 +50,25 @@ function(event){
 
 
 
+
     const extension =
-        file.name
-        .split(".")
-        .pop()
-        .toLowerCase();
+    file.name
+    .split(".")
+    .pop()
+    .toLowerCase();
 
 
 
 
 
-    if(extension !== "pdf" && extension !== "docx"){
-
+    if(
+        extension !== "pdf" &&
+        extension !== "docx"
+    ){
 
         alert(
-            "Only PDF and DOCX files are supported."
+            "Please upload PDF or DOCX"
         );
-
 
         return;
 
@@ -85,56 +79,25 @@ function(event){
 
 
     fileNameDiv.textContent =
-        `Selected: ${file.name}`;
+    `Selected: ${file.name}`;
 
 
 
 
 
     const reader =
-        new FileReader();
+    new FileReader();
 
 
 
 
 
-    reader.onload = async function(){
-
+    reader.onload =
+    async function(){
 
 
         const fileData =
-            reader.result;
-
-
-
-
-
-        // Save resume
-
-        const resume = {
-
-
-            id:"resume",
-
-
-            name:file.name,
-
-
-            type:file.type,
-
-
-            data:fileData
-
-
-        };
-
-
-
-        savePDF(resume);
-
-
-
-
+        reader.result;
 
 
 
@@ -146,94 +109,132 @@ function(event){
 
 
 
-        // =============================
-        // PDF
-        // =============================
-
+        // ===============================
+        // PDF Extraction
+        // ===============================
 
         if(extension === "pdf"){
 
 
 
             const fileURL =
-                URL.createObjectURL(file);
+            URL.createObjectURL(file);
 
 
 
             pdfViewer.src =
-                fileURL;
+            fileURL;
 
 
 
             previewContainer.style.display =
-                "block";
-
-
-
-
-            extractedText =
-                await extractPDFText(
-                    fileData
-                );
-
-
-
-        }
-
-
-
-
-
-
-        // =============================
-        // DOCX
-        // =============================
-
-
-        else {
-
-
-
-            previewContainer.style.display =
-                "none";
-
-
-
-            extractedText =
-                await extractDOCXText(
-                    fileData
-                );
-
-
-        }
-
-
-
-
-
-        // Display text
-
-        resumeText.value =
-            extractedText;
-
-
-
-        textContainer.style.display =
             "block";
 
 
 
+            extractedText =
+            await extractPDFText(fileData);
 
 
-        console.log(
-            "Extracted Text:"
-        );
+        }
 
 
-        console.log(
+
+
+
+
+
+        // ===============================
+        // DOCX Extraction
+        // ===============================
+
+        else{
+
+
+            previewContainer.style.display =
+            "none";
+
+
+
+            extractedText =
+            await extractDOCXText(fileData);
+
+
+        }
+
+
+
+
+
+
+
+
+        // ===============================
+        // Save Resume JSON Object
+        // ===============================
+
+        const resume = {
+
+
+            id:
+            crypto.randomUUID(),
+
+
+
+            fileName:
+            file.name,
+
+
+
+            fileType:
+            extension,
+
+
+
+            extractedText:
             extractedText
+
+
+        };
+
+
+
+
+
+
+        savePDF(resume);
+
+
+
+
+
+
+        console.log(
+            "Saved Resume:"
         );
 
+
+        console.log(resume);
+
+
+
+
+
+
+
+
+        // ===============================
+        // Display ONLY extracted text
+        // ===============================
+
+
+        resumeText.value =
+        extractedText;
+
+
+
+        textContainer.style.display =
+        "block";
 
 
 
@@ -245,34 +246,28 @@ function(event){
 
 
 
-    // PDF reading
+
+    // PDF uses Data URL
 
     if(extension === "pdf"){
-
 
 
         reader.readAsDataURL(file);
 
 
-
     }
 
 
 
+    // DOCX uses ArrayBuffer
 
-    // DOCX reading
-
-    else {
-
+    else{
 
 
         reader.readAsArrayBuffer(file);
 
 
-
     }
-
-
 
 
 
@@ -286,24 +281,21 @@ function(event){
 
 
 
-// =====================================
-// PDF Text Extraction
-// =====================================
-
+// ===============================
+// Extract PDF Text
+// ===============================
 
 async function extractPDFText(dataURL){
 
 
-
     const pdf =
-        await pdfjsLib
-        .getDocument({
+    await pdfjsLib
+    .getDocument({
 
-            url:dataURL
+        url:dataURL
 
-        })
-        .promise;
-
+    })
+    .promise;
 
 
 
@@ -323,34 +315,30 @@ async function extractPDFText(dataURL){
 
 
         const page =
-            await pdf.getPage(
-                pageNumber
-            );
+        await pdf.getPage(pageNumber);
+
 
 
 
 
         const content =
-            await page.getTextContent();
+        await page.getTextContent();
+
 
 
 
 
         const pageText =
-            content.items
-
-            .map(
-                item => item.str
-            )
-
-            .join(" ");
+        content.items
+        .map(item => item.str)
+        .join(" ");
 
 
 
 
 
         fullText +=
-            pageText + "\n";
+        pageText + "\n";
 
 
 
@@ -363,7 +351,6 @@ async function extractPDFText(dataURL){
     return fullText;
 
 
-
 }
 
 
@@ -374,10 +361,9 @@ async function extractPDFText(dataURL){
 
 
 
-// =====================================
-// DOCX Text Extraction
-// =====================================
-
+// ===============================
+// Extract DOCX Text
+// ===============================
 
 async function extractDOCXText(arrayBuffer){
 
@@ -386,14 +372,12 @@ async function extractDOCXText(arrayBuffer){
     if(typeof mammoth === "undefined"){
 
 
-
         console.error(
-            "Mammoth not loaded"
+            "Mammoth is not loaded"
         );
 
 
-
-        return "Unable to read DOCX file.";
+        return "";
 
     }
 
@@ -401,22 +385,18 @@ async function extractDOCXText(arrayBuffer){
 
 
 
-
     const result =
-        await mammoth
-        .extractRawText({
+    await mammoth.extractRawText({
 
-            arrayBuffer:arrayBuffer
+        arrayBuffer:arrayBuffer
 
-        });
-
+    });
 
 
 
 
 
     return result.value;
-
 
 
 }
