@@ -1,24 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>Resume Upload</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+
+        iframe {
+
+            width: 700px;
+            height: 500px;
+            border: 1px solid black;
+
+        }
+
+
+        textarea {
+
+            width: 700px;
+            height: 400px;
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
+
 
 <h2>Upload Resume</h2>
 
-<input type="file" id="pdf-input" accept="application/pdf">
 
-<div id="file-name">No file selected</div>
+<input
+    type="file"
+    id="pdf-input"
+    accept=".pdf,.docx">
 
-<div id="preview-container" style="display:none;">
-    <iframe id="pdf-viewer"></iframe>
+
+
+<div id="file-name">
+
+    No file selected
+
 </div>
 
+
+
+<br>
+
+
+
+<!-- PDF Preview -->
+
+<div id="preview-container" style="display:none;">
+
+    <h3>PDF Preview</h3>
+
+    <iframe id="pdf-viewer"></iframe>
+
+</div>
+
+
+
+
+<br>
+
+
+
+<!-- Extracted Text -->
+
+<div id="text-container" style="display:none;">
+
+    <h3>Extracted Resume Text</h3>
+
+
+    <textarea
+        id="resume-text"
+        readonly>
+    </textarea>
+
+
+</div>
+
+
+
+
+
+<!-- Mammoth DOCX Reader -->
+
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+
+
+<!-- IndexedDB -->
+
 <script src="js/database.js"></script>
+
+
+<!-- Main App -->
+
 <script type="module" src="js/app.js"></script>
 
 
+
 </body>
-</html> 
+
+</html>
