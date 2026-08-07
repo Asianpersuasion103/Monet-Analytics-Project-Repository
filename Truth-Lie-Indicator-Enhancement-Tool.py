@@ -48,12 +48,6 @@ try:
         if not ret:
             print("Could not read frame from camera.")
             break
-        
-        frame_count += 1
-
-        if elapsed >= 5:
-            actual_fps = frame_count / elapsed
-            print(f"Measured FPS: {actual_fps:.2f}")
             
         out.write(frame)
 
