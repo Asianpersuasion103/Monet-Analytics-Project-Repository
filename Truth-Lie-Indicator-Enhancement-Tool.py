@@ -1,8 +1,20 @@
 import cv2
 import time
 
-
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+cam.set(
+    cv2.CAP_PROP_FOURCC,
+    cv2.VideoWriter_fourcc(*'MJPG')
+)
+
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cam.set(cv2.CAP_PROP_FPS, 60)
+
+print("Width:", cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+print("Height:", cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+print("FPS:", cam.get(cv2.CAP_PROP_FPS))
 
 if not cam.isOpened():
     print("Could not open camera.")
@@ -16,7 +28,7 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(
     'output.mp4',
     fourcc,
-    20.0,
+    60.0,
     (frame_width, frame_height)
 )
 
