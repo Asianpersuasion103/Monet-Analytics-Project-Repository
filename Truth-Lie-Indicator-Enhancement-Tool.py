@@ -1,38 +1,50 @@
 import cv2
-import numpy as np
 
-# Create a blank black image
-image = np.zeros((512, 512, 3), dtype=np.uint8)
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-# Draw a green line
-cv2.line(
-    image,
-    (0, 0),
-    (511, 511),
-    (0, 255, 0),
-    5,
+if not cam.isOpened():
+    print("Could not open camera.")
+    exit()
+
+frame_width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+
+out = cv2.VideoWriter(
+    'output.mp4',
+    fourcc,
+    20.0,
+    (frame_width, frame_height)
 )
 
-# Draw a red rectangle
-cv2.rectangle(
-    image,
-    (300, 50),
-    (500, 200),
-    (0, 0, 255),
-    3,
-)
+cv2.namedWindow("Camera")
 
-# Draw a blue circle
-cv2.circle(
-    image,
-    (250, 250),
-    75,
-    (255, 0, 0),
-    -1,
-)
+try:
+    while True:
+        ret, frame = cam.read()
 
-cv2.imshow("My First OpenCV Image", image)
+        if not ret:
+            print("Could not read frame from camera.")
+            break
 
-# Keep the window open until a key is pressed
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+        out.write(frame)
+
+        cv2.imshow("Camera", frame)
+
+        key = cv2.waitKey(1) & 0xFF
+
+        # Q or Escape
+        if key == ord('q') or key == 27:
+            break
+
+        # Detect clicking X on the camera window
+        if cv2.getWindowProperty("Camera", cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+finally:
+    cam.release()
+    out.release()
+    cv2.destroyAllWindows()
+
+print("Camera closed successfully.")
