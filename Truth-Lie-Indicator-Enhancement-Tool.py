@@ -5,9 +5,31 @@ import os
 # The use of MSMF tries to use hardware transformations, which ended up slowing down the camera initialization
 # By having this line, this speeds it up so the camera boots up right after hitting "Run" 
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
-
 import cv2
 import time
+import sounddevice as sd
+import numpy as np 
+from scipy.io.wavfile import write
+
+#----------Audio Settings----------#
+mic_index = 24 # Device Identifier
+
+device_info = sd.query_devices(mic_index) # Provides information for particular device
+
+sample_rate = int(device_info["default_samplerate"]) # Uses device's preferred sample rate
+
+channels = 1 # One channel is available 
+
+audio_frames = [] # Holds chunks of audio while recording 
+
+#----------Audio Callback#----------#
+def audio_callback(indata, frames, time_info, status): # Automatically runs when microphone provides another chunk of audio
+    if status:
+        print("Audio status:", status)
+       
+    # Stores a copy of incoming audio data
+    # indata = numpy array containing current chunk of microphone samples.  
+    audio_frames.append(indata.copy()) 
 
 print("Opening camera...")
 
@@ -23,12 +45,67 @@ cam.set(
 # Initializaing default values
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-cam.set(cv2.CAP_PROP_FPS, 50.0)
+cam.set(cv2.CAP_PROP_FPS, 38.0)
 
 # Print default values set at their values 
 print("Width:", cam.get(cv2.CAP_PROP_FRAME_WIDTH))
 print("Height:", cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 print("FPS:", cam.get(cv2.CAP_PROP_FPS))
+# Import the sounddevice library and give it the shorter name "sd".
+# sounddevice provides access to microphones and speakers through PortAudio.
+import sounddevice as sd
+
+# Here it is used to keep the program running while the microphone captures audio.
+import time
+
+# Select which audio input device sounddevice should use.
+# 24 is the device index assigned to this particular microphone.
+# Device indexes can change between computers or when devices are connected/disconnected.
+mic_index = 24
+
+
+# Query sounddevice for information about the selected microphone.
+# The returned object contains properties such as:
+# device name, input channels, host API, and default sample rate.
+device_info = sd.query_devices(mic_index)
+
+print("Device:", device_info["name"])
+print("Host API index:", device_info["hostapi"])
+print("Default sample rate:", device_info["default_samplerate"])
+
+# Get the microphone's default sample rate and convert it to an integer.
+# The sample rate represents how many audio samples are captured per second.
+# For example, 48000 means approximately 48,000 samples are captured each second.
+# Using the microphone's default rate helps avoid requesting an unsupported rate.
+sample_rate = int(device_info["default_samplerate"])
+
+# This function is automatically called by sounddevice whenever
+# a new block (chunk) of microphone audio becomes available.
+# indata: NumPy array containing the actual microphone audio samples
+# frames: Number of audio frames contained in the current block.
+# time_info: Timing information associated with the audio stream.
+# status: Reports problems such as audio buffer overflow/underflow.
+def audio_callback(indata, frames, time_info, status):
+
+    # Check whether sounddevice/PortAudio detected a problem
+    # while processing the current block of audio.
+    if status:
+        print("Audio status:", status)
+
+    # Calculate the average absolute amplitude of the samples contained in the current audio block.
+    # abs(indata): Converts negative sample values to positive magnitudes.
+    # .mean(): Calculates their average.
+    # This produces a simple measurement of the current audio level.
+    # Louder sounds generally produce larger values.
+    volume = abs(indata).mean()
+
+    print(f"Audio level: {volume:.6f}")
+    
+    print("Microphone opened successfully.")
+    # The audio callback continues receiving microphone data during this period.
+    # Without keeping the program alive, Python would immediately leave the "with" block and close the microphone stream.
+    
+
 
 # Error check for camera operation
 if not cam.isOpened():
@@ -49,7 +126,7 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(
     'output.mp4',
     fourcc,
-    50.0,
+    38.0,
     (frame_width, frame_height)
 )
 
@@ -61,41 +138,83 @@ frame_count = 0
 # Creates a window called "Camera" before presenting images
 cv2.namedWindow("Camera")
 
+print("Camera:", frame_width, "x", frame_height)
+print("Microphone:", device_info["name"])
+print("Audio sample rate:", sample_rate)
+
+print("Recording started")
+
+# Note: THIS FEATURE WILL BE OVERWRITTEN BY WEBPAGE FEATURES.
+print("Press Q or escape to stop") 
 # Main camera loop: Repeatedly acquire frames from the webcam, 
 # write them to the output video, display the live stream, and 
 # check for exit conditions until recording is stopped.
-try:
-    while True:
-        ret, frame = cam.read()
-        elapsed = time.time() - start_time
-        
-        if not ret:
-            print("Could not read frame from camera.")
-            break
+
+# Input stream starts mic capture
+# Audio callback runs automatically while executions continue in video loop
+with sd.InputStream(
+    device=mic_index,
+    samplerate=sample_rate,
+    channels=channels,
+    dtype="float32",
+    callback=audio_callback,
+    blocksize = 1024
+):
+    
+    try:
+        while True:   
             
-        out.write(frame)
+            # Get one video frame from camera         
+            ret, frame = cam.read()
+            if not ret:
+                print("Could not read frame from camera.")
+                break
+            elapsed = time.time() - start_time
+            
+            if not ret:
+                print("Could not read frame from camera.")
+                break
+            
+            # Save the current video frame to mp4 file
+            out.write(frame)
+            
+            # Display camera
+            cv2.imshow("Camera", frame)
+            
+            # Check keyboard input
+            key = cv2.waitKey(1) & 0xFF
 
-        cv2.imshow("Camera", frame)
+            # Q or Escape to quit recording
+            if key == ord('q') or key == 27:
+                break
+            
+            # Click X on camera to close. Note: These two lines for quitting the recording 
+            # will not be in the web page features that will be responsible for shutting down
+            # the recording. 
+            if cv2.getWindowProperty("Camera", cv2.WND_PROP_VISIBLE) < 1: 
+                break
+            
 
-        key = cv2.waitKey(1) & 0xFF
-
-        # Q or Escape
-        if key == ord('q') or key == 27:
-            break
-
-        # Detect clicking X on the camera window
-        if cv2.getWindowProperty("Camera", cv2.WND_PROP_VISIBLE) < 1:
-            break
-
-# End stream, finalize and release cam, finish writing video, and clear windows
-finally:
-    cam.release()
-    out.release()
-    cv2.destroyAllWindows()
-
-print("Camera closed successfully.")
-
-"""
+    # End stream, finalize and release cam, finish writing video, and clear windows
+    finally:
+        cam.release()
+        out.release()
+        cv2.destroyAllWindows()
+        
+    # np.concatenate joins multiple chunks of audio into one recording
+    if audio_frames:
+        audio_data = np.concatenate(audio_frames, axis=0)
+        
+        # Save complete file as a .wav file
+        write("output_audio.wav", sample_rate, audio_data)
+        
+        print("Audio saved")
+    
+    print("Video saved as output.mp4")
+    print("Audio saved as output_audio.wav")
+    print("Recording session finished")
+    
+    """
 #############################################################################
 Process:
 1) Created opencv video that plays, processes frames, and saves video file +

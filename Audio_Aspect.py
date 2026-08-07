@@ -28,15 +28,10 @@ sample_rate = int(device_info["default_samplerate"])
 
 # This function is automatically called by sounddevice whenever
 # a new block (chunk) of microphone audio becomes available.
-#
-# indata: NumPy array containing the actual microphone audio samples.
-#
-# frames: Number of audio frames contained in the current block.
-#
-# time_info: Timing information associated with the audio stream.
-#
-# status:
-#     Reports problems such as audio buffer overflow/underflow.
+    # indata: NumPy array containing the actual microphone audio samples
+    # frames: Number of audio frames contained in the current block.
+    # time_info: Timing information associated with the audio stream.
+    # status: Reports problems such as audio buffer overflow/underflow.
 def audio_callback(indata, frames, time_info, status):
 
     # Check whether sounddevice/PortAudio detected a problem
@@ -44,15 +39,9 @@ def audio_callback(indata, frames, time_info, status):
     if status:
         print("Audio status:", status)
 
-    # Calculate the average absolute amplitude of the samples
-    # contained in the current audio block.
-    #
-    # abs(indata):
-    #     Converts negative sample values to positive magnitudes.
-    #
-    # .mean():
-    #     Calculates their average.
-    #
+    # Calculate the average absolute amplitude of the samples contained in the current audio block.
+    # abs(indata): Converts negative sample values to positive magnitudes.
+    # .mean(): Calculates their average.
     # This produces a simple measurement of the current audio level.
     # Louder sounds generally produce larger values.
     volume = abs(indata).mean()
@@ -61,8 +50,7 @@ def audio_callback(indata, frames, time_info, status):
 
 # Create and open a continuous microphone input stream.
 #
-# The "with" statement automatically handles opening and closing
-# the audio stream safely.
+# The "with" statement automatically handles opening and closing the audio stream safely.
 with sd.InputStream(
 
     # Select the microphone identified earlier.
@@ -77,32 +65,19 @@ with sd.InputStream(
 
     # Store individual audio samples as 32-bit floating-point values.
     #
-    # float32 audio is convenient for numerical/audio analysis
-    # and works naturally with NumPy.
+    # float32 audio is convenient for numerical/audio analysis and works naturally with NumPy.
     dtype="float32",
 
-    # Tell sounddevice which function should receive incoming audio.
-    #
-    # Every time another audio block becomes available,
+    # Tell sounddevice which function should receive incoming audio.Every time another audio block becomes available,
     # sounddevice automatically calls audio_callback().
     callback=audio_callback
 
 ):
-
     print("Microphone opened successfully.")
-    print("Speak into the microphone for 10 seconds...")
-
-    # Keep the main Python program alive for 10 seconds.
-    #
-    # The audio callback continues receiving microphone data
-    # during this period.
-    #
-    # Without keeping the program alive, Python would immediately
-    # leave the "with" block and close the microphone stream.
-    # Source - https://stackoverflow.com/a/37402698
-# Posted by kindall, modified by community. See post 'Timeline' for change history
-# Retrieved 2026-08-07, License - CC BY-SA 3.0
-
+    # The audio callback continues receiving microphone data during this period.
+    # Without keeping the program alive, Python would immediately leave the "with" block and close the microphone stream.
+    
+print("To cease operations, perform Ctrl+C")
 try:
     while True:
         time.sleep(0.5)
