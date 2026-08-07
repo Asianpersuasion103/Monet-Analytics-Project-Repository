@@ -51,23 +51,6 @@ cam.set(cv2.CAP_PROP_FPS, 38.0)
 print("Width:", cam.get(cv2.CAP_PROP_FRAME_WIDTH))
 print("Height:", cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 print("FPS:", cam.get(cv2.CAP_PROP_FPS))
-# Import the sounddevice library and give it the shorter name "sd".
-# sounddevice provides access to microphones and speakers through PortAudio.
-import sounddevice as sd
-
-# Here it is used to keep the program running while the microphone captures audio.
-import time
-
-# Select which audio input device sounddevice should use.
-# 24 is the device index assigned to this particular microphone.
-# Device indexes can change between computers or when devices are connected/disconnected.
-mic_index = 24
-
-
-# Query sounddevice for information about the selected microphone.
-# The returned object contains properties such as:
-# device name, input channels, host API, and default sample rate.
-device_info = sd.query_devices(mic_index)
 
 print("Device:", device_info["name"])
 print("Host API index:", device_info["hostapi"])
@@ -78,33 +61,8 @@ print("Default sample rate:", device_info["default_samplerate"])
 # For example, 48000 means approximately 48,000 samples are captured each second.
 # Using the microphone's default rate helps avoid requesting an unsupported rate.
 sample_rate = int(device_info["default_samplerate"])
-
-# This function is automatically called by sounddevice whenever
-# a new block (chunk) of microphone audio becomes available.
-# indata: NumPy array containing the actual microphone audio samples
-# frames: Number of audio frames contained in the current block.
-# time_info: Timing information associated with the audio stream.
-# status: Reports problems such as audio buffer overflow/underflow.
-def audio_callback(indata, frames, time_info, status):
-
-    # Check whether sounddevice/PortAudio detected a problem
-    # while processing the current block of audio.
-    if status:
-        print("Audio status:", status)
-
-    # Calculate the average absolute amplitude of the samples contained in the current audio block.
-    # abs(indata): Converts negative sample values to positive magnitudes.
-    # .mean(): Calculates their average.
-    # This produces a simple measurement of the current audio level.
-    # Louder sounds generally produce larger values.
-    volume = abs(indata).mean()
-
-    print(f"Audio level: {volume:.6f}")
     
-    print("Microphone opened successfully.")
-    # The audio callback continues receiving microphone data during this period.
-    # Without keeping the program alive, Python would immediately leave the "with" block and close the microphone stream.
-    
+print("Microphone opened successfully.")
 
 
 # Error check for camera operation
