@@ -1,4 +1,6 @@
 import cv2
+import time
+
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
@@ -14,16 +16,24 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(
     'output.mp4',
     fourcc,
-    20.0,
+    4.26,
     (frame_width, frame_height)
 )
+
+# fps = cam.get(cv2.CAP_PROP_FPS)
+# print(f"Camera FPS: {fps}")
+
+frame_count = 0
+start_time = time.time()
+
 
 cv2.namedWindow("Camera")
 
 try:
     while True:
         ret, frame = cam.read()
-
+        elapsed = time.time() - start_time
+        
         if not ret:
             print("Could not read frame from camera.")
             break
