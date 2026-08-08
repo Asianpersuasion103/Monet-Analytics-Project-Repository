@@ -5,9 +5,12 @@ import os
 # The use of MSMF tries to use hardware transformations, which ended up slowing down the camera initialization
 # By having this line, this speeds it up so the camera boots up right after hitting "Run" 
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+import imageio_ffmpeg
+import subprocess
 import cv2
 import time
 import sounddevice as sd
+import shutil
 import numpy as np 
 from scipy.io.wavfile import write
 
@@ -172,7 +175,23 @@ with sd.InputStream(
     print("Audio saved as output_audio.wav")
     print("Recording session finished")
     
-    """
+    ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+    print("Using FFmpeg:", ffmpeg_path)
+    # Automatically combine the recorded video and audio into one MP4 file
+    subprocess.run([
+        ffmpeg_path,
+        "-y",
+        "-i", "output.mp4",
+        "-i", "output_audio.wav",
+        "-c:v", "copy",
+        "-c:a", "aac",
+        "-shortest",
+        "final_output.mp4"
+    ])
+
+print("Final video saved as final_output.mp4")
+
+"""
 #############################################################################
 Process:
 1) Created opencv video that plays, processes frames, and saves video file +
