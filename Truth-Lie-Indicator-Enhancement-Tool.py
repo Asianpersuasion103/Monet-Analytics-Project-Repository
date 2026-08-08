@@ -15,16 +15,17 @@ import numpy as np
 from scipy.io.wavfile import write
 
 #----------Audio Settings----------#
-mic_index = 24 # Device Identifier
 
-device_info = sd.query_devices(mic_index) # Provides information for particular device
+
+device_info = sd.query_devices(kind = "input") # Provides information for particular device
 
 sample_rate = int(device_info["default_samplerate"]) # Uses device's preferred sample rate
 
 channels = 1 # One channel is available 
 
 audio_frames = [] # Holds chunks of audio while recording 
-
+print("Using microphone:", device_info["name"])
+print("Sample rate:", sample_rate)
 #----------Audio Callback#----------#
 def audio_callback(indata, frames, time_info, status): # Automatically runs when microphone provides another chunk of audio
     if status:
@@ -114,12 +115,10 @@ print("Press Q or escape to stop")
 # Input stream starts mic capture
 # Audio callback runs automatically while executions continue in video loop
 with sd.InputStream(
-    device=mic_index,
     samplerate=sample_rate,
     channels=channels,
     dtype="float32",
-    callback=audio_callback,
-    blocksize = 1024
+    callback=audio_callback
 ):
     
     try:
@@ -183,6 +182,7 @@ with sd.InputStream(
         "-y",
         "-i", "output.mp4",
         "-i", "output_audio.wav",
+        "-itsoffset", "-1.5",
         "-c:v", "copy",
         "-c:a", "aac",
         "-shortest",
