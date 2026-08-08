@@ -188,9 +188,9 @@ with sd.InputStream(
         "-shortest",
         "final_output.mp4"
     ])
-
+# message
 print("Final video saved as final_output.mp4")
-
+print("Farewell")
 """
 #############################################################################
 Process:
