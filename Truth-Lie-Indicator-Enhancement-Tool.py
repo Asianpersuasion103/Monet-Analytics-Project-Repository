@@ -49,7 +49,7 @@ cam.set(
 # Initializaing default values
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-cam.set(cv2.CAP_PROP_FPS, 45.0)
+cam.set(cv2.CAP_PROP_FPS, 30.0)
 
 # Print default values set at their values 
 print("Width:", cam.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -88,7 +88,7 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(
     'output.mp4',
     fourcc,
-    45.0,
+    30.0,
     (frame_width, frame_height)
 )
 
@@ -181,7 +181,6 @@ with sd.InputStream(
         ffmpeg_path,
         "-y",
         "-i", "output.mp4",
-        "-itsoffset", "-1.5",
         "-i", "output_audio.wav",
         "-c:v", "copy",
         "-c:a", "aac",
