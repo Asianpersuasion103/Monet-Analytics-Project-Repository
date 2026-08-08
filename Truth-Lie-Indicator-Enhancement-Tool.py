@@ -181,13 +181,13 @@ with sd.InputStream(
         ffmpeg_path,
         "-y",
         "-i", "output.mp4",
-        "-itsoffset", "-0.5",
+        "-itsoffset", "1.0",
         "-i", "output_audio.wav",
         "-c:v", "copy",
         "-c:a", "aac",
         "-shortest",
         "final_output.mp4"
-    ])
+    ], check = True)
 # message
 print("Final video saved as final_output.mp4")
 print("Farewell")
