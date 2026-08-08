@@ -181,7 +181,7 @@ with sd.InputStream(
         ffmpeg_path,
         "-y",
         "-i", "output.mp4",
-        "-itsoffset", "-1.0",
+        "-itsoffset", "-0.5",
         "-i", "output_audio.wav",
         "-c:v", "copy",
         "-c:a", "aac",
