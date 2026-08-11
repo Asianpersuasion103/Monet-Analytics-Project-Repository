@@ -12,7 +12,7 @@ testButton1.addEventListener("click", () => {
 
 testButton2.addEventListener("click", () => {
   console.log("Working!");
-  window.location.href = "interviewee.html";
+  window.location.href = "interviewee Page.html";
 
   /*alert("Get ready for your interview!");*/
 });
