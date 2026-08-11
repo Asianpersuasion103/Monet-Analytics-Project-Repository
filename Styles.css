@@ -8,17 +8,65 @@ body {
   margin: 0;
   min-height: 100vh;
 
-  font-family: Arial, Helvetica, sans-serif;
-
-  display: grid;
-  place-items: center;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  
+  background: linear-gradient(135deg, #e09cff, #f5eaff);
+  color: #000000;
 }
 
 main {
   text-align: center;
+  padding-top: 300px; 
 }
 
-button {
-  padding: 0.75rem 1rem;
-  cursor: pointer;
+h1 {
+  margin: 0 0 25px;
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 1.05;
+    padding: 24px; 
+
 }
+
+.gradient-text {
+    background: linear-gradient(
+        90deg,
+        #b73cff 0%,
+        #936fff 50%,
+        #3b4cff 100%
+    );
+
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+.button-container{ 
+  display: flex; 
+  justify-content: center; 
+  gap: 100px; 
+} 
+
+button { 
+
+  width: 200px; 
+  height: 100px; 
+
+  font-family: Roboto, sans-serif; 
+  font-size: 18px; 
+  font-weight: 400; 
+  letter-spacing: 2px; 
+
+  cursor: pointer;
+  border-radius: 8px 16px; 
+  transition: transform 0.4s ease; 
+}
+
+button:hover{
+  transform: scale(1.1);
+}
+
+

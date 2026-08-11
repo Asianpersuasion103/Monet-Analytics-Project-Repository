@@ -8,11 +8,11 @@ os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import imageio_ffmpeg
 import subprocess
 import cv2
-import time
-import threading
-import sounddevice as sd
+import time 
+import threading 
+import sounddevice as sd 
 import numpy as np 
-from scipy.io.wavfile import write
+from scipy.io.wavfile import write 
 
 # 1) Setting ==========================================================================
 # =====================================================================================
@@ -31,15 +31,15 @@ print("Audio sample rate:", sample_rate)
 
 # 3) Shared Recording State ===========================================================
 # =====================================================================================
-recording_initiation = threading.Event()
+recording_initiation = threading.Event() 
 
 # 4) Audio Callback ===================================================================
 # =====================================================================================
-def audio_callback(indata, frames, time_info, status):
-    if status:
-        print("Audio status: ", status)
-    if recording_initiation.is_set():
-        audio_frames.append(indata.copy())
+def audio_callback(indata, frames, time_info, status): 
+    if status: 
+        print("Audio status: ", status) 
+    if recording_initiation.is_set(): 
+        audio_frames.append(indata.copy()) 
 
 # 5) Camera Setup =====================================================================
 # =====================================================================================
