@@ -43,11 +43,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-                // interviewer.html is in
-                // the same folder as index.html
+                // interviewer.html is inside the htmls folder
 
                 window.location.href =
-                    "./interviewer.html";
+                    "./htmls/interviewer.html";
 
             }
         );
@@ -81,11 +80,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-                // interviewee.html is in
-                // the same folder as index.html
+                // interviewee.html is inside the htmls folder
 
                 window.location.href =
-                    "./interviewee.html";
+                    "./htmls/interviewee.html";
 
             }
         );

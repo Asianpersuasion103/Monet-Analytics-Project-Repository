@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -11,113 +10,36 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Camera and Microphone Recorder</title>
+    <title>Recording</title>
 
 
-    <style>
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
-        body {
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
-            font-family: Arial, sans-serif;
-
-            max-width: 900px;
-
-            margin: 40px auto;
-
-            padding: 20px;
-
-        }
-
-
-        h1 {
-
-            margin-bottom: 30px;
-
-        }
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
 
-        .controls {
-
-            display: grid;
-
-            gap: 15px;
-
-            margin-bottom: 20px;
-
-        }
+    <link
+        rel="stylesheet"
+        href="../Styles.css"
+    >
 
 
-        label {
-
-            font-weight: bold;
-
-        }
-
-
-        select {
-
-            width: 100%;
-
-            padding: 8px;
-
-            font-size: 16px;
-
-        }
-
-
-        video {
-
-            width: 640px;
-
-            max-width: 100%;
-
-            background: black;
-
-            border-radius: 8px;
-
-        }
-
-
-        button {
-
-            padding: 12px 20px;
-
-            margin-right: 10px;
-
-            font-size: 16px;
-
-            cursor: pointer;
-
-        }
-
-
-        button:disabled {
-
-            cursor: not-allowed;
-
-            opacity: 0.5;
-
-        }
-
-
-        #status {
-
-            margin-top: 20px;
-
-            font-weight: bold;
-
-        }
-
-
-        #downloadLink {
-
-            display: none;
-
-            margin-top: 20px;
-
-        }
-
-    </style>
+    <script
+        src="../js/recorder.js"
+        defer
+    ></script>
 
 </head>
 
@@ -125,122 +47,72 @@
 <body>
 
 
-    <h1>
-        Camera & Microphone Recorder
-    </h1>
-
-
-    <!-- =========================================
-         DEVICE SELECTION
-    ========================================== -->
-
-    <div class="controls">
-
-
-        <!-- CAMERA -->
-
-        <div>
-
-            <label for="cameraSelect">
-                Camera
-            </label>
-
-            <select id="cameraSelect">
-
-                <option value="">
-                    Select camera
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <!-- MICROPHONE -->
-
-        <div>
-
-            <label for="microphoneSelect">
-                Microphone
-            </label>
-
-            <select id="microphoneSelect">
-
-                <option value="">
-                    Select microphone
-                </option>
-
-            </select>
-
-        </div>
-
-
-    </div>
-
-
-    <!-- =========================================
-         CAMERA PREVIEW
-    ========================================== -->
-
-    <video
-        id="preview"
-        autoplay
-        playsinline
-        muted
-    ></video>
-
-
-    <br><br>
-
-
-    <!-- =========================================
-         RECORDING CONTROLS
-    ========================================== -->
+    <!-- BACK -->
 
     <button
-        id="startButton"
-        disabled
+        class="back-button"
+        onclick="history.back()"
+        type="button"
     >
-        Start Recording
+
+        <span>←</span>
+
+        <span>Back</span>
+
     </button>
 
 
-    <button
-        id="stopButton"
-        disabled
-    >
-        Stop Recording
-    </button>
+    <main class="container">
+
+        <h1>
+            Recording
+        </h1>
 
 
-    <!-- =========================================
-         STATUS
-    ========================================== -->
-
-    <p id="status">
-        Requesting camera and microphone permission...
-    </p>
-
-
-    <!-- =========================================
-         DOWNLOAD
-    ========================================== -->
-
-    <a
-        id="downloadLink"
-        download="resume-recording.webm"
-    >
-        Download Recording
-    </a>
+        <video
+            id="videoPreview"
+            autoplay
+            muted
+            playsinline
+        ></video>
 
 
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
+        <div>
 
-    <script
-        src="../js/recorder.js">
-    </script>
+            <button
+                id="startMeetingButton"
+                type="button"
+            >
+                Start Meeting
+            </button>
+
+
+            <button
+                id="startRecordingButton"
+                type="button"
+            >
+                Start Recording
+            </button>
+
+
+            <button
+                id="stopRecordingButton"
+                type="button"
+            >
+                Stop Recording
+            </button>
+
+
+            <button
+                id="endMeetingButton"
+                type="button"
+            >
+                Stop Meeting
+            </button>
+
+        </div>
+
+    </main>
 
 
 </body>

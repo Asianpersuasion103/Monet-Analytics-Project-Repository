@@ -137,8 +137,7 @@ if (backButton) {
 
             // Return to role-selection page
 
-            window.location.href =
-                "index.html";
+            window.location.href = "../index.html";
 
         }
     );
