@@ -10,9 +10,8 @@ testButton1.addEventListener("click", () => {
   /*alert("Let's prepare your meeting!");*/
 });
 
-testButton2.addEventListener("click", () => {
-  console.log("Working!");
-  window.location.href = "interviewee Page.html";
+document.getElementById("intervieweeButton").addEventListener("click", function () {
+    window.location.href = "Interviewee Page.html";
+});
 
   /*alert("Get ready for your interview!");*/
-});
