@@ -12,14 +12,18 @@
 
 <body>
   <main>
-    <form id="inviteForm">
-      <label for="Invite Code"> Invite Code </label>
-      <input type="text" id="inviteCode" name="inviteCode" placeholder="Enter invite code" autocomplete="off" required>
-      <button type="submit">
-        Join
+   <h1> Enter your invite code </h2>
+      <input
+        type = "text",
+        id = "inviteCode"
+        placeholder = "Enter invite code"
+      >
+      <button type="button" id="verifyCodeButton">
+        Continue
       </button>
 
-      <p id="formMessage"></p>
+      <div id="applicationSection" style="display: none">
+        
     </form>
   </main>
 </body>
