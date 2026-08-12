@@ -5,29 +5,185 @@
 
     <meta charset="UTF-8">
 
-    <title>Resume Upload</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Select Your Role</title>
+
+    <!-- Google Font -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Connect.js is inside the js folder -->
+
+    <script
+        src="./js/Connect.js"
+        defer
+    ></script>
 
     <style>
 
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
         }
 
-
-        iframe {
-
-            width: 700px;
-            height: 500px;
-            border: 1px solid black;
-
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f5f7fa;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 30px;
         }
 
+        .container {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
 
-        textarea {
+        .page-title {
+            margin: 0 0 12px;
+            font-size: 44px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #111827;
+        }
 
-            width: 700px;
-            height: 400px;
+        .gradient-text {
+            background: linear-gradient(
+                90deg,
+                #007bff,
+                #0056b3
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            margin: 0 0 45px;
+            font-size: 17px;
+            color: #6b7280;
+        }
+
+        .role-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .role-card {
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 15px;
+            padding: 45px 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s,
+                border-color 0.2s;
+        }
+
+        .role-card:hover {
+            transform: translateY(-4px);
+            border-color: #007bff;
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.12);
+        }
+
+        .role-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .role-title {
+            margin: 0 0 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .role-description {
+            margin: 0 0 25px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #6b7280;
+        }
+
+        .role-button {
+            width: 100%;
+            padding: 13px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: "Inter", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+                background-color 0.2s,
+                transform 0.2s;
+        }
+
+        .role-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .role-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            .role-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .role-card {
+                padding: 35px 25px;
+            }
 
         }
 
@@ -35,86 +191,78 @@
 
 </head>
 
-
 <body>
 
+    <main class="container">
 
-<h2>Upload Resume</h2>
+        <h1 class="page-title">
+            Please select your
+            <span class="gradient-text">
+                Role
+            </span>
+        </h1>
 
-<p class="upload-note">
-    It will only accept .docx and PDF files
-</p>
+        <p class="subtitle">
+            Choose how you would like to continue.
+        </p>
 
+        <div class="role-container">
 
-<input
-    type="file"
-    id="pdf-input"
-    accept=".pdf,.docx">
+            <!-- INTERVIEWER -->
 
+            <div class="role-card">
 
+                <div class="role-icon">
+                    👔
+                </div>
 
-<div id="file-name">
+                <h2 class="role-title">
+                    Interviewer
+                </h2>
 
-    No file selected
+                <p class="role-description">
+                    Setup the meeting, get the resume, get the logistics.
+                </p>
 
-</div>
+                <button
+                    id="interviewerButton"
+                    class="role-button"
+                    type="button"
+                >
+                    Continue as Interviewer
+                </button>
 
+            </div>
 
+            <!-- INTERVIEWEE -->
 
-<br>
+            <div class="role-card">
 
+                <div class="role-icon">
+                    👤
+                </div>
 
+                <h2 class="role-title">
+                    Interviewee
+                </h2>
 
-<!-- PDF Preview -->
+                <p class="role-description">
+                    Upload resume, get interviewed.
+                </p>
 
-<div id="preview-container" style="display:none;">
+                <button
+                    id="intervieweeButton"
+                    class="role-button"
+                    type="button"
+                >
+                    Continue as Interviewee
+                </button>
 
-    <h3>PDF Preview</h3>
+            </div>
 
-    <iframe id="pdf-viewer"></iframe>
+        </div>
 
-</div>
-
-
-
-
-<br>
-
-
-
-<!-- Extracted Text -->
-
-<div id="text-container" style="display:none;">
-
-    <h3>Extracted Resume Text</h3>
-
-
-    <textarea
-        id="resume-text"
-        readonly>
-    </textarea>
-
-
-</div>
-
-
-
-
-
-<!-- Mammoth DOCX Reader -->
-
-<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
-
-<!-- IndexedDB -->
-
-<script src="js/database.js"></script>
-
-
-<!-- Main App -->
-
-<script type="module" src="js/app.js"></script>
-
-
+    </main>
 
 </body>
 

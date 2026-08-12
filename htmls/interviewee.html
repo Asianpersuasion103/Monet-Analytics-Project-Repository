@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Applicant's Webpage</title>
+
+
+    <!-- ===============================
+         Google Font
+    =============================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ===============================
+         JavaScript
+
+         interviewee.html
+         is inside /htmls/
+
+         interviewee.js
+         is inside /js/
+
+         Therefore:
+         ../js/interviewee.js
+    =============================== -->
+
+    <script
+        src="../js/interviewee.js"
+        defer
+    ></script>
+
+
+    <style>
+
+        /* ===============================
+           Global
+        =============================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+
+            margin: 0;
+            padding: 0;
+
+            min-height: 100%;
+
+        }
+
+
+        body {
+
+            font-family: "Inter", sans-serif;
+
+            background-color: #f5f7fa;
+
+            color: #1f2937;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 100vh;
+
+            padding: 30px;
+
+        }
+
+
+        /* ===============================
+           Back Button
+        =============================== */
+
+        .back-button {
+
+            position: fixed;
+
+            top: 25px;
+            left: 25px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 16px;
+
+            background-color: white;
+
+            color: #374151;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-family: "Inter", sans-serif;
+
+            font-size: 15px;
+
+            font-weight: 500;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.2s,
+                border-color 0.2s,
+                color 0.2s;
+
+            z-index: 1000;
+
+        }
+
+
+        .back-button:hover {
+
+            background-color: #f3f4f6;
+
+            border-color: #9ca3af;
+
+            color: #111827;
+
+        }
+
+
+        /* ===============================
+           Main Container
+        =============================== */
+
+        .container {
+
+            width: 100%;
+
+            max-width: 600px;
+
+            text-align: center;
+
+        }
+
+
+        /* ===============================
+           Page Title
+        =============================== */
+
+        .page-title {
+
+            margin: 0 0 12px;
+
+            font-size: 42px;
+
+            font-weight: 700;
+
+            letter-spacing: -1px;
+
+            color: #111827;
+
+        }
+
+
+        /* ===============================
+           Gradient Text
+        =============================== */
+
+        .gradient-text {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #007bff,
+                    #0056b3
+                );
+
+            -webkit-background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+            background-clip: text;
+
+        }
+
+
+        /* ===============================
+           Subtitle
+        =============================== */
+
+        .subtitle {
+
+            margin: 0 0 35px;
+
+            font-size: 17px;
+
+            font-weight: 400;
+
+            color: #6b7280;
+
+        }
+
+
+        /* ===============================
+           Invite Card
+        =============================== */
+
+        .invite-card {
+
+            background-color: white;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 15px;
+
+            padding: 40px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0, 0, 0, 0.05);
+
+        }
+
+
+        /* ===============================
+           Label
+        =============================== */
+
+        label {
+
+            display: block;
+
+            text-align: left;
+
+            margin-bottom: 8px;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            color: #374151;
+
+        }
+
+
+        /* ===============================
+           Invite Code Input
+        =============================== */
+
+        #inviteCode {
+
+            width: 100%;
+
+            padding: 13px 15px;
+
+            margin-bottom: 15px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-family: "Inter", sans-serif;
+
+            font-size: 16px;
+
+            outline: none;
+
+        }
+
+
+        #inviteCode:focus {
+
+            border-color: #007bff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(0, 123, 255, 0.1);
+
+        }
+
+
+        /* ===============================
+           Continue Button
+        =============================== */
+
+        #verifyCodeButton {
+
+            width: 100%;
+
+            padding: 13px 20px;
+
+            background-color: #007bff;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-family: "Inter", sans-serif;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.2s,
+                transform 0.2s;
+
+        }
+
+
+        #verifyCodeButton:hover {
+
+            background-color: #0056b3;
+
+            transform: translateY(-1px);
+
+        }
+
+
+        #verifyCodeButton:active {
+
+            transform: translateY(0);
+
+        }
+
+
+        /* ===============================
+           Status Message
+        =============================== */
+
+        #status {
+
+            min-height: 22px;
+
+            margin-top: 20px;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+        }
+
+
+        .error {
+
+            color: #dc2626;
+
+        }
+
+
+        .success {
+
+            color: #16a34a;
+
+        }
+
+
+        /* ===============================
+           Mobile
+        =============================== */
+
+        @media (max-width: 700px) {
+
+            body {
+
+                padding: 20px;
+
+            }
+
+
+            .page-title {
+
+                font-size: 34px;
+
+            }
+
+
+            .subtitle {
+
+                font-size: 16px;
+
+            }
+
+
+            .invite-card {
+
+                padding: 30px 20px;
+
+            }
+
+
+            .back-button {
+
+                top: 15px;
+
+                left: 15px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ===============================
+         Back Button
+    =============================== -->
+
+    <button
+        id="backButton"
+        type="button"
+        class="back-button"
+    >
+
+        <span>←</span>
+
+        <span>Back</span>
+
+    </button>
+
+
+    <!-- ===============================
+         Main Container
+    =============================== -->
+
+    <main class="container">
+
+
+        <!-- ===============================
+             Title
+        =============================== -->
+
+        <h1 class="page-title">
+
+            Enter Your
+
+            <span class="gradient-text">
+                Invite Code
+            </span>
+
+        </h1>
+
+
+        <!-- ===============================
+             Subtitle
+        =============================== -->
+
+        <p class="subtitle">
+
+            Enter the invite code provided
+            by your interviewer.
+
+        </p>
+
+
+        <!-- ===============================
+             Invite Card
+        =============================== -->
+
+        <div class="invite-card">
+
+
+            <label for="inviteCode">
+
+                Invite Code
+
+            </label>
+
+
+            <input
+                type="text"
+                id="inviteCode"
+                placeholder="Enter invite code"
+                autocomplete="off"
+            >
+
+
+            <button
+                type="button"
+                id="verifyCodeButton"
+            >
+
+                Continue
+
+            </button>
+
+
+            <p id="status"></p>
+
+
+        </div>
+
+
+    </main>
+
+
+</body>
+
+</html>
