@@ -45,8 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // interviewer.html is inside the htmls folder
 
-                window.location.href =
-                    "./htmls/interviewer.html";
+                window.location.href = "../htmls/interviewer.html";
 
             }
         );
@@ -82,8 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // interviewee.html is inside the htmls folder
 
-                window.location.href =
-                    "./htmls/interviewee.html";
+               window.location.href = "../htmls/interviewee.html";
 
             }
         );
