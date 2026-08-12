@@ -6,14 +6,12 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Connect.js loaded successfully.");
     console.log("=================================");
 
-
     // ==========================================
     // FIND INTERVIEWER BUTTON
     // ==========================================
 
     const interviewerButton =
         document.getElementById("interviewerButton");
-
 
     // ==========================================
     // FIND INTERVIEWEE BUTTON
@@ -22,30 +20,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const intervieweeButton =
         document.getElementById("intervieweeButton");
 
-
     // ==========================================
     // CHECK INTERVIEWER BUTTON
     // ==========================================
 
     if (interviewerButton) {
 
-        console.log(
-            "Interviewer button found."
-        );
-
+        console.log("Interviewer button found.");
 
         interviewerButton.addEventListener(
             "click",
             function () {
 
-                console.log(
-                    "Interviewer button clicked."
-                );
+                console.log("Interviewer button clicked.");
 
-
-                // interviewer.html is inside the htmls folder
-
-                window.location.href = "../htmls/interviewer.html";
+                window.location.href =
+                    "./htmls/interviewer.html";
 
             }
         );
@@ -58,30 +48,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
     // ==========================================
     // CHECK INTERVIEWEE BUTTON
     // ==========================================
 
     if (intervieweeButton) {
 
-        console.log(
-            "Interviewee button found."
-        );
-
+        console.log("Interviewee button found.");
 
         intervieweeButton.addEventListener(
             "click",
             function () {
 
-                console.log(
-                    "Interviewee button clicked."
-                );
+                console.log("Interviewee button clicked.");
 
-
-                // interviewee.html is inside the htmls folder
-
-               window.location.href = "../htmls/interviewee.html";
+                window.location.href =
+                    "./htmls/interviewee.html";
 
             }
         );
