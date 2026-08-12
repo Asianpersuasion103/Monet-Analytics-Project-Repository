@@ -15,3 +15,7 @@ document.getElementById("intervieweeButton").addEventListener("click", function 
 });
 
   /*alert("Get ready for your interview!");*/
+
+  document.getElementById("interviewerButton").addEventListener("click", function () {
+    window.location.href = "Interviewer Page.html";
+});
