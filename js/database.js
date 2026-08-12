@@ -1,47 +1,196 @@
-let db;
+"use strict";
 
-const request = indexedDB.open("ResumeDB", 1);
 
-request.onupgradeneeded = (event) => {
+// ===============================
+// Database Configuration
+// ===============================
+
+const DB_NAME = "ResumeDB";
+
+const DB_VERSION = 1;
+
+const STORE_NAME = "pdfs";
+
+let db = null;
+
+
+// ===============================
+// Open Database
+// ===============================
+
+const request = indexedDB.open(
+    DB_NAME,
+    DB_VERSION
+);
+
+
+// ===============================
+// Create Database
+// ===============================
+
+request.onupgradeneeded = function (event) {
+
     db = event.target.result;
 
-    if (!db.objectStoreNames.contains("pdfs")) {
-        db.createObjectStore("pdfs", { keyPath: "id" });
+
+    if (
+        !db.objectStoreNames.contains(
+            STORE_NAME
+        )
+    ) {
+
+        db.createObjectStore(
+            STORE_NAME,
+            {
+                keyPath: "id"
+            }
+        );
+
     }
+
 };
 
-request.onsuccess = (event) => {
+
+// ===============================
+// Database Ready
+// ===============================
+
+request.onsuccess = function (event) {
+
     db = event.target.result;
-    console.log("Database ready.");
+
+    console.log(
+        "Resume database ready."
+    );
+
 };
 
-request.onerror = (event) => {
-    console.error(event.target.error);
+
+// ===============================
+// Database Error
+// ===============================
+
+request.onerror = function (event) {
+
+    console.error(
+        "IndexedDB error:",
+        event.target.error
+    );
+
 };
+
+
+// ===============================
+// Save Resume
+// ===============================
 
 function savePDF(record) {
 
-    const tx = db.transaction(["pdfs"], "readwrite");
+    if (!db) {
 
-    tx.objectStore("pdfs").put(record);
+        console.error(
+            "Database is not ready."
+        );
 
-    tx.oncomplete = () => {
-        console.log("Saved.");
-    };
+        return;
+
+    }
+
+
+    const transaction =
+        db.transaction(
+            [STORE_NAME],
+            "readwrite"
+        );
+
+
+    const store =
+        transaction.objectStore(
+            STORE_NAME
+        );
+
+
+    store.put(record);
+
+
+    transaction.oncomplete =
+        function () {
+
+            console.log(
+                "Resume saved."
+            );
+
+        };
+
+
+    transaction.onerror =
+        function (event) {
+
+            console.error(
+                "Could not save resume:",
+                event.target.error
+            );
+
+        };
+
 }
 
-function getPDF(id, callback) {
 
-    const tx = db.transaction(["pdfs"], "readonly");
+// ===============================
+// Get Resume
+// ===============================
 
-    const request = tx.objectStore("pdfs").get(id);
+function getPDF(
+    id,
+    callback
+) {
 
-    request.onsuccess = () => {
-        callback(request.result);
-    };
+    if (!db) {
 
-    request.onerror = () => {
-        console.error("Could not retrieve PDF.");
-    };
-} 
+        console.error(
+            "Database is not ready."
+        );
 
+        return;
+
+    }
+
+
+    const transaction =
+        db.transaction(
+            [STORE_NAME],
+            "readonly"
+        );
+
+
+    const store =
+        transaction.objectStore(
+            STORE_NAME
+        );
+
+
+    const request =
+        store.get(id);
+
+
+    request.onsuccess =
+        function () {
+
+            callback(
+                request.result
+            );
+
+        };
+
+
+    request.onerror =
+        function (event) {
+
+            console.error(
+                "Could not retrieve resume:",
+                event.target.error
+            );
+
+        };
+
+}

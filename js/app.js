@@ -1,5 +1,10 @@
-import * as pdfjsLib from "../pdfjs/pdf.mjs";
+import * as pdfjsLib
+    from "../pdfjs/pdf.mjs";
 
+
+// ===============================
+// PDF.js Worker
+// ===============================
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     "../pdfjs/pdf.worker.mjs";
@@ -10,35 +15,44 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 // ===============================
 
 const fileInput =
-    document.getElementById("pdf-input");
-
+    document.getElementById(
+        "pdf-input"
+    );
 
 const fileNameDiv =
-    document.getElementById("file-name");
-
+    document.getElementById(
+        "file-name"
+    );
 
 const previewContainer =
-    document.getElementById("preview-container");
-
+    document.getElementById(
+        "preview-container"
+    );
 
 const pdfViewer =
-    document.getElementById("pdf-viewer");
-
+    document.getElementById(
+        "pdf-viewer"
+    );
 
 const textContainer =
-    document.getElementById("text-container");
-
+    document.getElementById(
+        "text-container"
+    );
 
 const resumeText =
-    document.getElementById("resume-text");
-
+    document.getElementById(
+        "resume-text"
+    );
 
 const uploadBox =
-    document.getElementById("upload-box");
-
+    document.getElementById(
+        "upload-box"
+    );
 
 const nextButton =
-    document.getElementById("next-button");
+    document.getElementById(
+        "next-button"
+    );
 
 
 // ===============================
@@ -53,7 +67,7 @@ async function processResume(file) {
 
 
     // ===============================
-    // Get File Extension
+    // File Extension
     // ===============================
 
     const extension =
@@ -73,202 +87,163 @@ async function processResume(file) {
     ) {
 
         alert(
-            "Please upload PDF or DOCX"
+            "Please upload a PDF or DOCX file."
         );
 
         return;
+
     }
 
 
     // ===============================
-    // Display File Name
-    // ===============================
-
-    fileNameDiv.textContent =
-        `Selected: ${file.name}`;
-
-
-    // ===============================
-    // Hide Next Button
+    // Reset Page
     // ===============================
 
     nextButton.style.display =
         "none";
 
-
-    // ===============================
-    // Create File Reader
-    // ===============================
-
-    const reader =
-        new FileReader();
+    textContainer.style.display =
+        "none";
 
 
-    // ===============================
-    // Process File
-    // ===============================
-
-    reader.onload =
-        async function () {
-
-            try {
-
-                const fileData =
-                    reader.result;
+    fileNameDiv.textContent =
+        `Selected: ${file.name}`;
 
 
-                let extractedText = "";
+    try {
+
+        let extractedText = "";
 
 
-                // ===============================
-                // PDF Extraction
-                // ===============================
+        // ===============================
+        // PDF
+        // ===============================
 
-                if (extension === "pdf") {
+        if (
+            extension === "pdf"
+        ) {
 
-                    const fileURL =
-                        URL.createObjectURL(file);
-
-
-                    pdfViewer.src =
-                        fileURL;
-
-
-                    previewContainer.style.display =
-                        "block";
-
-
-                    extractedText =
-                        await extractPDFText(
-                            fileData
-                        );
-
-                }
-
-
-                // ===============================
-                // DOCX Extraction
-                // ===============================
-
-                else {
-
-                    previewContainer.style.display =
-                        "none";
-
-
-                    extractedText =
-                        await extractDOCXText(
-                            fileData
-                        );
-
-                }
-
-
-                // ===============================
-                // Make Sure Text Was Extracted
-                // ===============================
-
-                if (
-                    !extractedText ||
-                    extractedText.trim() === ""
-                ) {
-
-                    alert(
-                        "We could not extract any text from this resume."
-                    );
-
-                    return;
-                }
-
-
-                // ===============================
-                // Save Resume
-                // ===============================
-
-                const resume = {
-
-                    id:
-                        crypto.randomUUID(),
-
-                    fileName:
-                        file.name,
-
-                    fileType:
-                        extension,
-
-                    extractedText:
-                        extractedText
-
-                };
-
-
-                savePDF(resume);
-
-
-                console.log(
-                    "Saved Resume:"
+            const fileURL =
+                URL.createObjectURL(
+                    file
                 );
 
 
-                console.log(resume);
+            pdfViewer.src =
+                fileURL;
 
 
-                // ===============================
-                // Display Extracted Text
-                // ===============================
-
-                resumeText.value =
-                    extractedText;
+            previewContainer.style.display =
+                "block";
 
 
-                textContainer.style.display =
-                    "block";
-
-
-                // ===============================
-                // Show Next Button
-                // ===============================
-
-                nextButton.style.display =
-                    "block";
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error processing resume:",
-                    error
+            extractedText =
+                await extractPDFText(
+                    file
                 );
 
+        }
 
-                alert(
-                    "There was a problem processing the resume."
+
+        // ===============================
+        // DOCX
+        // ===============================
+
+        else {
+
+            previewContainer.style.display =
+                "none";
+
+
+            extractedText =
+                await extractDOCXText(
+                    file
                 );
 
-            }
+        }
+
+
+        // ===============================
+        // Check Extraction
+        // ===============================
+
+        if (
+            !extractedText ||
+            extractedText.trim() === ""
+        ) {
+
+            alert(
+                "We could not extract any text from this resume."
+            );
+
+            return;
+
+        }
+
+
+        // ===============================
+        // Display Text
+        // ===============================
+
+        resumeText.value =
+            extractedText;
+
+
+        textContainer.style.display =
+            "block";
+
+
+        // ===============================
+        // Save Resume
+        // ===============================
+
+        const resume = {
+
+            id:
+                crypto.randomUUID(),
+
+            fileName:
+                file.name,
+
+            fileType:
+                extension,
+
+            extractedText:
+                extractedText
 
         };
 
 
-    // ===============================
-    // Read PDF
-    // ===============================
+        savePDF(resume);
 
-    if (extension === "pdf") {
 
-        reader.readAsDataURL(file);
+        console.log(
+            "Resume saved:",
+            resume
+        );
+
+
+        // ===============================
+        // Enable Next
+        // ===============================
+
+        nextButton.style.display =
+            "block";
+
 
     }
 
+    catch (error) {
 
-    // ===============================
-    // Read DOCX
-    // ===============================
+        console.error(
+            "Resume processing error:",
+            error
+        );
 
-    else {
 
-        reader.readAsArrayBuffer(file);
+        alert(
+            "There was a problem processing the resume."
+        );
 
     }
 
@@ -276,7 +251,7 @@ async function processResume(file) {
 
 
 // ===============================
-// Normal File Selection
+// File Selection
 // ===============================
 
 fileInput.addEventListener(
@@ -302,7 +277,6 @@ uploadBox.addEventListener(
     function (event) {
 
         event.preventDefault();
-
 
         uploadBox.classList.add(
             "drag-over"
@@ -353,25 +327,18 @@ uploadBox.addEventListener(
         }
 
 
-        // ===============================
-        // Put Dropped File Into
-        // Normal File Input
-        // ===============================
-
         const dataTransfer =
             new DataTransfer();
 
 
-        dataTransfer.items.add(file);
+        dataTransfer.items.add(
+            file
+        );
 
 
         fileInput.files =
             dataTransfer.files;
 
-
-        // ===============================
-        // Process Dropped File
-        // ===============================
 
         processResume(file);
 
@@ -383,12 +350,16 @@ uploadBox.addEventListener(
 // Extract PDF Text
 // ===============================
 
-async function extractPDFText(dataURL) {
+async function extractPDFText(file) {
+
+    const arrayBuffer =
+        await file.arrayBuffer();
+
 
     const pdf =
         await pdfjsLib
             .getDocument({
-                url: dataURL
+                data: arrayBuffer
             })
             .promise;
 
@@ -397,7 +368,7 @@ async function extractPDFText(dataURL) {
 
 
     // ===============================
-    // Loop Through Pages
+    // Read Every Page
     // ===============================
 
     for (
@@ -419,7 +390,8 @@ async function extractPDFText(dataURL) {
         const pageText =
             content.items
                 .map(
-                    item => item.str
+                    item =>
+                        item.str
                 )
                 .join(" ");
 
@@ -430,7 +402,8 @@ async function extractPDFText(dataURL) {
     }
 
 
-    return fullText;
+    return fullText.trim();
+
 }
 
 
@@ -438,13 +411,7 @@ async function extractPDFText(dataURL) {
 // Extract DOCX Text
 // ===============================
 
-async function extractDOCXText(
-    arrayBuffer
-) {
-
-    // ===============================
-    // Check Mammoth
-    // ===============================
+async function extractDOCXText(file) {
 
     if (
         typeof mammoth ===
@@ -452,7 +419,7 @@ async function extractDOCXText(
     ) {
 
         console.error(
-            "Mammoth is not loaded"
+            "Mammoth is not loaded."
         );
 
         return "";
@@ -460,18 +427,17 @@ async function extractDOCXText(
     }
 
 
-    // ===============================
-    // Extract Text
-    // ===============================
+    const arrayBuffer =
+        await file.arrayBuffer();
+
 
     const result =
         await mammoth.extractRawText({
-
             arrayBuffer:
                 arrayBuffer
-
         });
 
 
-    return result.value;
+    return result.value.trim();
+
 }

@@ -1,8 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Resume Upload</title>
 
@@ -11,7 +18,10 @@
          Google Font
     =============================== -->
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
         rel="preconnect"
@@ -27,14 +37,9 @@
 
     <style>
 
-        /* ===============================
-           Global
-        =============================== */
-
         * {
             box-sizing: border-box;
         }
-
 
         body {
             font-family: "Inter", sans-serif;
@@ -47,18 +52,19 @@
         }
 
 
-        /* ===============================
-           Back Button
-        =============================== */
+        /* BACK BUTTON */
 
         .back-button {
+
             position: fixed;
 
             top: 25px;
             left: 25px;
 
             display: flex;
+
             align-items: center;
+
             gap: 8px;
 
             padding: 10px 16px;
@@ -67,7 +73,8 @@
 
             color: #374151;
 
-            border: 1px solid #d1d5db;
+            border:
+                1px solid #d1d5db;
 
             border-radius: 8px;
 
@@ -79,16 +86,12 @@
 
             cursor: pointer;
 
-            transition:
-                background-color 0.2s,
-                border-color 0.2s,
-                color 0.2s;
-
             z-index: 1000;
         }
 
 
         .back-button:hover {
+
             background-color: #f3f4f6;
 
             border-color: #9ca3af;
@@ -97,11 +100,10 @@
         }
 
 
-        /* ===============================
-           Next Button
-        =============================== */
+        /* NEXT BUTTON */
 
         .next-button {
+
             display: none;
 
             position: fixed;
@@ -127,26 +129,20 @@
 
             cursor: pointer;
 
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
-
             z-index: 1000;
         }
 
 
         .next-button:hover {
-            background-color: #0056b3;
 
-            transform: translateX(2px);
+            background-color: #0056b3;
         }
 
 
-        /* ===============================
-           Main Container
-        =============================== */
+        /* MAIN CONTAINER */
 
         .container {
+
             width: 1200px;
 
             max-width: 90%;
@@ -155,11 +151,10 @@
         }
 
 
-        /* ===============================
-           Page Title
-        =============================== */
+        /* TITLE */
 
         .page-title {
+
             text-align: center;
 
             font-size: 44px;
@@ -174,16 +169,11 @@
         }
 
 
-        /* ===============================
-           Subtitle
-        =============================== */
-
         .upload-note {
+
             text-align: center;
 
             font-size: 17px;
-
-            font-weight: 400;
 
             color: #6b7280;
 
@@ -191,14 +181,14 @@
         }
 
 
-        /* ===============================
-           Two Column Layout
-        =============================== */
+        /* CONTENT */
 
         .content {
+
             display: grid;
 
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns:
+                1fr 1fr;
 
             column-gap: 40px;
 
@@ -208,11 +198,8 @@
         }
 
 
-        /* ===============================
-           Vertical Divider
-        =============================== */
-
         .content::after {
+
             content: "";
 
             position: absolute;
@@ -227,37 +214,31 @@
 
             background-color: #d1d5db;
 
-            transform: translateX(-50%);
+            transform:
+                translateX(-50%);
         }
 
 
-        /* ===============================
-           Left Column
-        =============================== */
-
         .left-column {
+
             text-align: center;
 
             padding-right: 20px;
         }
 
 
-        /* ===============================
-           Right Column
-        =============================== */
-
         .right-column {
+
             text-align: left;
 
             padding-left: 20px;
         }
 
 
-        /* ===============================
-           Upload Box
-        =============================== */
+        /* UPLOAD BOX */
 
         .upload-box {
+
             width: 100%;
 
             min-height: 260px;
@@ -266,46 +247,39 @@
 
             background-color: white;
 
-            border: 3px dashed #007bff;
+            border:
+                3px dashed #007bff;
 
             border-radius: 15px;
 
             cursor: pointer;
-
-            transition:
-                background-color 0.2s,
-                border-color 0.2s;
         }
 
 
         .upload-box:hover {
+
             background-color: #f8fbff;
         }
 
 
         .upload-box.drag-over {
+
             background-color: #e8f3ff;
 
             border-color: #0056b3;
         }
 
 
-        /* ===============================
-           Upload Icon
-        =============================== */
-
         .upload-icon {
+
             font-size: 50px;
 
             margin-bottom: 15px;
         }
 
 
-        /* ===============================
-           Upload Title
-        =============================== */
-
         .upload-title {
+
             font-size: 23px;
 
             font-weight: 600;
@@ -316,11 +290,8 @@
         }
 
 
-        /* ===============================
-           Upload Subtitle
-        =============================== */
-
         .upload-subtitle {
+
             font-size: 15px;
 
             color: #6b7280;
@@ -329,20 +300,14 @@
         }
 
 
-        /* ===============================
-           File Input
-        =============================== */
-
         #pdf-input {
+
             display: none;
         }
 
 
-        /* ===============================
-           Choose Resume Button
-        =============================== */
-
         .upload-button {
+
             display: inline-block;
 
             padding: 12px 24px;
@@ -360,25 +325,17 @@
             font-weight: 600;
 
             cursor: pointer;
-
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
         }
 
 
         .upload-button:hover {
-            background-color: #0056b3;
 
-            transform: translateY(-1px);
+            background-color: #0056b3;
         }
 
 
-        /* ===============================
-           Selected File
-        =============================== */
-
         #file-name {
+
             font-size: 15px;
 
             font-weight: 500;
@@ -391,11 +348,8 @@
         }
 
 
-        /* ===============================
-           Section Headings
-        =============================== */
-
         h3 {
+
             font-size: 24px;
 
             font-weight: 600;
@@ -406,16 +360,14 @@
         }
 
 
-        /* ===============================
-           PDF Preview
-        =============================== */
-
         iframe {
+
             width: 100%;
 
             height: 500px;
 
-            border: 1px solid #d1d5db;
+            border:
+                1px solid #d1d5db;
 
             border-radius: 10px;
 
@@ -423,11 +375,8 @@
         }
 
 
-        /* ===============================
-           Extracted Text
-        =============================== */
-
         textarea {
+
             width: 100%;
 
             height: 500px;
@@ -444,7 +393,8 @@
 
             background-color: white;
 
-            border: 1px solid #d1d5db;
+            border:
+                1px solid #d1d5db;
 
             border-radius: 10px;
 
@@ -455,6 +405,7 @@
 
 
         textarea:focus {
+
             border-color: #007bff;
 
             box-shadow:
@@ -463,37 +414,36 @@
         }
 
 
-        /* ===============================
-           Mobile Layout
-        =============================== */
-
         @media (max-width: 800px) {
 
             .content {
+
                 grid-template-columns: 1fr;
 
                 gap: 30px;
             }
 
 
-            /* Hide vertical divider */
-
             .content::after {
+
                 display: none;
             }
 
 
             .left-column {
+
                 padding-right: 0;
             }
 
 
             .right-column {
+
                 padding-left: 0;
             }
 
 
             .container {
+
                 max-width: 90%;
 
                 margin-top: 90px;
@@ -501,21 +451,8 @@
 
 
             .page-title {
+
                 font-size: 36px;
-            }
-
-
-            .back-button {
-                top: 15px;
-
-                left: 15px;
-            }
-
-
-            .next-button {
-                top: 15px;
-
-                right: 15px;
             }
 
         }
@@ -528,9 +465,7 @@
 <body>
 
 
-    <!-- ===============================
-         Back Button
-    =============================== -->
+    <!-- BACK -->
 
     <button
         class="back-button"
@@ -544,13 +479,10 @@
     </button>
 
 
-    <!-- ===============================
-         Next Button
-         Hidden until resume is processed
-    =============================== -->
+    <!-- NEXT -->
 
     <a
-        href="next.html"
+        href="recording.html"
         id="next-button"
         class="next-button"
     >
@@ -558,46 +490,26 @@
     </a>
 
 
-    <!-- ===============================
-         Main Container
-    =============================== -->
-
     <div class="container">
 
 
-        <!-- ===============================
-             Page Title
-        =============================== -->
-
-        <h2 class="page-title">
+        <h1 class="page-title">
             Upload Resume
-        </h2>
+        </h1>
 
-
-        <!-- ===============================
-             Subtitle
-        =============================== -->
 
         <p class="upload-note">
             Upload your resume to get started
         </p>
 
 
-        <!-- ===============================
-             Two Column Content
-        =============================== -->
-
         <div class="content">
 
 
-            <!-- ===============================
-                 LEFT SIDE
-            =============================== -->
+            <!-- LEFT -->
 
             <div class="left-column">
 
-
-                <!-- Hidden File Input -->
 
                 <input
                     type="file"
@@ -605,10 +517,6 @@
                     accept=".pdf,.docx"
                 >
 
-
-                <!-- ===============================
-                     Drag & Drop Upload Box
-                =============================== -->
 
                 <div
                     id="upload-box"
@@ -645,18 +553,10 @@
                 </div>
 
 
-                <!-- ===============================
-                     Selected File
-                =============================== -->
-
                 <div id="file-name">
                     No file selected
                 </div>
 
-
-                <!-- ===============================
-                     PDF Preview
-                =============================== -->
 
                 <div
                     id="preview-container"
@@ -674,12 +574,11 @@
 
                 </div>
 
+
             </div>
 
 
-            <!-- ===============================
-                 RIGHT SIDE
-            =============================== -->
+            <!-- RIGHT -->
 
             <div
                 class="right-column"
@@ -706,19 +605,24 @@
 
 
     <!-- ===============================
-         Mammoth DOCX Reader
+         Mammoth DOCX
     =============================== -->
 
     <script
-        src="https://unpkg.com/mammoth/mammoth.browser.min.js">
-    </script>
+        src="https://unpkg.com/mammoth/mammoth.browser.min.js"
+    ></script>
 
 
     <!-- ===============================
          IndexedDB
+         
+         IMPORTANT:
+         ../ means go OUT of htmls/
     =============================== -->
 
-    <script src="js/database.js"></script>
+    <script
+        src="../js/database.js"
+    ></script>
 
 
     <!-- ===============================
@@ -727,12 +631,10 @@
 
     <script
         type="module"
-        src="js/app.js"
+        src="../js/app.js"
     ></script>
 
 
 </body>
 
 </html>
-
-

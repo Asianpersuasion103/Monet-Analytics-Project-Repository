@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Camera and Microphone Recorder</title>
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            max-width: 900px;
+
+            margin: 40px auto;
+
+            padding: 20px;
+
+        }
+
+
+        h1 {
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .controls {
+
+            display: grid;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        label {
+
+            font-weight: bold;
+
+        }
+
+
+        select {
+
+            width: 100%;
+
+            padding: 8px;
+
+            font-size: 16px;
+
+        }
+
+
+        video {
+
+            width: 640px;
+
+            max-width: 100%;
+
+            background: black;
+
+            border-radius: 8px;
+
+        }
+
+
+        button {
+
+            padding: 12px 20px;
+
+            margin-right: 10px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+        }
+
+
+        button:disabled {
+
+            cursor: not-allowed;
+
+            opacity: 0.5;
+
+        }
+
+
+        #status {
+
+            margin-top: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+        #downloadLink {
+
+            display: none;
+
+            margin-top: 20px;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <h1>
+        Camera & Microphone Recorder
+    </h1>
+
+
+    <!-- =========================================
+         DEVICE SELECTION
+    ========================================== -->
+
+    <div class="controls">
+
+
+        <!-- CAMERA -->
+
+        <div>
+
+            <label for="cameraSelect">
+                Camera
+            </label>
+
+            <select id="cameraSelect">
+
+                <option value="">
+                    Select camera
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- MICROPHONE -->
+
+        <div>
+
+            <label for="microphoneSelect">
+                Microphone
+            </label>
+
+            <select id="microphoneSelect">
+
+                <option value="">
+                    Select microphone
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================
+         CAMERA PREVIEW
+    ========================================== -->
+
+    <video
+        id="preview"
+        autoplay
+        playsinline
+        muted
+    ></video>
+
+
+    <br><br>
+
+
+    <!-- =========================================
+         RECORDING CONTROLS
+    ========================================== -->
+
+    <button
+        id="startButton"
+        disabled
+    >
+        Start Recording
+    </button>
+
+
+    <button
+        id="stopButton"
+        disabled
+    >
+        Stop Recording
+    </button>
+
+
+    <!-- =========================================
+         STATUS
+    ========================================== -->
+
+    <p id="status">
+        Requesting camera and microphone permission...
+    </p>
+
+
+    <!-- =========================================
+         DOWNLOAD
+    ========================================== -->
+
+    <a
+        id="downloadLink"
+        download="resume-recording.webm"
+    >
+        Download Recording
+    </a>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script
+        src="../js/recorder.js">
+    </script>
+
+
+</body>
+
+</html>
