@@ -2,7 +2,7 @@
 # IMPORTS
 # =========================================================
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, send_from_directory, request
 import imageio_ffmpeg
 import subprocess
 import os
@@ -12,7 +12,7 @@ import os
 # FLASK SETUP
 # =========================================================
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=".")
 
 
 # =========================================================
