@@ -1,37 +1,15 @@
 "use strict";
 
 
-// ==========================================
-// BACK BUTTON
-// ==========================================
+// ==================================================
+// HTML ELEMENTS
+// ==================================================
 
 const backButton =
     document.getElementById(
         "backButton"
     );
 
-
-if (backButton) {
-
-    backButton.addEventListener(
-        "click",
-        function () {
-
-            console.log(
-                "Back button clicked."
-            );
-
-
-            window.location.href = "../index.html";
-        }
-    );
-
-}
-
-
-// ==========================================
-// HTML ELEMENTS
-// ==========================================
 
 const inviteCodeInput =
     document.getElementById(
@@ -51,34 +29,56 @@ const status =
     );
 
 
-// ==========================================
-// TEMPORARY INVITE CODE
-// ==========================================
+// ==================================================
+// SERVER URL
+// ==================================================
 
-const VALID_INVITE_CODE =
-    "123";
+const SERVER_URL =
+    "http://localhost:8080";
 
 
-// ==========================================
+// ==================================================
+// BACK BUTTON
+// ==================================================
+
+if (backButton) {
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "../index.html";
+
+        }
+    );
+
+}
+
+
+// ==================================================
 // VERIFY INVITE CODE
-// ==========================================
+// ==================================================
 
 if (verifyCodeButton) {
 
     verifyCodeButton.addEventListener(
         "click",
-        function () {
-
+        async function () {
 
             const enteredCode =
-                inviteCodeInput.value.trim();
+                inviteCodeInput.value
+                    .trim()
+                    .toUpperCase();
 
 
-            // ===============================
+            // ======================================
             // EMPTY CODE
-            // ===============================
+            // ======================================
 
-            if (enteredCode === "") {
+            if (
+                enteredCode === ""
+            ) {
 
                 status.textContent =
                     "Please enter an invite code.";
@@ -91,15 +91,129 @@ if (verifyCodeButton) {
             }
 
 
-            // ===============================
-            // CORRECT CODE
-            // ===============================
+            // ======================================
+            // DISABLE BUTTON
+            // ======================================
 
-            if (
-                enteredCode ===
-                VALID_INVITE_CODE
-            ) {
+            verifyCodeButton.disabled =
+                true;
 
+
+            status.textContent =
+                "Checking invite code...";
+
+            status.className =
+                "";
+
+
+            try {
+
+                // ==================================
+                // ASK SERVER
+                // ==================================
+
+                const response =
+                    await fetch(
+                        SERVER_URL +
+                        "/api/verify-invite",
+                        {
+                            method:
+                                "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    inviteCode:
+                                        enteredCode
+                                })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                // ==================================
+                // INVALID
+                // ==================================
+
+                if (
+                    !response.ok ||
+                    !result.valid
+                ) {
+
+                    status.textContent =
+                        result.message ||
+                        "Invalid or expired invite code.";
+
+                    status.className =
+                        "error";
+
+
+                    inviteCodeInput.value =
+                        "";
+
+
+                    inviteCodeInput.focus();
+
+
+                    verifyCodeButton.disabled =
+                        false;
+
+
+                    return;
+
+                }
+
+
+                // ==================================
+                // VALID
+                // ==================================
+
+                console.log(
+                    "Invite accepted.",
+                    result
+                );
+
+
+                // ==================================
+                // SAVE ROLE
+                // ==================================
+
+                sessionStorage.setItem(
+                    "meetingRole",
+                    "interviewee"
+                );
+
+
+                // ==================================
+                // SAVE ROOM
+                // ==================================
+
+                sessionStorage.setItem(
+                    "meetingRoom",
+                    result.room
+                );
+
+
+                // ==================================
+                // SAVE INVITE CODE
+                // ==================================
+
+                sessionStorage.setItem(
+                    "inviteCode",
+                    enteredCode
+                );
+
+
+                // ==================================
+                // SUCCESS
+                // ==================================
 
                 status.textContent =
                     "Invite code accepted!";
@@ -108,9 +222,9 @@ if (verifyCodeButton) {
                     "success";
 
 
-                // ===============================
-                // Go to Resume Page
-                // ===============================
+                // ==================================
+                // GO TO RESUME
+                // ==================================
 
                 setTimeout(
                     function () {
@@ -122,23 +236,62 @@ if (verifyCodeButton) {
                     500
                 );
 
-
-                return;
-
             }
 
+            catch (error) {
 
-            // ===============================
-            // INCORRECT CODE
-            // ===============================
+                console.error(
+                    "Invite verification error:",
+                    error
+                );
 
-            status.textContent =
-                "Invalid invite code. Please try again.";
 
-            status.className =
-                "error";
+                status.textContent =
+                    "Could not connect to the meeting server.";
+
+                status.className =
+                    "error";
+
+
+                verifyCodeButton.disabled =
+                    false;
+
+            }
 
         }
     );
 
 }
+
+
+// ==================================================
+// ENTER KEY
+// ==================================================
+
+if (inviteCodeInput) {
+
+    inviteCodeInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+
+                verifyCodeButton.click();
+
+            }
+
+        }
+    );
+
+}
+
+
+console.log(
+    "interviewee.js loaded successfully."
+);

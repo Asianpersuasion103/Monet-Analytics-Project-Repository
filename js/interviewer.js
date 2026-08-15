@@ -2,18 +2,18 @@
 
 
 // ==================================================
-// INVITE CODE ELEMENTS
+// HTML ELEMENTS
 // ==================================================
 
-const inviteCode =
+const backButton =
     document.getElementById(
-        "inviteCode"
+        "backButton"
     );
 
 
-const verifyCodeButton =
+const createMeetingButton =
     document.getElementById(
-        "verifyCodeButton"
+        "createMeetingButton"
     );
 
 
@@ -23,77 +23,27 @@ const inviteStatus =
     );
 
 
-const inviteSection =
-    document.getElementById(
-        "inviteSection"
-    );
-
-
 const meetingSection =
     document.getElementById(
         "meetingSection"
     );
 
 
-// ==================================================
-// MEETING ELEMENTS
-// ==================================================
-
-const backButton =
+const inviteCodeDisplay =
     document.getElementById(
-        "backButton"
+        "inviteCodeDisplay"
     );
 
 
-const videoPreview =
+const copyCodeButton =
     document.getElementById(
-        "videoPreview"
+        "copyCodeButton"
     );
 
 
-const startMeetingButton =
+const openMeetingButton =
     document.getElementById(
-        "startMeetingButton"
-    );
-
-
-const startRecordingButton =
-    document.getElementById(
-        "startRecordingButton"
-    );
-
-
-const stopRecordingButton =
-    document.getElementById(
-        "stopRecordingButton"
-    );
-
-
-const endMeetingButton =
-    document.getElementById(
-        "endMeetingButton"
-    );
-
-
-const status =
-    document.getElementById(
-        "status"
-    );
-
-
-// ==================================================
-// RECORDING ELEMENTS
-// ==================================================
-
-const recordingPreview =
-    document.getElementById(
-        "recordingPreview"
-    );
-
-
-const downloadRecording =
-    document.getElementById(
-        "downloadRecording"
+        "openMeetingButton"
     );
 
 
@@ -101,28 +51,7 @@ const downloadRecording =
 // VARIABLES
 // ==================================================
 
-let mediaStream = null;
-
-let mediaRecorder = null;
-
-let recordedChunks = [];
-
-let recordingURL = null;
-
-
-// ==================================================
-// TEMPORARY INVITE CODE
-// ==================================================
-//
-// Change this to whatever code you want.
-//
-// Example:
-// ABC123
-//
-// ==================================================
-
-const VALID_INVITE_CODE =
-    "123";
+let meetingCode = null;
 
 
 // ==================================================
@@ -135,9 +64,13 @@ if (backButton) {
         "click",
         function () {
 
-            // Return to role-selection page
+            console.log(
+                "Back button clicked."
+            );
 
-            window.location.href = "../index.html";
+
+            window.location.href =
+                "../index.html";
 
         }
     );
@@ -146,98 +79,188 @@ if (backButton) {
 
 
 // ==================================================
-// VERIFY INVITE CODE
+// GENERATE RANDOM MEETING CODE
 // ==================================================
 
-if (verifyCodeButton) {
+function generateMeetingCode() {
 
-    verifyCodeButton.addEventListener(
+    /*
+     * Characters intentionally exclude
+     * confusing characters such as:
+     *
+     * 0
+     * O
+     * I
+     * 1
+     *
+     * This makes the code easier to read
+     * over the phone or in person.
+     */
+
+    const characters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+
+    const randomValues =
+        new Uint32Array(8);
+
+
+    crypto.getRandomValues(
+        randomValues
+    );
+
+
+    let code = "";
+
+
+    for (
+        let i = 0;
+        i < randomValues.length;
+        i++
+    ) {
+
+        code +=
+            characters[
+                randomValues[i] %
+                characters.length
+            ];
+
+    }
+
+
+    // ==========================================
+    // FORMAT
+    // ==========================================
+    //
+    // Example:
+    //
+    // ABCD-EFGH
+    //
+    // ==========================================
+
+    return (
+        code.substring(0, 4) +
+        "-" +
+        code.substring(4, 8)
+    );
+
+}
+
+
+// ==================================================
+// CREATE MEETING
+// ==================================================
+
+if (createMeetingButton) {
+
+    createMeetingButton.addEventListener(
         "click",
         function () {
 
-            const enteredCode =
-                inviteCode.value.trim();
+            console.log(
+                "Create Meeting clicked."
+            );
 
 
             // ======================================
-            // EMPTY CODE
+            // GENERATE CODE
             // ======================================
 
-            if (enteredCode === "") {
+            meetingCode =
+                generateMeetingCode();
 
-                inviteStatus.textContent =
-                    "Please enter an invite code.";
 
-                inviteStatus.style.color =
-                    "#dc2626";
+            console.log(
+                "Generated meeting code:",
+                meetingCode
+            );
 
-                return;
+
+            // ======================================
+            // SAVE ROLE
+            // ======================================
+
+            sessionStorage.setItem(
+                "meetingRole",
+                "interviewer"
+            );
+
+
+            // ======================================
+            // SAVE ROOM
+            // ======================================
+
+            sessionStorage.setItem(
+                "meetingRoom",
+                meetingCode
+            );
+
+
+            // ======================================
+            // SAVE INVITE CODE
+            // ======================================
+
+            sessionStorage.setItem(
+                "inviteCode",
+                meetingCode
+            );
+
+
+            // ======================================
+            // DISPLAY CODE
+            // ======================================
+
+            if (inviteCodeDisplay) {
+
+                inviteCodeDisplay.textContent =
+                    meetingCode;
 
             }
 
 
             // ======================================
-            // CORRECT CODE
+            // STATUS
             // ======================================
 
-            if (
-                enteredCode ===
-                VALID_INVITE_CODE
-            ) {
-
-                console.log(
-                    "Invite code accepted."
-                );
-
+            if (inviteStatus) {
 
                 inviteStatus.textContent =
-                    "Invite code accepted.";
+                    "Meeting created. Share this code with the interviewee.";
 
                 inviteStatus.style.color =
                     "#16a34a";
 
-
-                // Hide invite screen
-
-                inviteSection.style.display =
-                    "none";
+            }
 
 
-                // Show meeting screen
+            // ======================================
+            // SHOW MEETING SECTION
+            // ======================================
+
+            if (meetingSection) {
 
                 meetingSection.style.display =
                     "block";
 
-
-                status.textContent =
-                    "Invite accepted. Ready to start meeting.";
-
             }
 
 
             // ======================================
-            // INCORRECT CODE
+            // DISABLE CREATE BUTTON
             // ======================================
 
-            else {
-
-                console.log(
-                    "Invalid invite code."
-                );
+            createMeetingButton.disabled =
+                true;
 
 
-                inviteStatus.textContent =
-                    "Invalid invite code. Please try again.";
+            // ======================================
+            // SHOW OPEN MEETING BUTTON
+            // ======================================
 
-                inviteStatus.style.color =
-                    "#dc2626";
+            if (openMeetingButton) {
 
-
-                // Clear input
-
-                inviteCode.value = "";
-
-                inviteCode.focus();
+                openMeetingButton.style.display =
+                    "inline-block";
 
             }
 
@@ -248,100 +271,94 @@ if (verifyCodeButton) {
 
 
 // ==================================================
-// ALLOW ENTER KEY FOR INVITE CODE
+// COPY MEETING CODE
 // ==================================================
 
-if (inviteCode) {
+if (copyCodeButton) {
 
-    inviteCode.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key ===
-                "Enter"
-            ) {
-
-                verifyCodeButton.click();
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// START MEETING
-// ==================================================
-
-if (startMeetingButton) {
-
-    startMeetingButton.addEventListener(
+    copyCodeButton.addEventListener(
         "click",
         async function () {
 
+            if (!meetingCode) {
+
+                return;
+
+            }
+
+
             try {
 
-                status.textContent =
-                    "Requesting camera and microphone permission...";
+                await navigator.clipboard.writeText(
+                    meetingCode
+                );
 
 
-                // ==================================
-                // REQUEST CAMERA + MICROPHONE
-                // ==================================
-
-                mediaStream =
-                    await navigator.mediaDevices
-                        .getUserMedia({
-
-                            video: true,
-
-                            audio: true
-
-                        });
+                copyCodeButton.textContent =
+                    "Copied!";
 
 
-                // ==================================
-                // SHOW CAMERA
-                // ==================================
+                setTimeout(
+                    function () {
 
-                videoPreview.srcObject =
-                    mediaStream;
+                        copyCodeButton.textContent =
+                            "Copy Code";
 
-
-                // ==================================
-                // UPDATE BUTTONS
-                // ==================================
-
-                startMeetingButton.disabled =
-                    true;
-
-
-                startRecordingButton.disabled =
-                    false;
-
-
-                endMeetingButton.disabled =
-                    false;
-
-
-                status.textContent =
-                    "Meeting started. Camera and microphone are active.";
+                    },
+                    1500
+                );
 
             }
 
             catch (error) {
 
                 console.error(
-                    "Camera/microphone error:",
+                    "Could not copy meeting code:",
                     error
                 );
 
 
-                status.textContent =
-                    "Could not access the camera or microphone. Please check your browser permissions.";
+                // Fallback
+
+                const temporaryInput =
+                    document.createElement(
+                        "input"
+                    );
+
+
+                temporaryInput.value =
+                    meetingCode;
+
+
+                document.body.appendChild(
+                    temporaryInput
+                );
+
+
+                temporaryInput.select();
+
+
+                document.execCommand(
+                    "copy"
+                );
+
+
+                temporaryInput.remove();
+
+
+                copyCodeButton.textContent =
+                    "Copied!";
+
+
+                setTimeout(
+                    function () {
+
+                        copyCodeButton.textContent =
+                            "Copy Code";
+
+                    },
+                    1500
+                );
 
             }
 
@@ -352,24 +369,16 @@ if (startMeetingButton) {
 
 
 // ==================================================
-// START RECORDING
+// OPEN MEETING ROOM
 // ==================================================
 
-if (startRecordingButton) {
+if (openMeetingButton) {
 
-    startRecordingButton.addEventListener(
+    openMeetingButton.addEventListener(
         "click",
         function () {
 
-
-            // ======================================
-            // MAKE SURE CAMERA IS RUNNING
-            // ======================================
-
-            if (!mediaStream) {
-
-                status.textContent =
-                    "Please start the meeting first.";
+            if (!meetingCode) {
 
                 return;
 
@@ -377,203 +386,33 @@ if (startRecordingButton) {
 
 
             // ======================================
-            // RESET OLD RECORDING
+            // Make sure role and room are saved
             // ======================================
 
-            recordedChunks = [];
+            sessionStorage.setItem(
+                "meetingRole",
+                "interviewer"
+            );
 
 
-            // Hide old preview
-
-            recordingPreview.style.display =
-                "none";
-
-
-            // Hide old download
-
-            downloadRecording.style.display =
-                "none";
+            sessionStorage.setItem(
+                "meetingRoom",
+                meetingCode
+            );
 
 
-            // Remove old URL
+            // ======================================
+            // Open meeting.html
+            // ======================================
 
-            if (recordingURL) {
-
-                URL.revokeObjectURL(
-                    recordingURL
+            window.location.href =
+                "meeting.html" +
+                "?role=interviewer" +
+                "&room=" +
+                encodeURIComponent(
+                    meetingCode
                 );
 
-                recordingURL = null;
-
-            }
-
-
-            // ======================================
-            // CREATE MEDIA RECORDER
-            // ======================================
-
-            try {
-
-                mediaRecorder =
-                    new MediaRecorder(
-                        mediaStream
-                    );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "MediaRecorder error:",
-                    error
-                );
-
-
-                status.textContent =
-                    "This browser does not support recording.";
-
-                return;
-
-            }
-
-
-            // ======================================
-            // RECEIVE RECORDED DATA
-            // ======================================
-
-            mediaRecorder.ondataavailable =
-                function (event) {
-
-                    if (
-                        event.data &&
-                        event.data.size > 0
-                    ) {
-
-                        recordedChunks.push(
-                            event.data
-                        );
-
-                    }
-
-                };
-
-
-            // ======================================
-            // RECORDING STOPPED
-            // ======================================
-
-            mediaRecorder.onstop =
-                function () {
-
-                    console.log(
-                        "Recording stopped."
-                    );
-
-
-                    // ==================================
-                    // CREATE WEBM BLOB
-                    // ==================================
-
-                    const recordingBlob =
-                        new Blob(
-                            recordedChunks,
-                            {
-                                type:
-                                    "video/webm"
-                            }
-                        );
-
-
-                    console.log(
-                        "Recording size:",
-                        recordingBlob.size,
-                        "bytes"
-                    );
-
-
-                    // ==================================
-                    // CREATE TEMPORARY URL
-                    // ==================================
-
-                    recordingURL =
-                        URL.createObjectURL(
-                            recordingBlob
-                        );
-
-
-                    // ==================================
-                    // SET VIDEO SOURCE
-                    // ==================================
-
-                    recordingPreview.src =
-                        recordingURL;
-
-
-                    // Show recorded video
-
-                    recordingPreview.style.display =
-                        "block";
-
-
-                    // ==================================
-                    // SET DOWNLOAD LINK
-                    // ==================================
-
-                    downloadRecording.href =
-                        recordingURL;
-
-
-                    downloadRecording.style.display =
-                        "inline-block";
-
-
-                    status.textContent =
-                        "Recording finished. You can play the recording below.";
-
-                };
-
-
-            // ======================================
-            // RECORDING ERROR
-            // ======================================
-
-            mediaRecorder.onerror =
-                function (event) {
-
-                    console.error(
-                        "Recording error:",
-                        event.error
-                    );
-
-
-                    status.textContent =
-                        "An error occurred during recording.";
-
-                };
-
-
-            // ======================================
-            // START
-            // ======================================
-
-            mediaRecorder.start();
-
-
-            // ======================================
-            // UPDATE BUTTONS
-            // ======================================
-
-            startRecordingButton.disabled =
-                true;
-
-
-            stopRecordingButton.disabled =
-                false;
-
-
-            status.textContent =
-                "Recording...";
-
         }
     );
 
@@ -581,129 +420,17 @@ if (startRecordingButton) {
 
 
 // ==================================================
-// STOP RECORDING
+// DEBUG
 // ==================================================
 
-if (stopRecordingButton) {
+console.log(
+    "======================================"
+);
 
-    stopRecordingButton.addEventListener(
-        "click",
-        function () {
+console.log(
+    "interviewer.js loaded successfully."
+);
 
-
-            if (
-                mediaRecorder &&
-                mediaRecorder.state !==
-                    "inactive"
-            ) {
-
-                mediaRecorder.stop();
-
-            }
-
-
-            startRecordingButton.disabled =
-                false;
-
-
-            stopRecordingButton.disabled =
-                true;
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// END MEETING
-// ==================================================
-
-if (endMeetingButton) {
-
-    endMeetingButton.addEventListener(
-        "click",
-        function () {
-
-
-            // ======================================
-            // STOP RECORDING
-            // ======================================
-
-            if (
-                mediaRecorder &&
-                mediaRecorder.state !==
-                    "inactive"
-            ) {
-
-                mediaRecorder.stop();
-
-            }
-
-
-            // ======================================
-            // STOP CAMERA + MICROPHONE
-            // ======================================
-
-            if (mediaStream) {
-
-                mediaStream
-                    .getTracks()
-                    .forEach(
-                        function (track) {
-
-                            track.stop();
-
-                        }
-                    );
-
-            }
-
-
-            // ======================================
-            // REMOVE CAMERA
-            // ======================================
-
-            videoPreview.srcObject =
-                null;
-
-
-            // ======================================
-            // RESET MEDIA
-            // ======================================
-
-            mediaStream =
-                null;
-
-
-            mediaRecorder =
-                null;
-
-
-            // ======================================
-            // RESET BUTTONS
-            // ======================================
-
-            startMeetingButton.disabled =
-                false;
-
-
-            startRecordingButton.disabled =
-                true;
-
-
-            stopRecordingButton.disabled =
-                true;
-
-
-            endMeetingButton.disabled =
-                true;
-
-
-            status.textContent =
-                "Meeting ended.";
-
-        }
-    );
-
-}
+console.log(
+    "======================================"
+);

@@ -1,53 +1,67 @@
+"use strict";
+
+
+// ==================================================
+// PDF.JS
+// ==================================================
+
 import * as pdfjsLib
     from "../pdfjs/pdf.mjs";
 
 
-// ===============================
-// PDF.js Worker
-// ===============================
+// ==================================================
+// PDF.JS WORKER
+// ==================================================
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     "../pdfjs/pdf.worker.mjs";
 
 
-// ===============================
-// HTML Elements
-// ===============================
+// ==================================================
+// HTML ELEMENTS
+// ==================================================
 
 const fileInput =
     document.getElementById(
         "pdf-input"
     );
 
+
 const fileNameDiv =
     document.getElementById(
         "file-name"
     );
+
 
 const previewContainer =
     document.getElementById(
         "preview-container"
     );
 
+
 const pdfViewer =
     document.getElementById(
         "pdf-viewer"
     );
+
 
 const textContainer =
     document.getElementById(
         "text-container"
     );
 
+
 const resumeText =
     document.getElementById(
         "resume-text"
     );
 
+
 const uploadBox =
     document.getElementById(
         "upload-box"
     );
+
 
 const nextButton =
     document.getElementById(
@@ -55,20 +69,121 @@ const nextButton =
     );
 
 
-// ===============================
-// Process Resume
-// ===============================
+// ==================================================
+// CHECK HTML ELEMENTS
+// ==================================================
+
+console.log(
+    "======================================"
+);
+
+console.log(
+    "Resume app.js loaded."
+);
+
+console.log(
+    "======================================"
+);
+
+
+if (!fileInput) {
+
+    console.error(
+        "ERROR: #pdf-input was not found."
+    );
+
+}
+
+
+if (!uploadBox) {
+
+    console.error(
+        "ERROR: #upload-box was not found."
+    );
+
+}
+
+
+if (!nextButton) {
+
+    console.error(
+        "ERROR: #next-button was not found."
+    );
+
+}
+
+
+// ==================================================
+// MEETING INFORMATION
+// ==================================================
+//
+// interviewee.js saves these values when the
+// interviewee successfully enters the invite code.
+//
+// ==================================================
+
+const meetingRole =
+    sessionStorage.getItem(
+        "meetingRole"
+    ) || "interviewee";
+
+
+const meetingRoom =
+    sessionStorage.getItem(
+        "meetingRoom"
+    );
+
+
+console.log(
+    "Meeting role:",
+    meetingRole
+);
+
+
+console.log(
+    "Meeting room:",
+    meetingRoom
+);
+
+
+// ==================================================
+// INITIAL NEXT BUTTON STATE
+// ==================================================
+//
+// The interviewee should NOT be able to continue
+// until a valid resume has been processed.
+// ==================================================
+
+if (nextButton) {
+
+    nextButton.style.display =
+        "none";
+
+}
+
+
+// ==================================================
+// PROCESS RESUME
+// ==================================================
 
 async function processResume(file) {
 
     if (!file) {
+
         return;
+
     }
 
 
-    // ===============================
-    // File Extension
-    // ===============================
+    console.log(
+        "Processing resume:",
+        file.name
+    );
+
+
+    // ==============================================
+    // FILE EXTENSION
+    // ==============================================
 
     const extension =
         file.name
@@ -77,9 +192,9 @@ async function processResume(file) {
             .toLowerCase();
 
 
-    // ===============================
-    // Check File Type
-    // ===============================
+    // ==============================================
+    // CHECK FILE TYPE
+    // ==============================================
 
     if (
         extension !== "pdf" &&
@@ -95,19 +210,48 @@ async function processResume(file) {
     }
 
 
-    // ===============================
-    // Reset Page
-    // ===============================
+    // ==============================================
+    // RESET DISPLAY
+    // ==============================================
 
-    nextButton.style.display =
-        "none";
+    if (nextButton) {
 
-    textContainer.style.display =
-        "none";
+        nextButton.style.display =
+            "none";
+
+    }
 
 
-    fileNameDiv.textContent =
-        `Selected: ${file.name}`;
+    if (textContainer) {
+
+        textContainer.style.display =
+            "none";
+
+    }
+
+
+    if (previewContainer) {
+
+        previewContainer.style.display =
+            "none";
+
+    }
+
+
+    if (resumeText) {
+
+        resumeText.value =
+            "";
+
+    }
+
+
+    if (fileNameDiv) {
+
+        fileNameDiv.textContent =
+            `Selected: ${file.name}`;
+
+    }
 
 
     try {
@@ -115,9 +259,9 @@ async function processResume(file) {
         let extractedText = "";
 
 
-        // ===============================
+        // ==========================================
         // PDF
-        // ===============================
+        // ==========================================
 
         if (
             extension === "pdf"
@@ -129,12 +273,20 @@ async function processResume(file) {
                 );
 
 
-            pdfViewer.src =
-                fileURL;
+            if (pdfViewer) {
+
+                pdfViewer.src =
+                    fileURL;
+
+            }
 
 
-            previewContainer.style.display =
-                "block";
+            if (previewContainer) {
+
+                previewContainer.style.display =
+                    "block";
+
+            }
 
 
             extractedText =
@@ -145,15 +297,11 @@ async function processResume(file) {
         }
 
 
-        // ===============================
+        // ==========================================
         // DOCX
-        // ===============================
+        // ==========================================
 
         else {
-
-            previewContainer.style.display =
-                "none";
-
 
             extractedText =
                 await extractDOCXText(
@@ -163,9 +311,9 @@ async function processResume(file) {
         }
 
 
-        // ===============================
-        // Check Extraction
-        // ===============================
+        // ==========================================
+        // CHECK EXTRACTED TEXT
+        // ==========================================
 
         if (
             !extractedText ||
@@ -181,21 +329,29 @@ async function processResume(file) {
         }
 
 
-        // ===============================
-        // Display Text
-        // ===============================
+        // ==========================================
+        // DISPLAY EXTRACTED TEXT
+        // ==========================================
 
-        resumeText.value =
-            extractedText;
+        if (resumeText) {
+
+            resumeText.value =
+                extractedText;
+
+        }
 
 
-        textContainer.style.display =
-            "block";
+        if (textContainer) {
+
+            textContainer.style.display =
+                "block";
+
+        }
 
 
-        // ===============================
-        // Save Resume
-        // ===============================
+        // ==========================================
+        // SAVE RESUME
+        // ==========================================
 
         const resume = {
 
@@ -209,40 +365,93 @@ async function processResume(file) {
                 extension,
 
             extractedText:
-                extractedText
+                extractedText,
+
+            meetingRole:
+                meetingRole,
+
+            meetingRoom:
+                meetingRoom
 
         };
 
 
-        savePDF(resume);
+        // ==========================================
+        // SAVE TO INDEXED DB
+        // ==========================================
+
+        if (
+            typeof savePDF ===
+            "function"
+        ) {
+
+            await savePDF(
+                resume
+            );
+
+
+            console.log(
+                "Resume saved successfully:",
+                resume
+            );
+
+        }
+
+        else {
+
+            console.warn(
+                "savePDF() is not available. Check database.js."
+            );
+
+        }
+
+
+        // ==========================================
+        // PREPARE MEETING URL
+        // ==========================================
+
+        prepareMeetingURL();
+
+
+        // ==========================================
+        // SHOW NEXT BUTTON
+        // ==========================================
+
+        if (nextButton) {
+
+            nextButton.style.display =
+                "inline-block";
+
+        }
 
 
         console.log(
-            "Resume saved:",
-            resume
+            "Resume processing completed successfully."
         );
-
-
-        // ===============================
-        // Enable Next
-        // ===============================
-
-        nextButton.style.display =
-            "block";
-
 
     }
 
     catch (error) {
 
         console.error(
-            "Resume processing error:",
+            "======================================"
+        );
+
+        console.error(
+            "Resume processing error:"
+        );
+
+        console.error(
             error
+        );
+
+        console.error(
+            "======================================"
         );
 
 
         alert(
-            "There was a problem processing the resume."
+            "There was a problem processing the resume. Please check the browser console for details."
         );
 
     }
@@ -250,107 +459,233 @@ async function processResume(file) {
 }
 
 
-// ===============================
-// File Selection
-// ===============================
+// ==================================================
+// PREPARE MEETING URL
+// ==================================================
 
-fileInput.addEventListener(
-    "change",
-    function (event) {
+function prepareMeetingURL() {
 
-        const file =
-            event.target.files[0];
+    if (!nextButton) {
 
-
-        processResume(file);
+        return;
 
     }
-);
 
 
-// ===============================
-// Drag Over
-// ===============================
+    // ==============================================
+    // Get latest room information
+    // ==============================================
 
-uploadBox.addEventListener(
-    "dragover",
-    function (event) {
-
-        event.preventDefault();
-
-        uploadBox.classList.add(
-            "drag-over"
-        );
-
-    }
-);
+    const role =
+        sessionStorage.getItem(
+            "meetingRole"
+        ) || "interviewee";
 
 
-// ===============================
-// Drag Leave
-// ===============================
-
-uploadBox.addEventListener(
-    "dragleave",
-    function () {
-
-        uploadBox.classList.remove(
-            "drag-over"
-        );
-
-    }
-);
-
-
-// ===============================
-// Drop
-// ===============================
-
-uploadBox.addEventListener(
-    "drop",
-    function (event) {
-
-        event.preventDefault();
-
-
-        uploadBox.classList.remove(
-            "drag-over"
+    const room =
+        sessionStorage.getItem(
+            "meetingRoom"
         );
 
 
-        const file =
-            event.dataTransfer.files[0];
+    // ==============================================
+    // If there is no room, don't create a broken URL
+    // ==============================================
+
+    if (!room) {
+
+        console.warn(
+            "No meeting room found in sessionStorage."
+        );
 
 
-        if (!file) {
-            return;
+        nextButton.href =
+            "meeting.html";
+
+
+        return;
+
+    }
+
+
+    // ==============================================
+    // Create meeting URL
+    // ==============================================
+
+    const meetingURL =
+        "meeting.html" +
+        "?role=" +
+        encodeURIComponent(
+            role
+        ) +
+        "&room=" +
+        encodeURIComponent(
+            room
+        );
+
+
+    // ==============================================
+    // Set Next button
+    // ==============================================
+
+    nextButton.href =
+        meetingURL;
+
+
+    console.log(
+        "Meeting URL prepared:",
+        meetingURL
+    );
+
+}
+
+
+// ==================================================
+// FILE SELECTION
+// ==================================================
+
+if (fileInput) {
+
+    fileInput.addEventListener(
+        "change",
+        function (event) {
+
+            const file =
+                event.target.files[0];
+
+
+            processResume(
+                file
+            );
+
         }
+    );
+
+}
 
 
-        const dataTransfer =
-            new DataTransfer();
+// ==================================================
+// DRAG OVER
+// ==================================================
+
+if (uploadBox) {
+
+    uploadBox.addEventListener(
+        "dragover",
+        function (event) {
+
+            event.preventDefault();
 
 
-        dataTransfer.items.add(
-            file
-        );
+            uploadBox.classList.add(
+                "drag-over"
+            );
+
+        }
+    );
+
+}
 
 
-        fileInput.files =
-            dataTransfer.files;
+// ==================================================
+// DRAG LEAVE
+// ==================================================
+
+if (uploadBox) {
+
+    uploadBox.addEventListener(
+        "dragleave",
+        function () {
+
+            uploadBox.classList.remove(
+                "drag-over"
+            );
+
+        }
+    );
+
+}
 
 
-        processResume(file);
+// ==================================================
+// DROP
+// ==================================================
 
-    }
-);
+if (uploadBox) {
+
+    uploadBox.addEventListener(
+        "drop",
+        function (event) {
+
+            event.preventDefault();
 
 
-// ===============================
-// Extract PDF Text
-// ===============================
+            uploadBox.classList.remove(
+                "drag-over"
+            );
+
+
+            const file =
+                event.dataTransfer.files[0];
+
+
+            if (!file) {
+
+                return;
+
+            }
+
+
+            // ======================================
+            // Put dropped file into file input
+            // ======================================
+
+            try {
+
+                const dataTransfer =
+                    new DataTransfer();
+
+
+                dataTransfer.items.add(
+                    file
+                );
+
+
+                fileInput.files =
+                    dataTransfer.files;
+
+            }
+
+            catch (error) {
+
+                console.warn(
+                    "Could not update file input:",
+                    error
+                );
+
+            }
+
+
+            processResume(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// EXTRACT PDF TEXT
+// ==================================================
 
 async function extractPDFText(file) {
+
+    console.log(
+        "Extracting PDF text..."
+    );
+
 
     const arrayBuffer =
         await file.arrayBuffer();
@@ -359,17 +694,25 @@ async function extractPDFText(file) {
     const pdf =
         await pdfjsLib
             .getDocument({
-                data: arrayBuffer
+                data:
+                    arrayBuffer
             })
             .promise;
 
 
-    let fullText = "";
+    console.log(
+        "PDF pages:",
+        pdf.numPages
+    );
 
 
-    // ===============================
-    // Read Every Page
-    // ===============================
+    let fullText =
+        "";
+
+
+    // ==============================================
+    // READ EVERY PAGE
+    // ==============================================
 
     for (
         let pageNumber = 1;
@@ -390,14 +733,18 @@ async function extractPDFText(file) {
         const pageText =
             content.items
                 .map(
-                    item =>
-                        item.str
+                    function (item) {
+
+                        return item.str;
+
+                    }
                 )
                 .join(" ");
 
 
         fullText +=
-            pageText + "\n";
+            pageText +
+            "\n";
 
     }
 
@@ -407,11 +754,20 @@ async function extractPDFText(file) {
 }
 
 
-// ===============================
-// Extract DOCX Text
-// ===============================
+// ==================================================
+// EXTRACT DOCX TEXT
+// ==================================================
 
 async function extractDOCXText(file) {
+
+    console.log(
+        "Extracting DOCX text..."
+    );
+
+
+    // ==============================================
+    // Check Mammoth
+    // ==============================================
 
     if (
         typeof mammoth ===
@@ -422,22 +778,45 @@ async function extractDOCXText(file) {
             "Mammoth is not loaded."
         );
 
+
+        alert(
+            "DOCX parsing is unavailable because Mammoth did not load."
+        );
+
+
         return "";
 
     }
 
 
+    // ==============================================
+    // Read file
+    // ==============================================
+
     const arrayBuffer =
         await file.arrayBuffer();
 
 
+    // ==============================================
+    // Extract text
+    // ==============================================
+
     const result =
         await mammoth.extractRawText({
+
             arrayBuffer:
                 arrayBuffer
+
         });
 
 
     return result.value.trim();
 
 }
+
+
+// ==================================================
+// INITIALIZE
+// ==================================================
+
+prepareMeetingURL();
