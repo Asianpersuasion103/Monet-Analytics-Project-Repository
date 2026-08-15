@@ -2,6 +2,14 @@
 
 
 // ==================================================
+// CONFIGURATION
+// ==================================================
+
+const SERVER_URL =
+    "http://localhost:8080";
+
+
+// ==================================================
 // HTML ELEMENTS
 // ==================================================
 
@@ -11,27 +19,23 @@ const backButton =
     );
 
 
-const createMeetingButton =
-    document.getElementById(
-        "createMeetingButton"
+if (backButton) {
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.history.back();
+
+        }
     );
 
+}
 
-const inviteStatus =
+
+const generateCodeButton =
     document.getElementById(
-        "inviteStatus"
-    );
-
-
-const meetingSection =
-    document.getElementById(
-        "meetingSection"
-    );
-
-
-const inviteCodeDisplay =
-    document.getElementById(
-        "inviteCodeDisplay"
+        "generateCodeButton"
     );
 
 
@@ -41,143 +45,178 @@ const copyCodeButton =
     );
 
 
-const openMeetingButton =
+const inviteCodeElement =
     document.getElementById(
-        "openMeetingButton"
+        "inviteCode"
+    );
+
+
+const meetingLink =
+    document.getElementById(
+        "meetingLink"
+    );
+
+
+const statusElement =
+    document.getElementById(
+        "status"
+    );
+
+
+const expirationElement =
+    document.getElementById(
+        "expiration"
     );
 
 
 // ==================================================
-// VARIABLES
+// CURRENT MEETING
 // ==================================================
 
-let meetingCode = null;
+let currentInviteCode =
+    null;
 
 
 // ==================================================
-// BACK BUTTON
+// GENERATE MEETING CODE
 // ==================================================
 
-if (backButton) {
+generateCodeButton.addEventListener(
+    "click",
+    async function () {
 
-    backButton.addEventListener(
-        "click",
-        function () {
+        console.log(
+            "Generate Meeting Code clicked."
+        );
+
+
+        // ==========================================
+        // RESET UI
+        // ==========================================
+
+        generateCodeButton.disabled =
+            true;
+
+
+        copyCodeButton.disabled =
+            true;
+
+
+        meetingLink.style.display =
+            "none";
+
+
+        expirationElement.style.display =
+            "none";
+
+
+        inviteCodeElement.textContent =
+            "Generating...";
+
+
+        statusElement.textContent =
+            "Connecting to meeting server...";
+
+
+        statusElement.className =
+            "";
+
+
+        try {
+
+            // ======================================
+            // ASK SERVER TO CREATE ROOM
+            // ======================================
+
+            const response =
+                await fetch(
+                    `${SERVER_URL}/api/create-room`,
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
 
             console.log(
-                "Back button clicked."
-            );
-
-
-            window.location.href =
-                "../index.html";
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// GENERATE RANDOM MEETING CODE
-// ==================================================
-
-function generateMeetingCode() {
-
-    /*
-     * Characters intentionally exclude
-     * confusing characters such as:
-     *
-     * 0
-     * O
-     * I
-     * 1
-     *
-     * This makes the code easier to read
-     * over the phone or in person.
-     */
-
-    const characters =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-
-    const randomValues =
-        new Uint32Array(8);
-
-
-    crypto.getRandomValues(
-        randomValues
-    );
-
-
-    let code = "";
-
-
-    for (
-        let i = 0;
-        i < randomValues.length;
-        i++
-    ) {
-
-        code +=
-            characters[
-                randomValues[i] %
-                characters.length
-            ];
-
-    }
-
-
-    // ==========================================
-    // FORMAT
-    // ==========================================
-    //
-    // Example:
-    //
-    // ABCD-EFGH
-    //
-    // ==========================================
-
-    return (
-        code.substring(0, 4) +
-        "-" +
-        code.substring(4, 8)
-    );
-
-}
-
-
-// ==================================================
-// CREATE MEETING
-// ==================================================
-
-if (createMeetingButton) {
-
-    createMeetingButton.addEventListener(
-        "click",
-        function () {
-
-            console.log(
-                "Create Meeting clicked."
+                "Server response:",
+                response.status
             );
 
 
             // ======================================
-            // GENERATE CODE
+            // CHECK HTTP RESPONSE
             // ======================================
 
-            meetingCode =
-                generateMeetingCode();
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    `Server returned HTTP ${response.status}`
+                );
+
+            }
+
+
+            // ======================================
+            // READ JSON
+            // ======================================
+
+            const data =
+                await response.json();
 
 
             console.log(
-                "Generated meeting code:",
-                meetingCode
+                "Create room response:",
+                data
             );
 
 
             // ======================================
-            // SAVE ROLE
+            // VALIDATE RESPONSE
+            // ======================================
+
+            if (
+                !data.success
+                ||
+                !data.inviteCode
+            ) {
+
+                throw new Error(
+                    "The server did not return a meeting code."
+                );
+
+            }
+
+
+            // ======================================
+            // GET RANDOM CODE
+            // ======================================
+
+            currentInviteCode =
+                String(
+                    data.inviteCode
+                )
+                .trim()
+                .toUpperCase();
+
+
+            // ======================================
+            // DISPLAY CODE
+            // ======================================
+
+            inviteCodeElement.textContent =
+                currentInviteCode;
+
+
+            // ======================================
+            // SAVE MEETING INFORMATION
             // ======================================
 
             sessionStorage.setItem(
@@ -186,148 +225,188 @@ if (createMeetingButton) {
             );
 
 
-            // ======================================
-            // SAVE ROOM
-            // ======================================
-
             sessionStorage.setItem(
                 "meetingRoom",
-                meetingCode
+                currentInviteCode
             );
 
-
-            // ======================================
-            // SAVE INVITE CODE
-            // ======================================
 
             sessionStorage.setItem(
                 "inviteCode",
-                meetingCode
+                currentInviteCode
             );
 
 
             // ======================================
-            // DISPLAY CODE
+            // CREATE MEETING PAGE LINK
             // ======================================
 
-            if (inviteCodeDisplay) {
+            const meetingURL =
+                "meeting.html" +
+                "?role=interviewer" +
+                "&room=" +
+                encodeURIComponent(
+                    currentInviteCode
+                );
 
-                inviteCodeDisplay.textContent =
-                    meetingCode;
 
-            }
+            meetingLink.href =
+                meetingURL;
+
+
+            meetingLink.style.display =
+                "inline-block";
+
+
+            // ======================================
+            // ENABLE COPY
+            // ======================================
+
+            copyCodeButton.disabled =
+                false;
+
+
+            // ======================================
+            // EXPIRATION
+            // ======================================
+
+            expirationElement.style.display =
+                "block";
 
 
             // ======================================
             // STATUS
             // ======================================
 
-            if (inviteStatus) {
+            statusElement.textContent =
+                "Meeting code created. Give this code to the interviewee.";
 
-                inviteStatus.textContent =
-                    "Meeting created. Share this code with the interviewee.";
 
-                inviteStatus.style.color =
-                    "#16a34a";
-
-            }
+            statusElement.className =
+                "success";
 
 
             // ======================================
-            // SHOW MEETING SECTION
+            // CHANGE BUTTON
             // ======================================
 
-            if (meetingSection) {
+            generateCodeButton.textContent =
+                "Generate New Meeting";
 
-                meetingSection.style.display =
-                    "block";
 
-            }
+        }
+
+        catch (error) {
+
+            console.error(
+                "Meeting code generation failed:",
+                error
+            );
 
 
             // ======================================
-            // DISABLE CREATE BUTTON
+            // RESET CODE
             // ======================================
 
-            createMeetingButton.disabled =
+            currentInviteCode =
+                null;
+
+
+            inviteCodeElement.textContent =
+                "----";
+
+
+            copyCodeButton.disabled =
                 true;
 
 
+            meetingLink.style.display =
+                "none";
+
+
+            expirationElement.style.display =
+                "none";
+
+
             // ======================================
-            // SHOW OPEN MEETING BUTTON
+            // ERROR MESSAGE
             // ======================================
 
-            if (openMeetingButton) {
+            statusElement.textContent =
+                "Could not connect to the meeting server. Make sure server.js is running on port 8080.";
 
-                openMeetingButton.style.display =
-                    "inline-block";
 
-            }
+            statusElement.className =
+                "error";
 
         }
-    );
 
-}
+        finally {
+
+            generateCodeButton.disabled =
+                false;
+
+        }
+
+    }
+);
 
 
 // ==================================================
 // COPY MEETING CODE
 // ==================================================
 
-if (copyCodeButton) {
+copyCodeButton.addEventListener(
+    "click",
+    async function () {
 
-    copyCodeButton.addEventListener(
-        "click",
-        async function () {
+        if (
+            !currentInviteCode
+        ) {
 
-            if (!meetingCode) {
+            return;
 
-                return;
+        }
 
-            }
 
+        try {
+
+            await navigator.clipboard.writeText(
+                currentInviteCode
+            );
+
+
+            statusElement.textContent =
+                "Meeting code copied to clipboard.";
+
+
+            statusElement.className =
+                "success";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Could not copy code:",
+                error
+            );
+
+
+            // ======================================
+            // FALLBACK
+            // ======================================
 
             try {
 
-                await navigator.clipboard.writeText(
-                    meetingCode
-                );
-
-
-                copyCodeButton.textContent =
-                    "Copied!";
-
-
-                setTimeout(
-                    function () {
-
-                        copyCodeButton.textContent =
-                            "Copy Code";
-
-                    },
-                    1500
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Could not copy meeting code:",
-                    error
-                );
-
-
-                // Fallback
-
                 const temporaryInput =
                     document.createElement(
-                        "input"
+                        "textarea"
                     );
 
 
                 temporaryInput.value =
-                    meetingCode;
+                    currentInviteCode;
 
 
                 document.body.appendChild(
@@ -346,81 +425,39 @@ if (copyCodeButton) {
                 temporaryInput.remove();
 
 
-                copyCodeButton.textContent =
-                    "Copied!";
+                statusElement.textContent =
+                    "Meeting code copied.";
 
 
-                setTimeout(
-                    function () {
+                statusElement.className =
+                    "success";
 
-                        copyCodeButton.textContent =
-                            "Copy Code";
+            }
 
-                    },
-                    1500
+            catch (fallbackError) {
+
+                console.error(
+                    "Copy fallback failed:",
+                    fallbackError
                 );
+
+
+                statusElement.textContent =
+                    "Could not copy the code. Please copy it manually.";
+
+                statusElement.className =
+                    "error";
 
             }
 
         }
-    );
 
-}
-
-
-// ==================================================
-// OPEN MEETING ROOM
-// ==================================================
-
-if (openMeetingButton) {
-
-    openMeetingButton.addEventListener(
-        "click",
-        function () {
-
-            if (!meetingCode) {
-
-                return;
-
-            }
-
-
-            // ======================================
-            // Make sure role and room are saved
-            // ======================================
-
-            sessionStorage.setItem(
-                "meetingRole",
-                "interviewer"
-            );
-
-
-            sessionStorage.setItem(
-                "meetingRoom",
-                meetingCode
-            );
-
-
-            // ======================================
-            // Open meeting.html
-            // ======================================
-
-            window.location.href =
-                "meeting.html" +
-                "?role=interviewer" +
-                "&room=" +
-                encodeURIComponent(
-                    meetingCode
-                );
-
-        }
-    );
-
-}
+    }
+);
 
 
 // ==================================================
-// DEBUG
+// PAGE LOAD
 // ==================================================
 
 console.log(
@@ -428,7 +465,16 @@ console.log(
 );
 
 console.log(
-    "interviewer.js loaded successfully."
+    "Interviewer page loaded."
+);
+
+console.log(
+    "Server:",
+    SERVER_URL
+);
+
+console.log(
+    "Waiting for meeting-code generation."
 );
 
 console.log(

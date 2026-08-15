@@ -8,12 +8,6 @@
 const http =
     require("http");
 
-const fs =
-    require("fs");
-
-const path =
-    require("path");
-
 const crypto =
     require("crypto");
 
@@ -25,27 +19,11 @@ const WebSocket =
 // CONFIGURATION
 // ==================================================
 
-const PORT =
-    8080;
+const PORT = 8080;
 
 
 // ==================================================
 // MEETING ROOMS
-// ==================================================
-//
-// Stores active meeting rooms.
-//
-// Example:
-//
-// K7P4-X92M
-//      ↓
-// {
-//     createdAt: ...,
-//     expiresAt: ...,
-//     interviewer: null,
-//     interviewee: null
-// }
-//
 // ==================================================
 
 const meetingRooms =
@@ -53,12 +31,11 @@ const meetingRooms =
 
 
 // ==================================================
-// INVITE CODE SETTINGS
+// INVITE CODE EXPIRATION
 // ==================================================
 
 const INVITE_CODE_LIFETIME =
     30 * 60 * 1000;
-// 30 minutes
 
 
 // ==================================================
@@ -70,9 +47,7 @@ function generateInviteCode() {
     const characters =
         "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-
     let firstPart = "";
-
     let secondPart = "";
 
 
@@ -120,7 +95,7 @@ function generateInviteCode() {
 
 
 // ==================================================
-// CREATE UNIQUE ROOM
+// CREATE ROOM
 // ==================================================
 
 function createMeetingRoom() {
@@ -184,7 +159,7 @@ function createMeetingRoom() {
 
 
 // ==================================================
-// VERIFY ROOM
+// GET VALID ROOM
 // ==================================================
 
 function getValidRoom(
@@ -211,10 +186,6 @@ function getValidRoom(
     }
 
 
-    // ==============================================
-    // CHECK EXPIRATION
-    // ==============================================
-
     if (
         Date.now() >
         room.expiresAt
@@ -226,7 +197,7 @@ function getValidRoom(
 
 
         console.log(
-            "Meeting room expired:",
+            "Expired room:",
             inviteCode
         );
 
@@ -242,7 +213,7 @@ function getValidRoom(
 
 
 // ==================================================
-// JSON RESPONSE HELPER
+// SEND JSON
 // ==================================================
 
 function sendJSON(
@@ -250,12 +221,6 @@ function sendJSON(
     statusCode,
     data
 ) {
-
-    const body =
-        JSON.stringify(
-            data
-        );
-
 
     response.writeHead(
         statusCode,
@@ -276,7 +241,9 @@ function sendJSON(
 
 
     response.end(
-        body
+        JSON.stringify(
+            data
+        )
     );
 
 }
@@ -293,8 +260,9 @@ const server =
             response
         ) {
 
+
             // ======================================
-            // CORS PREFLIGHT
+            // CORS
             // ======================================
 
             if (
@@ -318,7 +286,6 @@ const server =
 
 
                 response.end();
-
 
                 return;
 
@@ -375,8 +342,7 @@ const server =
                     "/api/verify-invite"
             ) {
 
-                let body =
-                    "";
+                let body = "";
 
 
                 request.on(
@@ -417,10 +383,6 @@ const server =
                                 );
 
 
-                            // ==================
-                            // INVALID
-                            // ==================
-
                             if (!room) {
 
                                 sendJSON(
@@ -435,15 +397,10 @@ const server =
                                     }
                                 );
 
-
                                 return;
 
                             }
 
-
-                            // ==================
-                            // INTERVIEWEE
-                            // ==================
 
                             if (
                                 room.interviewee
@@ -461,15 +418,10 @@ const server =
                                     }
                                 );
 
-
                                 return;
 
                             }
 
-
-                            // ==================
-                            // RESERVE ROOM
-                            // ==================
 
                             sendJSON(
                                 response,
@@ -479,7 +431,10 @@ const server =
                                         true,
 
                                     room:
-                                        room.inviteCode
+                                        room.inviteCode,
+
+                                    expiresAt:
+                                        room.expiresAt
                                 }
                             );
 
@@ -517,7 +472,7 @@ const server =
 
 
             // ======================================
-            // HEALTH CHECK
+            // STATUS
             // ======================================
 
             if (
@@ -546,7 +501,7 @@ const server =
 
 
             // ======================================
-            // DEFAULT RESPONSE
+            // NOT FOUND
             // ======================================
 
             response.writeHead(
@@ -645,7 +600,6 @@ wss.on(
 
             socket.close();
 
-
             return;
 
         }
@@ -656,8 +610,10 @@ wss.on(
         // ==========================================
 
         if (
-            role !== "interviewer" &&
-            role !== "interviewee"
+            role !==
+                "interviewer" &&
+            role !==
+                "interviewee"
         ) {
 
             socket.send(
@@ -673,14 +629,13 @@ wss.on(
 
             socket.close();
 
-
             return;
 
         }
 
 
         // ==========================================
-        // CHECK ROLE AVAILABILITY
+        // CHECK DUPLICATE PARTICIPANT
         // ==========================================
 
         if (
@@ -695,13 +650,12 @@ wss.on(
                         "error",
 
                     message:
-                        "Interviewer is already connected."
+                        "An interviewer is already connected."
                 })
             );
 
 
             socket.close();
-
 
             return;
 
@@ -720,13 +674,12 @@ wss.on(
                         "error",
 
                     message:
-                        "Interviewee is already connected."
+                        "An interviewee is already connected."
                 })
             );
 
 
             socket.close();
-
 
             return;
 
@@ -734,7 +687,7 @@ wss.on(
 
 
         // ==========================================
-        // SAVE CONNECTION
+        // SAVE SOCKET
         // ==========================================
 
         if (
@@ -746,12 +699,7 @@ wss.on(
                 socket;
 
         }
-
-
-        if (
-            role ===
-            "interviewee"
-        ) {
+        else {
 
             room.interviewee =
                 socket;
@@ -765,7 +713,7 @@ wss.on(
 
 
         // ==========================================
-        // TELL CLIENT THEY JOINED
+        // CONFIRM JOIN
         // ==========================================
 
         socket.send(
@@ -783,7 +731,7 @@ wss.on(
 
 
         // ==========================================
-        // NOTIFY OTHER USER
+        // NOTIFY OTHER PARTICIPANT
         // ==========================================
 
         const otherSocket =
@@ -813,7 +761,7 @@ wss.on(
 
 
         // ==========================================
-        // WEBRTC SIGNALING
+        // RELAY SIGNALING MESSAGES
         // ==========================================
 
         socket.on(
@@ -864,19 +812,28 @@ wss.on(
                     "interviewer"
                 ) {
 
-                    room.interviewer =
-                        null;
+                    if (
+                        room.interviewer ===
+                        socket
+                    ) {
+
+                        room.interviewer =
+                            null;
+
+                    }
 
                 }
+                else {
 
+                    if (
+                        room.interviewee ===
+                        socket
+                    ) {
 
-                if (
-                    role ===
-                    "interviewee"
-                ) {
+                        room.interviewee =
+                            null;
 
-                    room.interviewee =
-                        null;
+                    }
 
                 }
 
@@ -939,7 +896,6 @@ server.listen(
 
         console.log(
             "======================================"
-
         );
 
     }
@@ -947,7 +903,7 @@ server.listen(
 
 
 // ==================================================
-// CLEAN UP EXPIRED ROOMS
+// CLEAN EXPIRED ROOMS
 // ==================================================
 
 setInterval(

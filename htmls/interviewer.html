@@ -11,98 +11,60 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Interviewer Meeting</title>
-
-
-    <!-- ==========================================
-         GOOGLE FONT
-    =========================================== -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- ==========================================
-         INTERVIEWER JAVASCRIPT
-    =========================================== -->
-
-    <script
-        src="../js/interviewer.js"
-        defer
-    ></script>
+    <title>Interviewer - Dashboard (Meeting & Resume)</title>
 
 
     <style>
-
-        /* ==========================================
-           GLOBAL
-        ========================================== */
 
         * {
             box-sizing: border-box;
         }
 
 
-        html,
         body {
 
             margin: 0;
-            padding: 0;
 
-            min-height: 100%;
-
-        }
-
-
-        body {
+            min-height: 100vh;
 
             font-family:
-                "Inter",
+                Arial,
                 sans-serif;
 
-            background-color:
+            background:
                 #f5f7fa;
 
             color:
                 #1f2937;
 
-            min-height:
-                100vh;
+            display:
+                flex;
 
-            padding:
-                30px;
+            align-items:
+                center;
+
+            justify-content:
+                center;
 
         }
 
 
-        /* ==========================================
+        /* ==============================
            BACK BUTTON
-        ========================================== */
+        ============================== */
 
         .back-button {
 
             position: fixed;
 
             top: 25px;
+
             left: 25px;
 
             padding:
                 10px 16px;
 
-            background-color:
+            background:
                 white;
 
             color:
@@ -115,7 +77,7 @@
                 8px;
 
             font-family:
-                "Inter",
+                Arial,
                 sans-serif;
 
             font-size:
@@ -127,10 +89,6 @@
             cursor:
                 pointer;
 
-            transition:
-                background-color 0.2s,
-                border-color 0.2s;
-
             z-index:
                 1000;
 
@@ -139,29 +97,41 @@
 
         .back-button:hover {
 
-            background-color:
+            background:
                 #f3f4f6;
 
             border-color:
                 #9ca3af;
 
+            color:
+                #111827;
+
         }
 
 
-        /* ==========================================
-           MAIN CONTAINER
-        ========================================== */
-
         .container {
 
-            width:
-                100%;
+            width: 90%;
 
-            max-width:
-                800px;
+            max-width: 650px;
 
-            margin:
-                100px auto 60px;
+            background:
+                white;
+
+            padding:
+                45px;
+
+            border-radius:
+                16px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
 
             text-align:
                 center;
@@ -169,135 +139,126 @@
         }
 
 
-        /* ==========================================
-           TITLE
-        ========================================== */
-
-        .page-title {
+        h1 {
 
             margin:
                 0 0 12px;
 
             font-size:
-                44px;
+                36px;
+
+            color:
+                #111827;
+
+        }
+
+
+        .description {
+
+            color:
+                #6b7280;
+
+            font-size:
+                16px;
+
+            line-height:
+                1.6;
+
+            margin-bottom:
+                30px;
+
+        }
+
+
+        /* ==============================
+           CODE BOX
+        ============================== */
+
+        .code-label {
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+
+            color:
+                #6b7280;
+
+            margin-bottom:
+                10px;
+
+        }
+
+
+        #inviteCode {
+
+            font-size:
+                42px;
 
             font-weight:
                 700;
 
             letter-spacing:
-                -1px;
+                6px;
 
             color:
-                #111827;
-
-        }
-
-
-        /* ==========================================
-           SUBTITLE
-        ========================================== */
-
-        .subtitle {
-
-            margin:
-                0 0 35px;
-
-            font-size:
-                17px;
-
-            color:
-                #6b7280;
-
-        }
-
-
-        /* ==========================================
-           CARD
-        ========================================== */
-
-        .meeting-card {
-
-            width:
-                100%;
-
-            max-width:
-                550px;
-
-            margin:
-                0 auto;
-
-            padding:
-                40px 30px;
-
-            background-color:
-                white;
-
-            border:
-                1px solid #d1d5db;
-
-            border-radius:
-                15px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0, 0, 0, 0.05);
-
-        }
-
-
-        /* ==========================================
-           CARD TITLE
-        ========================================== */
-
-        .meeting-card h2 {
-
-            margin:
-                0 0 15px;
-
-            font-size:
-                25px;
-
-            color:
-                #111827;
-
-        }
-
-
-        /* ==========================================
-           DESCRIPTION
-        ========================================== */
-
-        .description {
-
-            margin:
-                0 0 25px;
-
-            color:
-                #6b7280;
-
-            font-size:
-                15px;
-
-            line-height:
-                1.6;
-
-        }
-
-
-        /* ==========================================
-           PRIMARY BUTTON
-        ========================================== */
-
-        .primary-button {
-
-            padding:
-                13px 24px;
-
-            background-color:
                 #007bff;
 
-            color:
-                white;
+            background:
+                #f8fbff;
+
+            border:
+                2px solid
+                #dbeafe;
+
+            border-radius:
+                12px;
+
+            padding:
+                20px;
+
+            margin-bottom:
+                25px;
+
+            min-height:
+                88px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .button-row {
+
+            display:
+                flex;
+
+            justify-content:
+                center;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
+
+        }
+
+
+        button,
+        .meeting-button {
 
             border:
                 none;
@@ -305,9 +266,8 @@
             border-radius:
                 8px;
 
-            font-family:
-                "Inter",
-                sans-serif;
+            padding:
+                12px 22px;
 
             font-size:
                 16px;
@@ -318,324 +278,154 @@
             cursor:
                 pointer;
 
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
-
-        }
-
-
-        .primary-button:hover:not(:disabled) {
-
-            background-color:
-                #0056b3;
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        .primary-button:disabled {
-
-            opacity:
-                0.5;
-
-            cursor:
-                not-allowed;
-
-            transform:
+            text-decoration:
                 none;
-
-        }
-
-
-        /* ==========================================
-           INVITE STATUS
-        ========================================== */
-
-        #inviteStatus {
-
-            min-height:
-                22px;
-
-            margin:
-                20px 0 0;
-
-            font-size:
-                14px;
-
-            font-weight:
-                500;
-
-        }
-
-
-        /* ==========================================
-           MEETING SECTION
-        ========================================== */
-
-        #meetingSection {
-
-            margin-top:
-                30px;
-
-            padding-top:
-                30px;
-
-            border-top:
-                1px solid #e5e7eb;
-
-        }
-
-
-        /* ==========================================
-           CODE LABEL
-        ========================================== */
-
-        .code-label {
-
-            margin:
-                0 0 10px;
-
-            font-size:
-                14px;
-
-            font-weight:
-                600;
-
-            color:
-                #6b7280;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                1px;
-
-        }
-
-
-        /* ==========================================
-           INVITE CODE
-        ========================================== */
-
-        #inviteCodeDisplay {
 
             display:
                 inline-block;
 
-            padding:
-                15px 25px;
-
-            margin:
-                5px 0 20px;
-
-            background-color:
-                #f3f6fb;
-
-            border:
-                2px solid #007bff;
-
-            border-radius:
-                10px;
-
-            color:
-                #111827;
-
-            font-size:
-                32px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                5px;
-
-            user-select:
-                all;
-
         }
 
 
-        /* ==========================================
-           SHARE MESSAGE
-        ========================================== */
+        #generateCodeButton {
 
-        .share-message {
-
-            margin:
-                0 0 25px;
-
-            color:
-                #6b7280;
-
-            font-size:
-                15px;
-
-            line-height:
-                1.6;
-
-        }
-
-
-        /* ==========================================
-           COPY BUTTON
-        ========================================== */
-
-        #copyCodeButton {
-
-            padding:
-                11px 20px;
-
-            background-color:
-                #111827;
+            background:
+                #007bff;
 
             color:
                 white;
 
-            border:
-                none;
+        }
 
-            border-radius:
-                8px;
 
-            font-family:
-                "Inter",
-                sans-serif;
+        #generateCodeButton:hover {
 
-            font-size:
-                15px;
+            background:
+                #0056b3;
 
-            font-weight:
-                600;
+        }
 
-            cursor:
-                pointer;
+
+        #copyCodeButton {
+
+            background:
+                #374151;
+
+            color:
+                white;
 
         }
 
 
         #copyCodeButton:hover {
 
-            background-color:
-                #374151;
+            background:
+                #1f2937;
 
         }
 
 
-        /* ==========================================
-           OPEN MEETING BUTTON
-        ========================================== */
+        #copyCodeButton:disabled,
+        #generateCodeButton:disabled {
 
-        #openMeetingButton {
+            opacity:
+                0.6;
 
-            display:
-                none;
+            cursor:
+                not-allowed;
 
-            margin-top:
-                15px;
+        }
 
-            padding:
-                12px 20px;
 
-            background-color:
+        .meeting-button {
+
+            background:
                 #16a34a;
 
             color:
                 white;
 
-            border:
+            display:
                 none;
-
-            border-radius:
-                8px;
-
-            font-family:
-                "Inter",
-                sans-serif;
-
-            font-size:
-                15px;
-
-            font-weight:
-                600;
-
-            cursor:
-                pointer;
 
         }
 
 
-        #openMeetingButton:hover {
+        .meeting-button:hover {
 
-            background-color:
+            background:
                 #15803d;
 
         }
 
 
-        /* ==========================================
-           SECURITY NOTE
-        ========================================== */
+        /* ==============================
+           STATUS
+        ============================== */
 
-        .security-note {
+        #status {
 
             margin-top:
                 25px;
 
-            padding:
-                12px 15px;
-
-            background-color:
-                #f9fafb;
-
-            border-radius:
-                8px;
+            font-size:
+                15px;
 
             color:
                 #6b7280;
 
-            font-size:
-                13px;
-
-            line-height:
-                1.5;
+            min-height:
+                24px;
 
         }
 
 
-        /* ==========================================
+        #status.success {
+
+            color:
+                #15803d;
+
+        }
+
+
+        #status.error {
+
+            color:
+                #dc2626;
+
+        }
+
+
+        /* ==============================
+           EXPIRATION
+        ============================== */
+
+        #expiration {
+
+            display:
+                none;
+
+            margin-top:
+                10px;
+
+            font-size:
+                13px;
+
+            color:
+                #9ca3af;
+
+        }
+
+
+        /* ==============================
            MOBILE
-        ========================================== */
+        ============================== */
 
-        @media (max-width: 700px) {
-
-            body {
-
-                padding:
-                    20px;
-
-            }
-
+        @media (
+            max-width: 600px
+        ) {
 
             .container {
-
-                margin-top:
-                    80px;
-
-            }
-
-
-            .page-title {
-
-                font-size:
-                    36px;
-
-            }
-
-
-            .meeting-card {
 
                 padding:
                     30px 20px;
@@ -643,24 +433,30 @@
             }
 
 
-            #inviteCodeDisplay {
+            h1 {
 
                 font-size:
-                    25px;
+                    30px;
+
+            }
+
+
+            #inviteCode {
+
+                font-size:
+                    30px;
 
                 letter-spacing:
-                    3px;
+                    4px;
 
             }
 
 
             .back-button {
 
-                top:
-                    15px;
+                top: 15px;
 
-                left:
-                    15px;
+                left: 15px;
 
             }
 
@@ -674,9 +470,9 @@
 <body>
 
 
-    <!-- ==========================================
+    <!-- ==============================
          BACK BUTTON
-    ========================================== -->
+    ============================== -->
 
     <button
         id="backButton"
@@ -689,141 +485,152 @@
     </button>
 
 
-    <!-- ==========================================
-         MAIN
-    ========================================== -->
-
-    <main class="container">
+    <div class="container">
 
 
-        <h1 class="page-title">
-
-            Interviewer Meeting
-
+        <h1>
+            Interviewer Dashboard
         </h1>
 
 
-        <p class="subtitle">
+        <p class="description">
 
-            Create a secure meeting and invite your interviewee.
+            Generate a secure meeting code
+            and give it to your interviewee.
+
+            The interviewee will use the code
+            to enter the interview process.
 
         </p>
 
 
-        <!-- ======================================
-             MEETING CARD
-        ====================================== -->
+        <!-- ==============================
+             CODE LABEL
+        ============================== -->
 
-        <section class="meeting-card">
+        <div class="code-label">
 
+            MEETING CODE
 
-            <h2>
-
-                Create Interview Meeting
-
-            </h2>
+        </div>
 
 
-            <p class="description">
+        <!-- ==============================
+             RANDOM CODE
+        ============================== -->
 
-                Click the button below to generate
-                a unique meeting code.
+        <div
+            id="inviteCode"
+        >
 
-            </p>
+            ----
+
+        </div>
 
 
-            <!-- ==================================
-                 CREATE BUTTON
-            =================================== -->
+        <!-- ==============================
+             BUTTONS
+        ============================== -->
+
+        <div class="button-row">
+
 
             <button
-                id="createMeetingButton"
-                class="primary-button"
+                id="generateCodeButton"
                 type="button"
             >
 
-                Create Meeting
+                Generate Meeting Code
 
             </button>
 
 
-            <!-- ==================================
-                 STATUS
-            =================================== -->
-
-            <p id="inviteStatus"></p>
-
-
-            <!-- ==================================
-                 GENERATED MEETING
-            =================================== -->
-
-            <div
-                id="meetingSection"
-                style="display: none;"
+            <button
+                id="copyCodeButton"
+                type="button"
+                disabled
             >
 
+                Copy Code
 
-                <p class="code-label">
-
-                    Meeting Code
-
-                </p>
+            </button>
 
 
-                <div
-                    id="inviteCodeDisplay"
-                >
-                </div>
+            <a
+                id="meetingLink"
+                class="meeting-button"
+                href="#"
+            >
+
+                Enter Meeting →
+
+            </a>
 
 
-                <p class="share-message">
-
-                    Give this code to the interviewee.
-                    They will enter it on their invite page.
-
-                </p>
+        </div>
 
 
-                <!-- COPY -->
+        <!-- ==============================
+             STATUS
+        ============================== -->
 
-                <button
-                    id="copyCodeButton"
-                    type="button"
-                >
+        <div
+            id="status"
+        >
 
-                    Copy Code
+            No meeting created yet.
 
-                </button>
-
-
-                <!-- OPEN MEETING -->
-
-                <button
-                    id="openMeetingButton"
-                    type="button"
-                >
-
-                    Open Meeting Room
-
-                </button>
+        </div>
 
 
-                <p class="security-note">
+        <!-- ==============================
+             EXPIRATION
+        ============================== -->
 
-                    This meeting code is randomly generated
-                    for this browser session.
+        <div
+            id="expiration"
+        >
 
-                </p>
+            This meeting code expires
+            after 30 minutes.
 
-
-            </div>
-
-
-        </section>
+        </div>
 
 
-    </main>
+    </div>
+
+
+    <!-- ==============================
+         INTERVIEWER JAVASCRIPT
+    ============================== -->
+
+    <script
+        src="../js/interviewer.js"
+    ></script>
+
+
+    <!-- ==============================
+         BACK BUTTON
+    ============================== -->
+
+    <script>
+
+        const backButton =
+            document.getElementById(
+                "backButton"
+            );
+
+
+        backButton.addEventListener(
+            "click",
+            function () {
+
+                window.history.back();
+
+            }
+        );
+
+    </script>
 
 
 </body>

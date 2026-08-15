@@ -2,7 +2,7 @@
 
 
 // ==================================================
-// URL / ROOM INFORMATION
+// URL PARAMETERS
 // ==================================================
 
 const urlParams =
@@ -12,11 +12,15 @@ const urlParams =
 
 
 const role =
-    urlParams.get("role");
+    urlParams.get(
+        "role"
+    );
 
 
 const room =
-    urlParams.get("room");
+    urlParams.get(
+        "room"
+    );
 
 
 // ==================================================
@@ -90,16 +94,30 @@ const downloadRecording =
 
 
 // ==================================================
-// VALIDATE ROOM
+// VALIDATE
 // ==================================================
 
-if (!role || !room) {
+if (
+    !role ||
+    !room
+) {
 
-    status.textContent =
-        "Invalid meeting URL.";
+    if (status) {
 
-    startMeetingButton.disabled =
-        true;
+        status.textContent =
+            "Invalid meeting URL.";
+
+    }
+
+
+    if (
+        startMeetingButton
+    ) {
+
+        startMeetingButton.disabled =
+            true;
+
+    }
 
 }
 
@@ -108,7 +126,10 @@ if (!role || !room) {
 // DISPLAY ROOM
 // ==================================================
 
-if (roomDisplay && room) {
+if (
+    roomDisplay &&
+    room
+) {
 
     roomDisplay.textContent =
         `Room: ${room}`;
@@ -120,53 +141,62 @@ if (roomDisplay && room) {
 // VARIABLES
 // ==================================================
 
-let localStream = null;
+let localStream =
+    null;
 
-let remoteStream = null;
+let remoteStream =
+    null;
 
-let peerConnection = null;
+let peerConnection =
+    null;
 
-let socket = null;
+let socket =
+    null;
 
-let peerConnected = false;
+let peerConnected =
+    false;
 
-let meetingStarted = false;
-
-
-// ==================================================
-// RECORDING VARIABLES
-// ==================================================
-
-let mediaRecorder = null;
-
-let recordedChunks = [];
-
-let recordingURL = null;
-
-let recordingCanvas = null;
-
-let recordingCanvasContext = null;
-
-let recordingAnimationFrame = null;
-
-let recordingAudioContext = null;
-
-let recordingAudioDestination = null;
-
-let localAudioSource = null;
-
-let remoteAudioSource = null;
+let meetingStarted =
+    false;
 
 
 // ==================================================
-// WEBSOCKET SERVER
+// RECORDING
 // ==================================================
-//
-// Development:
-// localhost:8080
-//
-// When deployed with HTTPS, this should become:
-// wss://your-domain.com
+
+let mediaRecorder =
+    null;
+
+let recordedChunks =
+    [];
+
+let recordingURL =
+    null;
+
+let recordingCanvas =
+    null;
+
+let recordingCanvasContext =
+    null;
+
+let recordingAnimationFrame =
+    null;
+
+let recordingAudioContext =
+    null;
+
+let recordingAudioDestination =
+    null;
+
+let localAudioSource =
+    null;
+
+let remoteAudioSource =
+    null;
+
+
+// ==================================================
+// SIGNALING SERVER
 // ==================================================
 
 const SIGNALING_SERVER =
@@ -174,13 +204,7 @@ const SIGNALING_SERVER =
 
 
 // ==================================================
-// ICE SERVERS
-// ==================================================
-//
-// STUN helps peers discover possible network
-// paths.
-//
-// For production, add a TURN server too.
+// ICE
 // ==================================================
 
 const ICE_SERVERS = {
@@ -198,15 +222,18 @@ const ICE_SERVERS = {
 
 
 // ==================================================
-// INITIALIZATION
+// INITIALIZE
 // ==================================================
 
 initialize();
 
 
-async function initialize() {
+function initialize() {
 
-    if (!role || !room) {
+    if (
+        !role ||
+        !room
+    ) {
 
         return;
 
@@ -225,17 +252,13 @@ async function initialize() {
     );
 
 
-    // ==============================================
-    // CONNECT TO SIGNALING SERVER
-    // ==============================================
-
     connectToSignalingServer();
 
 }
 
 
 // ==================================================
-// SIGNALING SERVER CONNECTION
+// CONNECT SIGNALING
 // ==================================================
 
 function connectToSignalingServer() {
@@ -244,15 +267,29 @@ function connectToSignalingServer() {
         "Connecting to meeting server...";
 
 
-    socket =
-        new WebSocket(
-            SIGNALING_SERVER
+    const websocketURL =
+        SIGNALING_SERVER +
+        "?room=" +
+        encodeURIComponent(
+            room
+        ) +
+        "&role=" +
+        encodeURIComponent(
+            role
         );
 
 
-    // ==============================================
-    // OPEN
-    // ==============================================
+    console.log(
+        "WebSocket:",
+        websocketURL
+    );
+
+
+    socket =
+        new WebSocket(
+            websocketURL
+        );
+
 
     socket.onopen =
         function () {
@@ -263,33 +300,15 @@ function connectToSignalingServer() {
 
 
             status.textContent =
-                "Connected. Waiting to join meeting...";
-
-
-            socket.send(
-                JSON.stringify({
-
-                    type:
-                        "join-room",
-
-                    room:
-                        room,
-
-                    role:
-                        role
-
-                })
-            );
+                "Connected. Waiting for participant...";
 
         };
 
 
-    // ==============================================
-    // MESSAGE
-    // ==============================================
-
     socket.onmessage =
-        async function (event) {
+        async function (
+            event
+        ) {
 
             try {
 
@@ -297,6 +316,12 @@ function connectToSignalingServer() {
                     JSON.parse(
                         event.data
                     );
+
+
+                console.log(
+                    "Signaling:",
+                    message.type
+                );
 
 
                 await handleSignalingMessage(
@@ -308,7 +333,7 @@ function connectToSignalingServer() {
             catch (error) {
 
                 console.error(
-                    "Signaling message error:",
+                    "Signaling error:",
                     error
                 );
 
@@ -316,10 +341,6 @@ function connectToSignalingServer() {
 
         };
 
-
-    // ==============================================
-    // CLOSE
-    // ==============================================
 
     socket.onclose =
         function () {
@@ -334,10 +355,6 @@ function connectToSignalingServer() {
 
         };
 
-
-    // ==============================================
-    // ERROR
-    // ==============================================
 
     socket.onerror =
         function (error) {
@@ -357,60 +374,37 @@ function connectToSignalingServer() {
 
 
 // ==================================================
-// SIGNALING MESSAGE HANDLER
+// SIGNALING HANDLER
 // ==================================================
 
 async function handleSignalingMessage(
     message
 ) {
 
-    console.log(
-        "Signaling message:",
-        message.type
-    );
-
-
-    // ==================================================
-    // ROOM JOINED
-    // ==================================================
+    // ==============================================
+    // JOINED
+    // ==============================================
 
     if (
         message.type ===
-        "room-joined"
+        "joined-room"
     ) {
 
         status.textContent =
-            "Joined meeting room. Click Start Meeting.";
+            "Joined meeting room. Waiting for participant...";
 
         return;
 
     }
 
 
-    // ==================================================
-    // PEER WAITING
-    // ==================================================
+    // ==============================================
+    // PEER JOINED
+    // ==============================================
 
     if (
         message.type ===
-        "peer-waiting"
-    ) {
-
-        status.textContent =
-            "Waiting for the other participant...";
-
-        return;
-
-    }
-
-
-    // ==================================================
-    // PEER READY
-    // ==================================================
-
-    if (
-        message.type ===
-        "peer-ready"
+        "peer-joined"
     ) {
 
         peerConnected =
@@ -418,16 +412,53 @@ async function handleSignalingMessage(
 
 
         status.textContent =
-            "Both participants are in the room.";
+            "Both participants are in the meeting room.";
+
+
+        // ==========================================
+        // INTERVIEWER CREATES OFFER
+        // ==========================================
+
+        if (
+            role ===
+            "interviewer"
+            &&
+            meetingStarted
+            &&
+            peerConnection
+        ) {
+
+            await createOffer();
+
+        }
+
 
         return;
 
     }
 
 
-    // ==================================================
+    // ==============================================
+    // ERROR
+    // ==============================================
+
+    if (
+        message.type ===
+        "error"
+    ) {
+
+        status.textContent =
+            message.message ||
+            "Meeting server error.";
+
+        return;
+
+    }
+
+
+    // ==============================================
     // OFFER
-    // ==================================================
+    // ==============================================
 
     if (
         message.type ===
@@ -443,9 +474,9 @@ async function handleSignalingMessage(
     }
 
 
-    // ==================================================
+    // ==============================================
     // ANSWER
-    // ==================================================
+    // ==============================================
 
     if (
         message.type ===
@@ -461,9 +492,9 @@ async function handleSignalingMessage(
     }
 
 
-    // ==================================================
-    // ICE CANDIDATE
-    // ==================================================
+    // ==============================================
+    // ICE
+    // ==============================================
 
     if (
         message.type ===
@@ -486,7 +517,7 @@ async function handleSignalingMessage(
             catch (error) {
 
                 console.error(
-                    "ICE candidate error:",
+                    "ICE error:",
                     error
                 );
 
@@ -499,9 +530,9 @@ async function handleSignalingMessage(
     }
 
 
-    // ==================================================
+    // ==============================================
     // PEER LEFT
-    // ==================================================
+    // ==============================================
 
     if (
         message.type ===
@@ -512,34 +543,18 @@ async function handleSignalingMessage(
             false;
 
 
-        remoteVideo.srcObject =
-            null;
+        if (
+            remoteVideo
+        ) {
+
+            remoteVideo.srcObject =
+                null;
+
+        }
 
 
         status.textContent =
             "The other participant left the meeting.";
-
-        return;
-
-    }
-
-
-    // ==================================================
-    // ROOM FULL
-    // ==================================================
-
-    if (
-        message.type ===
-        "room-full"
-    ) {
-
-        status.textContent =
-            "This meeting room already has two participants.";
-
-        startMeetingButton.disabled =
-            true;
-
-        return;
 
     }
 
@@ -550,112 +565,106 @@ async function handleSignalingMessage(
 // START MEETING
 // ==================================================
 
-startMeetingButton.addEventListener(
-    "click",
-    async function () {
+if (
+    startMeetingButton
+) {
 
-        try {
+    startMeetingButton.addEventListener(
+        "click",
+        async function () {
 
-            status.textContent =
-                "Requesting camera and microphone...";
+            try {
 
-
-            // ==========================================
-            // GET CAMERA + MICROPHONE
-            // ==========================================
-
-            localStream =
-                await navigator.mediaDevices
-                    .getUserMedia({
-
-                        video: true,
-
-                        audio: true
-
-                    });
+                status.textContent =
+                    "Requesting camera and microphone...";
 
 
-            // ==========================================
-            // SHOW LOCAL VIDEO
-            // ==========================================
+                localStream =
+                    await navigator.mediaDevices
+                        .getUserMedia({
 
-            localVideo.srcObject =
-                localStream;
+                            video:
+                                true,
 
+                            audio:
+                                true
 
-            // ==========================================
-            // CREATE PEER CONNECTION
-            // ==========================================
-
-            createPeerConnection();
+                        });
 
 
-            // ==========================================
-            // ADD LOCAL TRACKS
-            // ==========================================
+                localVideo.srcObject =
+                    localStream;
 
-            localStream
-                .getTracks()
-                .forEach(
-                    function (track) {
 
-                        peerConnection.addTrack(
-                            track,
-                            localStream
-                        );
+                createPeerConnection();
 
-                    }
+
+                localStream
+                    .getTracks()
+                    .forEach(
+                        function (
+                            track
+                        ) {
+
+                            peerConnection.addTrack(
+                                track,
+                                localStream
+                            );
+
+                        }
+                    );
+
+
+                meetingStarted =
+                    true;
+
+
+                startMeetingButton.disabled =
+                    true;
+
+
+                endMeetingButton.disabled =
+                    false;
+
+
+                status.textContent =
+                    "Meeting started. Waiting for the other participant...";
+
+
+                // ==================================
+                // IF PEER ALREADY THERE
+                // ==================================
+
+                if (
+                    role ===
+                    "interviewer"
+                    &&
+                    peerConnected
+                ) {
+
+                    await createOffer();
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Start meeting error:",
+                    error
                 );
 
 
-            meetingStarted =
-                true;
-
-
-            startMeetingButton.disabled =
-                true;
-
-
-            endMeetingButton.disabled =
-                false;
-
-
-            status.textContent =
-                "Meeting started. Waiting for the other participant...";
-
-
-            // ==========================================
-            // INTERVIEWER CREATES OFFER
-            // ==========================================
-
-            if (
-                role ===
-                "interviewer"
-                &&
-                peerConnected
-            ) {
-
-                await createOffer();
+                status.textContent =
+                    "Could not access camera or microphone. Check browser permissions.";
 
             }
 
         }
+    );
 
-        catch (error) {
-
-            console.error(
-                "Could not start meeting:",
-                error
-            );
-
-
-            status.textContent =
-                "Could not access the camera or microphone. Please check browser permissions.";
-
-        }
-
-    }
-);
+}
 
 
 // ==================================================
@@ -680,17 +689,17 @@ function createPeerConnection() {
 
 
     // ==============================================
-    // ICE CANDIDATE
+    // ICE
     // ==============================================
 
     peerConnection.onicecandidate =
-        function (event) {
+        function (
+            event
+        ) {
 
             if (
-                event.candidate
-                &&
-                socket
-                &&
+                event.candidate &&
+                socket &&
                 socket.readyState ===
                     WebSocket.OPEN
             ) {
@@ -700,9 +709,6 @@ function createPeerConnection() {
 
                         type:
                             "ice-candidate",
-
-                        room:
-                            room,
 
                         candidate:
                             event.candidate
@@ -720,16 +726,12 @@ function createPeerConnection() {
     // ==============================================
 
     peerConnection.ontrack =
-        function (event) {
-
-            console.log(
-                "Remote track received."
-            );
-
+        function (
+            event
+        ) {
 
             if (
-                event.streams
-                &&
+                event.streams &&
                 event.streams[0]
             ) {
 
@@ -737,7 +739,6 @@ function createPeerConnection() {
                     event.streams[0];
 
             }
-
             else {
 
                 if (
@@ -763,13 +764,7 @@ function createPeerConnection() {
 
             remoteVideo.play()
                 .catch(
-                    function () {
-
-                        console.log(
-                            "Remote video requires user interaction."
-                        );
-
-                    }
+                    function () {}
                 );
 
 
@@ -787,7 +782,7 @@ function createPeerConnection() {
         function () {
 
             console.log(
-                "Connection state:",
+                "WebRTC connection:",
                 peerConnection.connectionState
             );
 
@@ -800,8 +795,15 @@ function createPeerConnection() {
                 status.textContent =
                     "🟢 Meeting connected.";
 
-                startRecordingButton.disabled =
-                    false;
+
+                if (
+                    startRecordingButton
+                ) {
+
+                    startRecordingButton.disabled =
+                        false;
+
+                }
 
             }
 
@@ -839,7 +841,8 @@ function createPeerConnection() {
 async function createOffer() {
 
     if (
-        !peerConnection
+        !peerConnection ||
+        !socket
     ) {
 
         return;
@@ -865,9 +868,6 @@ async function createOffer() {
 
                 type:
                     "offer",
-
-                room:
-                    room,
 
                 offer:
                     peerConnection.localDescription
@@ -903,10 +903,6 @@ async function handleOffer(
 
     try {
 
-        // ==========================================
-        // CREATE CONNECTION IF NECESSARY
-        // ==========================================
-
         if (
             !peerConnection
         ) {
@@ -916,10 +912,6 @@ async function handleOffer(
         }
 
 
-        // ==========================================
-        // GET LOCAL CAMERA
-        // ==========================================
-
         if (
             !localStream
         ) {
@@ -928,9 +920,11 @@ async function handleOffer(
                 await navigator.mediaDevices
                     .getUserMedia({
 
-                        video: true,
+                        video:
+                            true,
 
-                        audio: true
+                        audio:
+                            true
 
                     });
 
@@ -942,7 +936,9 @@ async function handleOffer(
             localStream
                 .getTracks()
                 .forEach(
-                    function (track) {
+                    function (
+                        track
+                    ) {
 
                         peerConnection.addTrack(
                             track,
@@ -967,19 +963,11 @@ async function handleOffer(
         }
 
 
-        // ==========================================
-        // SET REMOTE DESCRIPTION
-        // ==========================================
-
         await peerConnection
             .setRemoteDescription(
                 offer
             );
 
-
-        // ==========================================
-        // CREATE ANSWER
-        // ==========================================
 
         const answer =
             await peerConnection
@@ -992,18 +980,11 @@ async function handleOffer(
             );
 
 
-        // ==========================================
-        // SEND ANSWER
-        // ==========================================
-
         socket.send(
             JSON.stringify({
 
                 type:
                     "answer",
-
-                room:
-                    room,
 
                 answer:
                     peerConnection.localDescription
@@ -1076,97 +1057,78 @@ async function handleAnswer(
 
 
 // ==================================================
-// START RECORDING
+// RECORDING
 // ==================================================
 
-startRecordingButton.addEventListener(
-    "click",
-    async function () {
+if (
+    startRecordingButton
+) {
 
-        if (
-            !localStream
-        ) {
+    startRecordingButton.addEventListener(
+        "click",
+        async function () {
 
-            status.textContent =
-                "Start the meeting first.";
+            try {
 
-            return;
+                await startRecording();
 
-        }
+            }
 
+            catch (error) {
 
-        if (
-            mediaRecorder
-            &&
-            mediaRecorder.state ===
-                "recording"
-        ) {
-
-            return;
-
-        }
+                console.error(
+                    "Recording error:",
+                    error
+                );
 
 
-        try {
+                status.textContent =
+                    "Could not start recording.";
 
-            await startRecording();
+            }
 
         }
+    );
 
-        catch (error) {
+}
 
-            console.error(
-                "Recording error:",
-                error
-            );
-
-
-            status.textContent =
-                "Could not start recording.";
-
-        }
-
-    }
-);
-
-
-// ==================================================
-// CREATE RECORDING STREAM
-// ==================================================
 
 async function startRecording() {
+
+    if (
+        !localStream
+    ) {
+
+        return;
+
+    }
+
 
     recordedChunks = [];
 
 
-    // ==============================================
-    // RESET OLD RECORDING
-    // ==============================================
+    if (
+        recordingPreview
+    ) {
 
-    recordingPreview.style.display =
-        "none";
+        recordingPreview.style.display =
+            "none";
 
-
-    downloadRecording.style.display =
-        "none";
+    }
 
 
     if (
-        recordingURL
+        downloadRecording
     ) {
 
-        URL.revokeObjectURL(
-            recordingURL
-        );
-
-        recordingURL =
-            null;
+        downloadRecording.style.display =
+            "none";
 
     }
 
 
     // ==============================================
-    // CREATE CANVAS
+    // CANVAS
     // ==============================================
 
     recordingCanvas =
@@ -1189,16 +1151,8 @@ async function startRecording() {
         );
 
 
-    // ==============================================
-    // START DRAWING VIDEOS
-    // ==============================================
-
     drawRecordingFrame();
 
-
-    // ==============================================
-    // CANVAS VIDEO STREAM
-    // ==============================================
 
     const canvasStream =
         recordingCanvas.captureStream(
@@ -1207,7 +1161,7 @@ async function startRecording() {
 
 
     // ==============================================
-    // AUDIO CONTEXT
+    // AUDIO
     // ==============================================
 
     recordingAudioContext =
@@ -1218,10 +1172,6 @@ async function startRecording() {
         recordingAudioContext
             .createMediaStreamDestination();
 
-
-    // ==============================================
-    // LOCAL AUDIO
-    // ==============================================
 
     try {
 
@@ -1241,16 +1191,12 @@ async function startRecording() {
     catch (error) {
 
         console.warn(
-            "Could not add local audio:",
+            "Local audio error:",
             error
         );
 
     }
 
-
-    // ==============================================
-    // REMOTE AUDIO
-    // ==============================================
 
     if (
         remoteStream
@@ -1274,7 +1220,7 @@ async function startRecording() {
         catch (error) {
 
             console.warn(
-                "Could not add remote audio:",
+                "Remote audio error:",
                 error
             );
 
@@ -1283,29 +1229,24 @@ async function startRecording() {
     }
 
 
-    // ==============================================
-    // ADD AUDIO TO CANVAS STREAM
-    // ==============================================
-
-    const audioTracks =
-        recordingAudioDestination
-            .stream
-            .getAudioTracks();
-
-
-    audioTracks.forEach(
-        function (track) {
-
-            canvasStream.addTrack(
+    recordingAudioDestination
+        .stream
+        .getAudioTracks()
+        .forEach(
+            function (
                 track
-            );
+            ) {
 
-        }
-    );
+                canvasStream.addTrack(
+                    track
+                );
+
+            }
+        );
 
 
     // ==============================================
-    // FIND RECORDING FORMAT
+    // MIME TYPE
     // ==============================================
 
     let mimeType = "";
@@ -1321,7 +1262,6 @@ async function startRecording() {
             "video/webm;codecs=vp9,opus";
 
     }
-
     else if (
         MediaRecorder.isTypeSupported(
             "video/webm;codecs=vp8,opus"
@@ -1332,12 +1272,7 @@ async function startRecording() {
             "video/webm;codecs=vp8,opus";
 
     }
-
-    else if (
-        MediaRecorder.isTypeSupported(
-            "video/webm"
-        )
-    ) {
+    else {
 
         mimeType =
             "video/webm";
@@ -1345,45 +1280,23 @@ async function startRecording() {
     }
 
 
-    // ==============================================
-    // CREATE MEDIA RECORDER
-    // ==============================================
+    mediaRecorder =
+        new MediaRecorder(
+            canvasStream,
+            {
+                mimeType:
+                    mimeType
+            }
+        );
 
-    if (
-        mimeType
-    ) {
-
-        mediaRecorder =
-            new MediaRecorder(
-                canvasStream,
-                {
-                    mimeType:
-                        mimeType
-                }
-            );
-
-    }
-
-    else {
-
-        mediaRecorder =
-            new MediaRecorder(
-                canvasStream
-            );
-
-    }
-
-
-    // ==============================================
-    // DATA AVAILABLE
-    // ==============================================
 
     mediaRecorder.ondataavailable =
-        function (event) {
+        function (
+            event
+        ) {
 
             if (
-                event.data
-                &&
+                event.data &&
                 event.data.size > 0
             ) {
 
@@ -1396,10 +1309,6 @@ async function startRecording() {
         };
 
 
-    // ==============================================
-    // STOPPED
-    // ==============================================
-
     mediaRecorder.onstop =
         function () {
 
@@ -1407,29 +1316,6 @@ async function startRecording() {
 
         };
 
-
-    // ==============================================
-    // ERROR
-    // ==============================================
-
-    mediaRecorder.onerror =
-        function (event) {
-
-            console.error(
-                "MediaRecorder error:",
-                event.error
-            );
-
-
-            status.textContent =
-                "Recording error.";
-
-        };
-
-
-    // ==============================================
-    // START
-    // ==============================================
 
     mediaRecorder.start(
         1000
@@ -1451,7 +1337,7 @@ async function startRecording() {
 
 
 // ==================================================
-// DRAW RECORDING FRAME
+// DRAW RECORDING
 // ==================================================
 
 function drawRecordingFrame() {
@@ -1477,10 +1363,6 @@ function drawRecordingFrame() {
         recordingCanvas.height;
 
 
-    // ==============================================
-    // BACKGROUND
-    // ==============================================
-
     ctx.fillStyle =
         "#000000";
 
@@ -1493,10 +1375,6 @@ function drawRecordingFrame() {
     );
 
 
-    // ==============================================
-    // DRAW LOCAL VIDEO
-    // ==============================================
-
     drawVideoContain(
         localVideo,
         0,
@@ -1506,10 +1384,6 @@ function drawRecordingFrame() {
     );
 
 
-    // ==============================================
-    // DRAW REMOTE VIDEO
-    // ==============================================
-
     drawVideoContain(
         remoteVideo,
         width / 2,
@@ -1518,10 +1392,6 @@ function drawRecordingFrame() {
         height
     );
 
-
-    // ==============================================
-    // DIVIDER
-    // ==============================================
 
     ctx.fillStyle =
         "#111827";
@@ -1535,52 +1405,6 @@ function drawRecordingFrame() {
     );
 
 
-    // ==============================================
-    // LABELS
-    // ==============================================
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.65)";
-
-
-    ctx.fillRect(
-        20,
-        height - 55,
-        130,
-        35
-    );
-
-
-    ctx.fillRect(
-        width / 2 + 20,
-        height - 55,
-        180,
-        35
-    );
-
-
-    ctx.fillStyle =
-        "#ffffff";
-
-
-    ctx.font =
-        "18px Arial";
-
-
-    ctx.fillText(
-        "You",
-        35,
-        height - 32
-    );
-
-
-    ctx.fillText(
-        "Other Participant",
-        width / 2 + 35,
-        height - 32
-    );
-
-
     recordingAnimationFrame =
         requestAnimationFrame(
             drawRecordingFrame
@@ -1590,7 +1414,7 @@ function drawRecordingFrame() {
 
 
 // ==================================================
-// DRAW VIDEO WITH CONTAIN
+// DRAW VIDEO
 // ==================================================
 
 function drawVideoContain(
@@ -1602,10 +1426,8 @@ function drawVideoContain(
 ) {
 
     if (
-        !video
-        ||
-        video.readyState <
-            2
+        !video ||
+        video.readyState < 2
     ) {
 
         return;
@@ -1622,8 +1444,7 @@ function drawVideoContain(
 
 
     if (
-        !videoWidth
-        ||
+        !videoWidth ||
         !videoHeight
     ) {
 
@@ -1677,7 +1498,6 @@ function drawVideoContain(
             2;
 
     }
-
     else {
 
         drawWidth =
@@ -1711,27 +1531,32 @@ function drawVideoContain(
 // STOP RECORDING
 // ==================================================
 
-stopRecordingButton.addEventListener(
-    "click",
-    function () {
+if (
+    stopRecordingButton
+) {
 
-        if (
-            mediaRecorder
-            &&
-            mediaRecorder.state ===
-                "recording"
-        ) {
+    stopRecordingButton.addEventListener(
+        "click",
+        function () {
 
-            mediaRecorder.stop();
+            if (
+                mediaRecorder &&
+                mediaRecorder.state ===
+                    "recording"
+            ) {
+
+                mediaRecorder.stop();
+
+            }
+
+
+            stopRecordingButton.disabled =
+                true;
 
         }
+    );
 
-
-        stopRecordingButton.disabled =
-            true;
-
-    }
-);
+}
 
 
 // ==================================================
@@ -1739,10 +1564,6 @@ stopRecordingButton.addEventListener(
 // ==================================================
 
 function finishRecording() {
-
-    // ==============================================
-    // STOP CANVAS ANIMATION
-    // ==============================================
 
     if (
         recordingAnimationFrame
@@ -1752,15 +1573,12 @@ function finishRecording() {
             recordingAnimationFrame
         );
 
+
         recordingAnimationFrame =
             null;
 
     }
 
-
-    // ==============================================
-    // CLOSE AUDIO CONTEXT
-    // ==============================================
 
     if (
         recordingAudioContext
@@ -1772,15 +1590,12 @@ function finishRecording() {
                 function () {}
             );
 
+
         recordingAudioContext =
             null;
 
     }
 
-
-    // ==============================================
-    // CHECK DATA
-    // ==============================================
 
     if (
         recordedChunks.length === 0
@@ -1794,10 +1609,6 @@ function finishRecording() {
     }
 
 
-    // ==============================================
-    // CREATE BLOB
-    // ==============================================
-
     const recordingBlob =
         new Blob(
             recordedChunks,
@@ -1809,19 +1620,11 @@ function finishRecording() {
         );
 
 
-    // ==============================================
-    // CREATE URL
-    // ==============================================
-
     recordingURL =
         URL.createObjectURL(
             recordingBlob
         );
 
-
-    // ==============================================
-    // SHOW PREVIEW
-    // ==============================================
 
     recordingPreview.src =
         recordingURL;
@@ -1830,10 +1633,6 @@ function finishRecording() {
     recordingPreview.style.display =
         "block";
 
-
-    // ==============================================
-    // DOWNLOAD
-    // ==============================================
 
     downloadRecording.href =
         recordingURL;
@@ -1846,10 +1645,6 @@ function finishRecording() {
     downloadRecording.style.display =
         "inline-block";
 
-
-    // ==============================================
-    // STATUS
-    // ==============================================
 
     const sizeMB =
         (
@@ -1873,136 +1668,125 @@ function finishRecording() {
 // END MEETING
 // ==================================================
 
-endMeetingButton.addEventListener(
-    "click",
-    function () {
+if (
+    endMeetingButton
+) {
 
-        // ==========================================
-        // STOP RECORDING
-        // ==========================================
+    endMeetingButton.addEventListener(
+        "click",
+        function () {
 
-        if (
-            mediaRecorder
-            &&
-            mediaRecorder.state ===
-                "recording"
-        ) {
+            if (
+                mediaRecorder &&
+                mediaRecorder.state ===
+                    "recording"
+            ) {
 
-            mediaRecorder.stop();
+                mediaRecorder.stop();
 
-        }
-
-
-        // ==========================================
-        // STOP CAMERA + MICROPHONE
-        // ==========================================
-
-        if (
-            localStream
-        ) {
-
-            localStream
-                .getTracks()
-                .forEach(
-                    function (track) {
-
-                        track.stop();
-
-                    }
-                );
-
-        }
+            }
 
 
-        // ==========================================
-        // CLOSE PEER CONNECTION
-        // ==========================================
+            if (
+                localStream
+            ) {
 
-        if (
-            peerConnection
-        ) {
+                localStream
+                    .getTracks()
+                    .forEach(
+                        function (
+                            track
+                        ) {
 
-            peerConnection.close();
+                            track.stop();
 
-            peerConnection =
+                        }
+                    );
+
+            }
+
+
+            if (
+                peerConnection
+            ) {
+
+                peerConnection.close();
+
+                peerConnection =
+                    null;
+
+            }
+
+
+            if (
+                socket
+            ) {
+
+                socket.close();
+
+            }
+
+
+            localVideo.srcObject =
                 null;
 
+
+            remoteVideo.srcObject =
+                null;
+
+
+            localStream =
+                null;
+
+
+            remoteStream =
+                null;
+
+
+            meetingStarted =
+                false;
+
+
+            startMeetingButton.disabled =
+                false;
+
+
+            startRecordingButton.disabled =
+                true;
+
+
+            stopRecordingButton.disabled =
+                true;
+
+
+            endMeetingButton.disabled =
+                true;
+
+
+            status.textContent =
+                "Meeting ended.";
+
         }
+    );
 
-
-        // ==========================================
-        // CLOSE WEBSOCKET
-        // ==========================================
-
-        if (
-            socket
-        ) {
-
-            socket.close();
-
-        }
-
-
-        // ==========================================
-        // CLEAR VIDEO
-        // ==========================================
-
-        localVideo.srcObject =
-            null;
-
-
-        remoteVideo.srcObject =
-            null;
-
-
-        // ==========================================
-        // RESET
-        // ==========================================
-
-        localStream =
-            null;
-
-
-        remoteStream =
-            null;
-
-
-        meetingStarted =
-            false;
-
-
-        startMeetingButton.disabled =
-            false;
-
-
-        startRecordingButton.disabled =
-            true;
-
-
-        stopRecordingButton.disabled =
-            true;
-
-
-        endMeetingButton.disabled =
-            true;
-
-
-        status.textContent =
-            "Meeting ended.";
-
-    }
-);
+}
 
 
 // ==================================================
-// BACK BUTTON
+// BACK
 // ==================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+if (
+    backButton
+) {
 
-        window.history.back();
+    backButton.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            window.history.back();
+
+        }
+    );
+
+}
