@@ -18,21 +18,31 @@
             box-sizing: border-box;
         }
 
+
+        /* =========================================
+           PAGE
+           ========================================= */
+
         body {
 
             margin: 0;
 
             background:
-                #111827;
+                #ffffff;
 
             color:
-                white;
+                #111827;
 
             font-family:
                 Arial,
                 sans-serif;
 
         }
+
+
+        /* =========================================
+           HEADER
+           ========================================= */
 
         header {
 
@@ -52,26 +62,39 @@
                 0 25px;
 
             background:
-                #1f2937;
+                #ffffff;
+
+            border-bottom:
+                1px solid #e5e7eb;
 
         }
+
 
         #roomDisplay {
 
             font-weight:
                 600;
 
+            color:
+                #111827;
+
         }
+
 
         #status {
 
             color:
-                #d1d5db;
+                #6b7280;
 
             font-size:
                 14px;
 
         }
+
+
+        /* =========================================
+           MAIN CONTAINER
+           ========================================= */
 
         .meeting-container {
 
@@ -79,6 +102,11 @@
                 25px;
 
         }
+
+
+        /* =========================================
+           LIVE VIDEO GRID
+           ========================================= */
 
         .video-grid {
 
@@ -93,13 +121,18 @@
 
         }
 
+
+        /* =========================================
+           LIVE VIDEO CARDS
+           ========================================= */
+
         .video-card {
 
             position:
                 relative;
 
             background:
-                #000;
+                #000000;
 
             border-radius:
                 12px;
@@ -112,7 +145,10 @@
 
         }
 
-        video {
+
+        /* Only live meeting videos */
+
+        .video-card video {
 
             width:
                 100%;
@@ -127,6 +163,11 @@
                 block;
 
         }
+
+
+        /* =========================================
+           VIDEO LABELS
+           ========================================= */
 
         .video-label {
 
@@ -143,7 +184,15 @@
                 6px 10px;
 
             background:
-                rgba(0,0,0,0.65);
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            color:
+                #ffffff;
 
             border-radius:
                 6px;
@@ -152,6 +201,11 @@
                 13px;
 
         }
+
+
+        /* =========================================
+           CONTROLS
+           ========================================= */
 
         .controls {
 
@@ -168,6 +222,11 @@
                 20px;
 
         }
+
+
+        /* =========================================
+           BUTTONS
+           ========================================= */
 
         button {
 
@@ -188,6 +247,7 @@
 
         }
 
+
         button:disabled {
 
             opacity:
@@ -198,15 +258,33 @@
 
         }
 
+
+        /* =========================================
+           START MEETING
+           ========================================= */
+
         #startMeetingButton {
 
             background:
                 #2563eb;
 
             color:
-                white;
+                #ffffff;
 
         }
+
+
+        #startMeetingButton:hover:not(:disabled) {
+
+            background:
+                #1d4ed8;
+
+        }
+
+
+        /* =========================================
+           START RECORDING
+           ========================================= */
 
         #startRecordingButton {
 
@@ -214,9 +292,22 @@
                 #dc2626;
 
             color:
-                white;
+                #ffffff;
 
         }
+
+
+        #startRecordingButton:hover:not(:disabled) {
+
+            background:
+                #b91c1c;
+
+        }
+
+
+        /* =========================================
+           STOP RECORDING
+           ========================================= */
 
         #stopRecordingButton {
 
@@ -224,9 +315,22 @@
                 #f59e0b;
 
             color:
-                white;
+                #ffffff;
 
         }
+
+
+        #stopRecordingButton:hover:not(:disabled) {
+
+            background:
+                #d97706;
+
+        }
+
+
+        /* =========================================
+           END MEETING
+           ========================================= */
 
         #endMeetingButton {
 
@@ -234,9 +338,72 @@
                 #374151;
 
             color:
-                white;
+                #ffffff;
 
         }
+
+
+        #endMeetingButton:hover:not(:disabled) {
+
+            background:
+                #1f2937;
+
+        }
+
+
+        /* =========================================
+           BACK BUTTON
+           ========================================= */
+
+        #backButton {
+
+            background:
+                #e5e7eb;
+
+            color:
+                #111827;
+
+        }
+
+
+        #backButton:hover:not(:disabled) {
+
+            background:
+                #d1d5db;
+
+        }
+
+
+        /* =========================================
+           RECORDING PREVIEW TITLE
+           ========================================= */
+
+        #recordingPreviewTitle {
+
+            display:
+                block;
+
+            margin-top:
+                30px;
+
+            margin-bottom:
+                12px;
+
+            color:
+                #111827;
+
+            font-size:
+                20px;
+
+            font-weight:
+                600;
+
+        }
+
+
+        /* =========================================
+           RECORDING PREVIEW
+           ========================================= */
 
         #recordingPreview {
 
@@ -249,13 +416,30 @@
             max-width:
                 1000px;
 
-            margin-top:
-                25px;
+            height:
+                auto;
+
+            aspect-ratio:
+                16 / 9;
+
+            object-fit:
+                contain;
 
             background:
-                black;
+                #000000;
+
+            border-radius:
+                10px;
+
+            margin:
+                0;
 
         }
+
+
+        /* =========================================
+           DOWNLOAD RECORDING
+           ========================================= */
 
         #downloadRecording {
 
@@ -266,9 +450,28 @@
                 15px;
 
             color:
-                white;
+                #2563eb;
+
+            font-weight:
+                600;
+
+            text-decoration:
+                none;
 
         }
+
+
+        #downloadRecording:hover {
+
+            text-decoration:
+                underline;
+
+        }
+
+
+        /* =========================================
+           MOBILE
+           ========================================= */
 
         @media (max-width: 800px) {
 
@@ -276,6 +479,41 @@
 
                 grid-template-columns:
                     1fr;
+
+            }
+
+
+            header {
+
+                padding:
+                    0 15px;
+
+            }
+
+
+            .meeting-container {
+
+                padding:
+                    15px;
+
+            }
+
+
+            #status {
+
+                font-size:
+                    12px;
+
+            }
+
+
+            #recordingPreview {
+
+                width:
+                    100%;
+
+                max-width:
+                    100%;
 
             }
 
@@ -288,6 +526,10 @@
 
 <body>
 
+
+    <!-- =========================================
+         HEADER
+         ========================================= -->
 
     <header>
 
@@ -303,11 +545,23 @@
     </header>
 
 
+    <!-- =========================================
+         MAIN MEETING AREA
+         ========================================= -->
+
     <main class="meeting-container">
 
 
+        <!-- =====================================
+             LIVE VIDEO GRID
+             ===================================== -->
+
         <div class="video-grid">
 
+
+            <!-- =================================
+                 LOCAL VIDEO
+                 ================================= -->
 
             <div class="video-card">
 
@@ -318,12 +572,17 @@
                     playsinline
                 ></video>
 
+
                 <div class="video-label">
                     You
                 </div>
 
             </div>
 
+
+            <!-- =================================
+                 REMOTE VIDEO
+                 ================================= -->
 
             <div class="video-card">
 
@@ -332,6 +591,7 @@
                     autoplay
                     playsinline
                 ></video>
+
 
                 <div class="video-label">
                     Other Participant
@@ -342,6 +602,10 @@
 
         </div>
 
+
+        <!-- =====================================
+             CONTROLS
+             ===================================== -->
 
         <div class="controls">
 
@@ -397,14 +661,31 @@
         </div>
 
 
+        <!-- =====================================
+             RECORDING PREVIEW TITLE
+             ===================================== -->
+
+        <h3 id="recordingPreviewTitle">
+
+            Preview Recording
+
+        </h3>
+
+
+        <!-- =====================================
+             RECORDING PREVIEW
+             ===================================== -->
+
         <video
             id="recordingPreview"
             controls
+            playsinline
         ></video>
 
 
-        <br>
-
+        <!-- =====================================
+             DOWNLOAD RECORDING
+             ===================================== -->
 
         <a
             id="downloadRecording"
@@ -418,6 +699,10 @@
 
     </main>
 
+
+    <!-- =========================================
+         MEETING JAVASCRIPT
+         ========================================= -->
 
     <script
         src="../js/meeting.js"

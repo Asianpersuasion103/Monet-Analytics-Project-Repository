@@ -161,7 +161,7 @@ let meetingStarted =
 
 
 // ==================================================
-// RECORDING
+// RECORDING VARIABLES
 // ==================================================
 
 let mediaRecorder =
@@ -258,7 +258,7 @@ function initialize() {
 
 
 // ==================================================
-// CONNECT SIGNALING
+// CONNECT SIGNALING SERVER
 // ==================================================
 
 function connectToSignalingServer() {
@@ -382,7 +382,7 @@ async function handleSignalingMessage(
 ) {
 
     // ==============================================
-    // JOINED
+    // JOINED ROOM
     // ==============================================
 
     if (
@@ -553,8 +553,16 @@ async function handleSignalingMessage(
         }
 
 
+        /*
+         * Do not destroy remoteStream here.
+         *
+         * The recording may still be running.
+         */
+
         status.textContent =
             "The other participant left the meeting.";
+
+        return;
 
     }
 
@@ -592,9 +600,23 @@ if (
                         });
 
 
-                localVideo.srcObject =
-                    localStream;
+                // ==================================
+                // LOCAL VIDEO
+                // ==================================
 
+                if (
+                    localVideo
+                ) {
+
+                    localVideo.srcObject =
+                        localStream;
+
+                }
+
+
+                // ==================================
+                // PEER CONNECTION
+                // ==================================
 
                 createPeerConnection();
 
@@ -627,8 +649,20 @@ if (
                     false;
 
 
+                /*
+                 * IMPORTANT:
+                 *
+                 * Recording is now available immediately.
+                 *
+                 * The remote participant is NOT required.
+                 */
+
+                startRecordingButton.disabled =
+                    false;
+
+
                 status.textContent =
-                    "Meeting started. Waiting for the other participant...";
+                    "Meeting started. You can start recording now. Waiting for the other participant...";
 
 
                 // ==================================
@@ -689,7 +723,7 @@ function createPeerConnection() {
 
 
     // ==============================================
-    // ICE
+    // ICE CANDIDATE
     // ==============================================
 
     peerConnection.onicecandidate =
@@ -730,42 +764,95 @@ function createPeerConnection() {
             event
         ) {
 
+            console.log(
+                "Remote track received:",
+                event.track.kind
+            );
+
+
+            // ======================================
+            // CREATE REMOTE STREAM
+            // ======================================
+
             if (
-                event.streams &&
-                event.streams[0]
+                !remoteStream
             ) {
 
                 remoteStream =
-                    event.streams[0];
+                    new MediaStream();
 
             }
-            else {
 
-                if (
-                    !remoteStream
-                ) {
 
-                    remoteStream =
-                        new MediaStream();
+            const track =
+                event.track;
 
-                }
 
+            // ======================================
+            // PREVENT DUPLICATE TRACK
+            // ======================================
+
+            const trackAlreadyExists =
+                remoteStream
+                    .getTracks()
+                    .some(
+                        function (
+                            existingTrack
+                        ) {
+
+                            return (
+                                existingTrack.id ===
+                                track.id
+                            );
+
+                        }
+                    );
+
+
+            if (
+                !trackAlreadyExists
+            ) {
 
                 remoteStream.addTrack(
-                    event.track
+                    track
                 );
 
             }
 
 
-            remoteVideo.srcObject =
-                remoteStream;
+            // ======================================
+            // REMOTE VIDEO
+            // ======================================
+
+            if (
+                remoteVideo
+            ) {
+
+                remoteVideo.srcObject =
+                    remoteStream;
 
 
-            remoteVideo.play()
-                .catch(
-                    function () {}
-                );
+                remoteVideo.play()
+                    .catch(
+                        function () {}
+                    );
+
+            }
+
+
+            // ======================================
+            // IMPORTANT:
+            // ADD REMOTE AUDIO TO ACTIVE RECORDING
+            // ======================================
+
+            if (
+                track.kind ===
+                "audio"
+            ) {
+
+                addRemoteAudioToRecording();
+
+            }
 
 
             status.textContent =
@@ -781,6 +868,15 @@ function createPeerConnection() {
     peerConnection.onconnectionstatechange =
         function () {
 
+            if (
+                !peerConnection
+            ) {
+
+                return;
+
+            }
+
+
             console.log(
                 "WebRTC connection:",
                 peerConnection.connectionState
@@ -795,16 +891,6 @@ function createPeerConnection() {
                 status.textContent =
                     "🟢 Meeting connected.";
 
-
-                if (
-                    startRecordingButton
-                ) {
-
-                    startRecordingButton.disabled =
-                        false;
-
-                }
-
             }
 
 
@@ -814,7 +900,7 @@ function createPeerConnection() {
             ) {
 
                 status.textContent =
-                    "Participant disconnected.";
+                    "Participant disconnected. Recording can continue.";
 
             }
 
@@ -929,8 +1015,14 @@ async function handleOffer(
                     });
 
 
-            localVideo.srcObject =
-                localStream;
+            if (
+                localVideo
+            ) {
+
+                localVideo.srcObject =
+                    localStream;
+
+            }
 
 
             localStream
@@ -958,6 +1050,15 @@ async function handleOffer(
 
 
             endMeetingButton.disabled =
+                false;
+
+
+            /*
+             * The participant who receives the offer
+             * can also record immediately.
+             */
+
+            startRecordingButton.disabled =
                 false;
 
         }
@@ -1057,7 +1158,7 @@ async function handleAnswer(
 
 
 // ==================================================
-// RECORDING
+// RECORDING BUTTON
 // ==================================================
 
 if (
@@ -1093,10 +1194,20 @@ if (
 }
 
 
+// ==================================================
+// START RECORDING
+// ==================================================
+
 async function startRecording() {
 
+    // ==============================================
+    // PREVENT DOUBLE RECORDING
+    // ==============================================
+
     if (
-        !localStream
+        mediaRecorder &&
+        mediaRecorder.state ===
+            "recording"
     ) {
 
         return;
@@ -1104,8 +1215,29 @@ async function startRecording() {
     }
 
 
-    recordedChunks = [];
+    // ==============================================
+    // LOCAL STREAM IS REQUIRED
+    // ==============================================
 
+    if (
+        !localStream
+    ) {
+
+        status.textContent =
+            "Start the meeting before recording.";
+
+        return;
+
+    }
+
+
+    recordedChunks =
+        [];
+
+
+    // ==============================================
+    // HIDE OLD RECORDING
+    // ==============================================
 
     if (
         recordingPreview
@@ -1128,7 +1260,7 @@ async function startRecording() {
 
 
     // ==============================================
-    // CANVAS
+    // CREATE CANVAS
     // ==============================================
 
     recordingCanvas =
@@ -1151,6 +1283,10 @@ async function startRecording() {
         );
 
 
+    // ==============================================
+    // START CANVAS ANIMATION
+    // ==============================================
+
     drawRecordingFrame();
 
 
@@ -1161,58 +1297,77 @@ async function startRecording() {
 
 
     // ==============================================
-    // AUDIO
+    // CREATE AUDIO CONTEXT
     // ==============================================
 
-    recordingAudioContext =
-        new AudioContext();
+    const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
 
+
+    if (
+        !AudioContextClass
+    ) {
+
+        throw new Error(
+            "Web Audio API is not supported."
+        );
+
+    }
+
+
+    recordingAudioContext =
+        new AudioContextClass();
+
+
+    // ==============================================
+    // RESUME AUDIO CONTEXT
+    // ==============================================
+
+    if (
+        recordingAudioContext.state ===
+        "suspended"
+    ) {
+
+        await recordingAudioContext.resume();
+
+    }
+
+
+    // ==============================================
+    // CREATE AUDIO DESTINATION
+    // ==============================================
 
     recordingAudioDestination =
         recordingAudioContext
             .createMediaStreamDestination();
 
 
-    try {
-
-        localAudioSource =
-            recordingAudioContext
-                .createMediaStreamSource(
-                    localStream
-                );
-
-
-        localAudioSource.connect(
-            recordingAudioDestination
-        );
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Local audio error:",
-            error
-        );
-
-    }
-
+    // ==============================================
+    // LOCAL AUDIO
+    // ==============================================
 
     if (
-        remoteStream
+        localStream &&
+        localStream.getAudioTracks().length > 0
     ) {
 
         try {
 
-            remoteAudioSource =
+            localAudioSource =
                 recordingAudioContext
                     .createMediaStreamSource(
-                        remoteStream
+                        localStream
                     );
 
 
-            remoteAudioSource.connect(
+            localAudioSource.connect(
                 recordingAudioDestination
+            );
+
+
+            console.log(
+                "Local audio added to recording."
             );
 
         }
@@ -1220,7 +1375,7 @@ async function startRecording() {
         catch (error) {
 
             console.warn(
-                "Remote audio error:",
+                "Could not add local audio:",
                 error
             );
 
@@ -1228,6 +1383,17 @@ async function startRecording() {
 
     }
 
+
+    // ==============================================
+    // REMOTE AUDIO IF ALREADY PRESENT
+    // ==============================================
+
+    addRemoteAudioToRecording();
+
+
+    // ==============================================
+    // ADD AUDIO TRACKS TO CANVAS STREAM
+    // ==============================================
 
     recordingAudioDestination
         .stream
@@ -1249,7 +1415,8 @@ async function startRecording() {
     // MIME TYPE
     // ==============================================
 
-    let mimeType = "";
+    let mimeType =
+        "";
 
 
     if (
@@ -1262,6 +1429,7 @@ async function startRecording() {
             "video/webm;codecs=vp9,opus";
 
     }
+
     else if (
         MediaRecorder.isTypeSupported(
             "video/webm;codecs=vp8,opus"
@@ -1272,13 +1440,30 @@ async function startRecording() {
             "video/webm;codecs=vp8,opus";
 
     }
-    else {
+
+    else if (
+        MediaRecorder.isTypeSupported(
+            "video/webm"
+        )
+    ) {
 
         mimeType =
             "video/webm";
 
     }
 
+    else {
+
+        throw new Error(
+            "WebM recording is not supported."
+        );
+
+    }
+
+
+    // ==============================================
+    // CREATE MEDIA RECORDER
+    // ==============================================
 
     mediaRecorder =
         new MediaRecorder(
@@ -1289,6 +1474,10 @@ async function startRecording() {
             }
         );
 
+
+    // ==============================================
+    // DATA AVAILABLE
+    // ==============================================
 
     mediaRecorder.ondataavailable =
         function (
@@ -1309,6 +1498,10 @@ async function startRecording() {
         };
 
 
+    // ==============================================
+    // RECORDING STOPPED
+    // ==============================================
+
     mediaRecorder.onstop =
         function () {
 
@@ -1317,10 +1510,39 @@ async function startRecording() {
         };
 
 
+    // ==============================================
+    // RECORDING ERROR
+    // ==============================================
+
+    mediaRecorder.onerror =
+        function (
+            event
+        ) {
+
+            console.error(
+                "MediaRecorder error:",
+                event.error
+            );
+
+
+            status.textContent =
+                "Recording error occurred.";
+
+        };
+
+
+    // ==============================================
+    // START
+    // ==============================================
+
     mediaRecorder.start(
         1000
     );
 
+
+    // ==============================================
+    // BUTTONS
+    // ==============================================
 
     startRecordingButton.disabled =
         true;
@@ -1330,20 +1552,130 @@ async function startRecording() {
         false;
 
 
-    status.textContent =
-        "🔴 Recording meeting...";
+    // ==============================================
+    // STATUS
+    // ==============================================
+
+    if (
+        peerConnected
+    ) {
+
+        status.textContent =
+            "🔴 Recording meeting...";
+
+    }
+
+    else {
+
+        status.textContent =
+            "🔴 Recording started. Waiting for participant...";
+
+    }
 
 }
 
 
 // ==================================================
-// DRAW RECORDING
+// ADD REMOTE AUDIO TO RECORDING
+// ==================================================
+
+function addRemoteAudioToRecording() {
+
+    /*
+     * If recording hasn't started yet, there is
+     * nothing to do.
+     */
+
+    if (
+        !recordingAudioContext ||
+        !recordingAudioDestination
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Remote stream doesn't exist yet.
+     */
+
+    if (
+        !remoteStream
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * No remote audio track yet.
+     */
+
+    if (
+        remoteStream.getAudioTracks().length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Already connected.
+     */
+
+    if (
+        remoteAudioSource
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        remoteAudioSource =
+            recordingAudioContext
+                .createMediaStreamSource(
+                    remoteStream
+                );
+
+
+        remoteAudioSource.connect(
+            recordingAudioDestination
+        );
+
+
+        console.log(
+            "Remote audio added to active recording."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not add remote audio:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// DRAW RECORDING FRAME
 // ==================================================
 
 function drawRecordingFrame() {
 
     if (
-        !recordingCanvasContext
+        !recordingCanvasContext ||
+        !recordingCanvas
     ) {
 
         return;
@@ -1363,6 +1695,10 @@ function drawRecordingFrame() {
         recordingCanvas.height;
 
 
+    // ==============================================
+    // BLACK BACKGROUND
+    // ==============================================
+
     ctx.fillStyle =
         "#000000";
 
@@ -1375,6 +1711,10 @@ function drawRecordingFrame() {
     );
 
 
+    // ==============================================
+    // LOCAL VIDEO
+    // ==============================================
+
     drawVideoContain(
         localVideo,
         0,
@@ -1384,6 +1724,10 @@ function drawRecordingFrame() {
     );
 
 
+    // ==============================================
+    // REMOTE VIDEO
+    // ==============================================
+
     drawVideoContain(
         remoteVideo,
         width / 2,
@@ -1392,6 +1736,10 @@ function drawRecordingFrame() {
         height
     );
 
+
+    // ==============================================
+    // CENTER DIVIDER
+    // ==============================================
 
     ctx.fillStyle =
         "#111827";
@@ -1404,6 +1752,10 @@ function drawRecordingFrame() {
         height
     );
 
+
+    // ==============================================
+    // CONTINUE ANIMATION
+    // ==============================================
 
     recordingAnimationFrame =
         requestAnimationFrame(
@@ -1424,6 +1776,11 @@ function drawVideoContain(
     width,
     height
 ) {
+
+    /*
+     * If there is no video yet, simply leave
+     * that half of the recording black.
+     */
 
     if (
         !video ||
@@ -1479,6 +1836,10 @@ function drawVideoContain(
         y;
 
 
+    // ==============================================
+    // WIDE VIDEO
+    // ==============================================
+
     if (
         videoRatio >
         boxRatio
@@ -1498,6 +1859,11 @@ function drawVideoContain(
             2;
 
     }
+
+    // ==============================================
+    // TALL VIDEO
+    // ==============================================
+
     else {
 
         drawWidth =
@@ -1565,6 +1931,10 @@ if (
 
 function finishRecording() {
 
+    // ==============================================
+    // STOP CANVAS ANIMATION
+    // ==============================================
+
     if (
         recordingAnimationFrame
     ) {
@@ -1579,6 +1949,58 @@ function finishRecording() {
 
     }
 
+
+    // ==============================================
+    // DISCONNECT LOCAL AUDIO
+    // ==============================================
+
+    if (
+        localAudioSource
+    ) {
+
+        try {
+
+            localAudioSource.disconnect();
+
+        }
+
+        catch (
+            error
+        ) {}
+
+        localAudioSource =
+            null;
+
+    }
+
+
+    // ==============================================
+    // DISCONNECT REMOTE AUDIO
+    // ==============================================
+
+    if (
+        remoteAudioSource
+    ) {
+
+        try {
+
+            remoteAudioSource.disconnect();
+
+        }
+
+        catch (
+            error
+        ) {}
+
+        remoteAudioSource =
+            null;
+
+    }
+
+
+    // ==============================================
+    // CLOSE AUDIO CONTEXT
+    // ==============================================
 
     if (
         recordingAudioContext
@@ -1597,6 +2019,14 @@ function finishRecording() {
     }
 
 
+    recordingAudioDestination =
+        null;
+
+
+    // ==============================================
+    // CHECK DATA
+    // ==============================================
+
     if (
         recordedChunks.length === 0
     ) {
@@ -1604,21 +2034,51 @@ function finishRecording() {
         status.textContent =
             "No recording data was captured.";
 
+
+        startRecordingButton.disabled =
+            false;
+
+
         return;
 
     }
 
+
+    // ==============================================
+    // CREATE BLOB
+    // ==============================================
 
     const recordingBlob =
         new Blob(
             recordedChunks,
             {
                 type:
-                    mediaRecorder.mimeType ||
-                    "video/webm"
+                    mediaRecorder &&
+                    mediaRecorder.mimeType
+                        ? mediaRecorder.mimeType
+                        : "video/webm"
             }
         );
 
+
+    // ==============================================
+    // REVOKE OLD URL
+    // ==============================================
+
+    if (
+        recordingURL
+    ) {
+
+        URL.revokeObjectURL(
+            recordingURL
+        );
+
+    }
+
+
+    // ==============================================
+    // CREATE NEW URL
+    // ==============================================
 
     recordingURL =
         URL.createObjectURL(
@@ -1626,25 +2086,49 @@ function finishRecording() {
         );
 
 
-    recordingPreview.src =
-        recordingURL;
+    // ==============================================
+    // PREVIEW
+    // ==============================================
+
+    if (
+        recordingPreview
+    ) {
+
+        recordingPreview.src =
+            recordingURL;
 
 
-    recordingPreview.style.display =
-        "block";
+        recordingPreview.style.display =
+            "block";
+
+    }
 
 
-    downloadRecording.href =
-        recordingURL;
+    // ==============================================
+    // DOWNLOAD
+    // ==============================================
+
+    if (
+        downloadRecording
+    ) {
+
+        downloadRecording.href =
+            recordingURL;
 
 
-    downloadRecording.download =
-        `interview-${room}.webm`;
+        downloadRecording.download =
+            `interview-${room}.webm`;
 
 
-    downloadRecording.style.display =
-        "inline-block";
+        downloadRecording.style.display =
+            "inline-block";
 
+    }
+
+
+    // ==============================================
+    // FILE SIZE
+    // ==============================================
 
     const sizeMB =
         (
@@ -1654,12 +2138,24 @@ function finishRecording() {
         ).toFixed(2);
 
 
+    // ==============================================
+    // STATUS
+    // ==============================================
+
     status.textContent =
         `Recording complete. Size: ${sizeMB} MB`;
 
 
+    // ==============================================
+    // BUTTONS
+    // ==============================================
+
     startRecordingButton.disabled =
         false;
+
+
+    stopRecordingButton.disabled =
+        true;
 
 }
 
@@ -1676,6 +2172,10 @@ if (
         "click",
         function () {
 
+            // ======================================
+            // STOP RECORDING FIRST
+            // ======================================
+
             if (
                 mediaRecorder &&
                 mediaRecorder.state ===
@@ -1686,6 +2186,10 @@ if (
 
             }
 
+
+            // ======================================
+            // STOP LOCAL MEDIA
+            // ======================================
 
             if (
                 localStream
@@ -1706,6 +2210,10 @@ if (
             }
 
 
+            // ======================================
+            // CLOSE PEER CONNECTION
+            // ======================================
+
             if (
                 peerConnection
             ) {
@@ -1718,22 +2226,53 @@ if (
             }
 
 
+            // ======================================
+            // CLOSE SOCKET
+            // ======================================
+
             if (
                 socket
             ) {
 
                 socket.close();
 
+                socket =
+                    null;
+
             }
 
 
-            localVideo.srcObject =
-                null;
+            // ======================================
+            // CLEAR LOCAL VIDEO
+            // ======================================
+
+            if (
+                localVideo
+            ) {
+
+                localVideo.srcObject =
+                    null;
+
+            }
 
 
-            remoteVideo.srcObject =
-                null;
+            // ======================================
+            // CLEAR REMOTE VIDEO
+            // ======================================
 
+            if (
+                remoteVideo
+            ) {
+
+                remoteVideo.srcObject =
+                    null;
+
+            }
+
+
+            // ======================================
+            // CLEAR STREAMS
+            // ======================================
 
             localStream =
                 null;
@@ -1743,9 +2282,17 @@ if (
                 null;
 
 
+            peerConnected =
+                false;
+
+
             meetingStarted =
                 false;
 
+
+            // ======================================
+            // BUTTON STATES
+            // ======================================
 
             startMeetingButton.disabled =
                 false;
@@ -1763,8 +2310,21 @@ if (
                 true;
 
 
+            // ======================================
+            // IMPORTANT
+            //
+            // Do NOT clear:
+            //
+            // recordingURL
+            // recordingPreview
+            // recordedChunks
+            //
+            // The finished recording should remain
+            // available after the meeting ends.
+            // ======================================
+
             status.textContent =
-                "Meeting ended.";
+                "Meeting ended. Your recording is still available.";
 
         }
     );
