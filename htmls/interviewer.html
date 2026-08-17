@@ -11,96 +11,60 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Interviewer Meeting</title>
-
-
-    <!-- ==========================================
-         GOOGLE FONT
-    =========================================== -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- ==========================================
-         INTERVIEWER JAVASCRIPT
-    =========================================== -->
-
-    <script
-        src="../js/interviewer.js"
-        defer
-    ></script>
+    <title>Interviewer - Dashboard (Meeting & Resume)</title>
 
 
     <style>
-
-        /* ==========================================
-           GLOBAL
-        =========================================== */
 
         * {
             box-sizing: border-box;
         }
 
 
-        html,
         body {
 
             margin: 0;
-            padding: 0;
 
-            min-height: 100%;
-
-        }
-
-
-        body {
+            min-height: 100vh;
 
             font-family:
-                "Inter",
+                Arial,
                 sans-serif;
 
-            background-color:
+            background:
                 #f5f7fa;
 
             color:
                 #1f2937;
 
-            min-height: 100vh;
+            display:
+                flex;
 
-            padding: 30px;
+            align-items:
+                center;
+
+            justify-content:
+                center;
 
         }
 
 
-        /* ==========================================
+        /* ==============================
            BACK BUTTON
-        =========================================== */
+        ============================== */
 
         .back-button {
 
             position: fixed;
 
             top: 25px;
+
             left: 25px;
 
             padding:
                 10px 16px;
 
-            background-color:
+            background:
                 white;
 
             color:
@@ -113,7 +77,7 @@
                 8px;
 
             font-family:
-                "Inter",
+                Arial,
                 sans-serif;
 
             font-size:
@@ -124,10 +88,6 @@
 
             cursor:
                 pointer;
-
-            transition:
-                background-color 0.2s,
-                border-color 0.2s;
 
             z-index:
                 1000;
@@ -137,29 +97,41 @@
 
         .back-button:hover {
 
-            background-color:
+            background:
                 #f3f4f6;
 
             border-color:
                 #9ca3af;
 
+            color:
+                #111827;
+
         }
 
 
-        /* ==========================================
-           MAIN CONTAINER
-        =========================================== */
-
         .container {
 
-            width:
-                100%;
+            width: 90%;
 
-            max-width:
-                1000px;
+            max-width: 650px;
 
-            margin:
-                80px auto 60px;
+            background:
+                white;
+
+            padding:
+                45px;
+
+            border-radius:
+                16px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
 
             text-align:
                 center;
@@ -167,23 +139,13 @@
         }
 
 
-        /* ==========================================
-           TITLE
-        =========================================== */
-
-        .page-title {
+        h1 {
 
             margin:
                 0 0 12px;
 
             font-size:
-                44px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                -1px;
+                36px;
 
             color:
                 #111827;
@@ -191,254 +153,94 @@
         }
 
 
-        /* ==========================================
-           SUBTITLE
-        =========================================== */
-
-        .subtitle {
-
-            margin:
-                0 0 35px;
-
-            font-size:
-                17px;
+        .description {
 
             color:
                 #6b7280;
 
-        }
-
-
-        /* ==========================================
-           INVITE SECTION
-        =========================================== */
-
-        #inviteSection {
-
-            width:
-                100%;
-
-            max-width:
-                500px;
-
-            margin:
-                0 auto;
-
-            padding:
-                40px 30px;
-
-            background-color:
-                white;
-
-            border:
-                1px solid #d1d5db;
-
-            border-radius:
-                15px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0, 0, 0, 0.05);
-
-        }
-
-
-        #inviteSection h2 {
-
-            margin:
-                0 0 20px;
-
-            font-size:
-                24px;
-
-            color:
-                #111827;
-
-        }
-
-
-        /* ==========================================
-           INVITE INPUT
-        =========================================== */
-
-        #inviteCode {
-
-            width:
-                100%;
-
-            padding:
-                13px 15px;
-
-            margin-bottom:
-                15px;
-
-            border:
-                1px solid #d1d5db;
-
-            border-radius:
-                8px;
-
-            font-family:
-                "Inter",
-                sans-serif;
-
             font-size:
                 16px;
 
-            outline:
-                none;
+            line-height:
+                1.6;
+
+            margin-bottom:
+                30px;
 
         }
 
 
-        #inviteCode:focus {
+        /* ==============================
+           CODE BOX
+        ============================== */
 
-            border-color:
-                #007bff;
-
-            box-shadow:
-                0 0 0 3px
-                rgba(0, 123, 255, 0.1);
-
-        }
-
-
-        /* ==========================================
-           BUTTONS
-        =========================================== */
-
-        button {
-
-            font-family:
-                "Inter",
-                sans-serif;
-
-        }
-
-
-        .primary-button {
-
-            padding:
-                12px 20px;
-
-            background-color:
-                #007bff;
-
-            color:
-                white;
-
-            border:
-                none;
-
-            border-radius:
-                8px;
-
-            font-size:
-                15px;
-
-            font-weight:
-                600;
-
-            cursor:
-                pointer;
-
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
-
-        }
-
-
-        .primary-button:hover {
-
-            background-color:
-                #0056b3;
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        .primary-button:disabled {
-
-            opacity:
-                0.5;
-
-            cursor:
-                not-allowed;
-
-            transform:
-                none;
-
-        }
-
-
-        /* ==========================================
-           INVITE STATUS
-        =========================================== */
-
-        #inviteStatus {
-
-            margin:
-                15px 0 0;
+        .code-label {
 
             font-size:
                 14px;
 
             font-weight:
-                500;
+                600;
 
-            min-height:
-                20px;
+            color:
+                #6b7280;
 
-        }
-
-
-        /* ==========================================
-           MEETING SECTION
-        =========================================== */
-
-        #meetingSection {
-
-            width:
-                100%;
-
-        }
-
-
-        /* ==========================================
-           LIVE VIDEO
-        =========================================== */
-
-        #videoPreview {
-
-            width:
-                640px;
-
-            max-width:
-                100%;
-
-            display:
-                block;
-
-            margin:
-                0 auto 25px;
-
-            background-color:
-                black;
-
-            border-radius:
+            margin-bottom:
                 10px;
 
         }
 
 
-        /* ==========================================
-           CONTROL BUTTONS
-        =========================================== */
+        #inviteCode {
 
-        .controls {
+            font-size:
+                42px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                6px;
+
+            color:
+                #007bff;
+
+            background:
+                #f8fbff;
+
+            border:
+                2px solid
+                #dbeafe;
+
+            border-radius:
+                12px;
+
+            padding:
+                20px;
+
+            margin-bottom:
+                25px;
+
+            min-height:
+                88px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .button-row {
 
             display:
                 flex;
@@ -446,31 +248,17 @@
             justify-content:
                 center;
 
-            align-items:
-                center;
+            gap:
+                10px;
 
             flex-wrap:
                 wrap;
 
-            gap:
-                10px;
-
-            margin-bottom:
-                20px;
-
         }
 
 
-        .controls button {
-
-            padding:
-                12px 20px;
-
-            background-color:
-                #007bff;
-
-            color:
-                white;
+        button,
+        .meeting-button {
 
             border:
                 none;
@@ -478,52 +266,8 @@
             border-radius:
                 8px;
 
-            font-size:
-                15px;
-
-            font-weight:
-                600;
-
-            cursor:
-                pointer;
-
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
-
-        }
-
-
-        .controls button:hover:not(:disabled) {
-
-            background-color:
-                #0056b3;
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        .controls button:disabled {
-
-            opacity:
-                0.5;
-
-            cursor:
-                not-allowed;
-
-        }
-
-
-        /* ==========================================
-           STATUS
-        =========================================== */
-
-        #status {
-
-            margin:
-                15px 0 40px;
+            padding:
+                12px 22px;
 
             font-size:
                 16px;
@@ -531,158 +275,188 @@
             font-weight:
                 600;
 
-        }
-
-
-        /* ==========================================
-           RECORDED VIDEO SECTION
-        =========================================== */
-
-        .recording-section {
-
-            margin-top:
-                40px;
-
-            padding-top:
-                35px;
-
-            border-top:
-                1px solid #d1d5db;
-
-        }
-
-
-        .recording-section h2 {
-
-            margin:
-                0 0 20px;
-
-            font-size:
-                26px;
-
-            color:
-                #111827;
-
-        }
-
-
-        #recordingPreview {
-
-            width:
-                640px;
-
-            max-width:
-                100%;
-
-            display:
-                none;
-
-            margin:
-                0 auto 20px;
-
-            background-color:
-                black;
-
-            border-radius:
-                10px;
-
-        }
-
-
-        /* ==========================================
-           DOWNLOAD LINK
-        =========================================== */
-
-        #downloadRecording {
-
-            display:
-                none;
-
-            padding:
-                12px 20px;
-
-            background-color:
-                #111827;
-
-            color:
-                white;
+            cursor:
+                pointer;
 
             text-decoration:
                 none;
 
-            border-radius:
-                8px;
+            display:
+                inline-block;
+
+        }
+
+
+        #generateCodeButton {
+
+            background:
+                #007bff;
+
+            color:
+                white;
+
+        }
+
+
+        #generateCodeButton:hover {
+
+            background:
+                #0056b3;
+
+        }
+
+
+        #copyCodeButton {
+
+            background:
+                #374151;
+
+            color:
+                white;
+
+        }
+
+
+        #copyCodeButton:hover {
+
+            background:
+                #1f2937;
+
+        }
+
+
+        #copyCodeButton:disabled,
+        #generateCodeButton:disabled {
+
+            opacity:
+                0.6;
+
+            cursor:
+                not-allowed;
+
+        }
+
+
+        .meeting-button {
+
+            background:
+                #16a34a;
+
+            color:
+                white;
+
+            display:
+                none;
+
+        }
+
+
+        .meeting-button:hover {
+
+            background:
+                #15803d;
+
+        }
+
+
+        /* ==============================
+           STATUS
+        ============================== */
+
+        #status {
+
+            margin-top:
+                25px;
 
             font-size:
                 15px;
 
-            font-weight:
-                600;
+            color:
+                #6b7280;
+
+            min-height:
+                24px;
 
         }
 
 
-        #downloadRecording:hover {
+        #status.success {
 
-            background-color:
-                #374151;
+            color:
+                #15803d;
 
         }
 
 
-        /* ==========================================
+        #status.error {
+
+            color:
+                #dc2626;
+
+        }
+
+
+        /* ==============================
+           EXPIRATION
+        ============================== */
+
+        #expiration {
+
+            display:
+                none;
+
+            margin-top:
+                10px;
+
+            font-size:
+                13px;
+
+            color:
+                #9ca3af;
+
+        }
+
+
+        /* ==============================
            MOBILE
-        =========================================== */
+        ============================== */
 
-        @media (max-width: 700px) {
-
-            body {
-
-                padding:
-                    20px;
-
-            }
-
+        @media (
+            max-width: 600px
+        ) {
 
             .container {
 
-                margin-top:
-                    80px;
+                padding:
+                    30px 20px;
 
             }
 
 
-            .page-title {
+            h1 {
 
                 font-size:
-                    36px;
+                    30px;
 
             }
 
 
-            .controls {
+            #inviteCode {
 
-                flex-direction:
-                    column;
+                font-size:
+                    30px;
 
-            }
-
-
-            .controls button {
-
-                width:
-                    100%;
+                letter-spacing:
+                    4px;
 
             }
 
 
             .back-button {
 
-                top:
-                    15px;
+                top: 15px;
 
-                left:
-                    15px;
+                left: 15px;
 
             }
 
@@ -696,9 +470,9 @@
 <body>
 
 
-    <!-- ==========================================
+    <!-- ==============================
          BACK BUTTON
-    =========================================== -->
+    ============================== -->
 
     <button
         id="backButton"
@@ -711,188 +485,152 @@
     </button>
 
 
-    <!-- ==========================================
-         MAIN
-    =========================================== -->
-
-    <main class="container">
+    <div class="container">
 
 
-        <h1 class="page-title">
-
-            Interviewer Meeting
-
+        <h1>
+            Interviewer Dashboard
         </h1>
 
 
-        <p class="subtitle">
+        <p class="description">
 
-            Enter your invite code to continue.
+            Generate a secure meeting code
+            and give it to your interviewee.
+
+            The interviewee will use the code
+            to enter the interview process.
 
         </p>
 
 
-        <!-- ======================================
-             INVITE CODE
-        ======================================= -->
+        <!-- ==============================
+             CODE LABEL
+        ============================== -->
 
-        <section id="inviteSection">
+        <div class="code-label">
 
-            <h2>
+            MEETING CODE
 
-                Enter your invite code
-
-            </h2>
+        </div>
 
 
-            <input
-                type="text"
-                id="inviteCode"
-                placeholder="Enter invite code"
-                autocomplete="off"
-            >
+        <!-- ==============================
+             RANDOM CODE
+        ============================== -->
+
+        <div
+            id="inviteCode"
+        >
+
+            ----
+
+        </div>
 
 
-            <br>
+        <!-- ==============================
+             BUTTONS
+        ============================== -->
+
+        <div class="button-row">
 
 
             <button
-                id="verifyCodeButton"
-                class="primary-button"
+                id="generateCodeButton"
                 type="button"
             >
 
-                Continue
+                Generate Meeting Code
 
             </button>
 
 
-            <p id="inviteStatus"></p>
+            <button
+                id="copyCodeButton"
+                type="button"
+                disabled
+            >
 
-        </section>
+                Copy Code
+
+            </button>
 
 
-        <!-- ======================================
-             MEETING
-        ======================================= -->
+            <a
+                id="meetingLink"
+                class="meeting-button"
+                href="#"
+            >
 
-        <section
-            id="meetingSection"
-            style="display: none;"
+                Enter Meeting →
+
+            </a>
+
+
+        </div>
+
+
+        <!-- ==============================
+             STATUS
+        ============================== -->
+
+        <div
+            id="status"
         >
 
+            No meeting created yet.
 
-            <!-- LIVE CAMERA -->
-
-            <video
-                id="videoPreview"
-                autoplay
-                muted
-                playsinline
-            ></video>
+        </div>
 
 
-            <!-- CONTROLS -->
+        <!-- ==============================
+             EXPIRATION
+        ============================== -->
 
-            <div class="controls">
+        <div
+            id="expiration"
+        >
 
+            This meeting code expires
+            after 30 minutes.
 
-                <button
-                    id="startMeetingButton"
-                    type="button"
-                >
-
-                    Start Meeting
-
-                </button>
-
-
-                <button
-                    id="startRecordingButton"
-                    type="button"
-                    disabled
-                >
-
-                    Start Recording
-
-                </button>
+        </div>
 
 
-                <button
-                    id="stopRecordingButton"
-                    type="button"
-                    disabled
-                >
-
-                    Stop Recording
-
-                </button>
+    </div>
 
 
-                <button
-                    id="endMeetingButton"
-                    type="button"
-                    disabled
-                >
+    <!-- ==============================
+         INTERVIEWER JAVASCRIPT
+    ============================== -->
 
-                    End Meeting
-
-                </button>
+    <script
+        src="../js/interviewer.js"
+    ></script>
 
 
-            </div>
+    <!-- ==============================
+         BACK BUTTON
+    ============================== -->
+
+    <script>
+
+        const backButton =
+            document.getElementById(
+                "backButton"
+            );
 
 
-            <!-- STATUS -->
+        backButton.addEventListener(
+            "click",
+            function () {
 
-            <p id="status">
+                window.history.back();
 
-                Meeting not started.
+            }
+        );
 
-            </p>
-
-
-            <!-- ==================================
-                 RECORDED VIDEO
-            =================================== -->
-
-            <section class="recording-section">
-
-
-                <h2>
-
-                    Recorded Interview
-
-                </h2>
-
-
-                <video
-                    id="recordingPreview"
-                    controls
-                    playsinline
-                ></video>
-
-
-                <br>
-
-
-                <a
-                    id="downloadRecording"
-                    download="recording.webm"
-                >
-
-                    Download Recording
-
-                </a>
-
-
-            </section>
-
-
-        </section>
-
-
-    </main>
+    </script>
 
 
 </body>

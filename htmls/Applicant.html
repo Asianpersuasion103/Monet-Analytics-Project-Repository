@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -11,12 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Applicant's Webpage</title>
-
-
-    <!-- ===============================
-         Google Font
-    =============================== -->
+    <title>Join Interview</title>
 
     <link
         rel="preconnect"
@@ -34,72 +28,29 @@
         rel="stylesheet"
     >
 
-
-    <!-- ===============================
-         JavaScript
-
-         interviewee.html
-         is inside /htmls/
-
-         interviewee.js
-         is inside /js/
-
-         Therefore:
-         ../js/interviewee.js
-    =============================== -->
-
-    <script
-        src="../js/interviewee.js"
-        defer
-    ></script>
-
-
     <style>
-
-        /* ===============================
-           Global
-        =============================== */
 
         * {
             box-sizing: border-box;
         }
 
-
-        html,
         body {
 
             margin: 0;
-            padding: 0;
-
-            min-height: 100%;
-
-        }
-
-
-        body {
-
-            font-family: "Inter", sans-serif;
-
-            background-color: #f5f7fa;
-
-            color: #1f2937;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
 
             min-height: 100vh;
 
-            padding: 30px;
+            font-family:
+                "Inter",
+                sans-serif;
+
+            background:
+                #f5f7fa;
+
+            color:
+                #111827;
 
         }
-
-
-        /* ===============================
-           Back Button
-        =============================== */
 
         .back-button {
 
@@ -108,323 +59,212 @@
             top: 25px;
             left: 25px;
 
-            display: flex;
+            padding:
+                10px 16px;
 
-            align-items: center;
+            background:
+                white;
 
-            gap: 8px;
+            border:
+                1px solid #d1d5db;
 
-            padding: 10px 16px;
+            border-radius:
+                8px;
 
-            background-color: white;
+            cursor:
+                pointer;
 
-            color: #374151;
-
-            border: 1px solid #d1d5db;
-
-            border-radius: 8px;
-
-            font-family: "Inter", sans-serif;
-
-            font-size: 15px;
-
-            font-weight: 500;
-
-            cursor: pointer;
-
-            transition:
-                background-color 0.2s,
-                border-color 0.2s,
-                color 0.2s;
-
-            z-index: 1000;
+            font-size:
+                15px;
 
         }
-
-
-        .back-button:hover {
-
-            background-color: #f3f4f6;
-
-            border-color: #9ca3af;
-
-            color: #111827;
-
-        }
-
-
-        /* ===============================
-           Main Container
-        =============================== */
 
         .container {
 
-            width: 100%;
+            width:
+                600px;
 
-            max-width: 600px;
+            max-width:
+                90%;
 
-            text-align: center;
+            margin:
+                140px auto;
 
-        }
-
-
-        /* ===============================
-           Page Title
-        =============================== */
-
-        .page-title {
-
-            margin: 0 0 12px;
-
-            font-size: 42px;
-
-            font-weight: 700;
-
-            letter-spacing: -1px;
-
-            color: #111827;
+            text-align:
+                center;
 
         }
 
+        h1 {
 
-        /* ===============================
-           Gradient Text
-        =============================== */
+            font-size:
+                42px;
 
-        .gradient-text {
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #007bff,
-                    #0056b3
-                );
-
-            -webkit-background-clip: text;
-
-            -webkit-text-fill-color: transparent;
-
-            background-clip: text;
+            margin-bottom:
+                12px;
 
         }
-
-
-        /* ===============================
-           Subtitle
-        =============================== */
 
         .subtitle {
 
-            margin: 0 0 35px;
+            color:
+                #6b7280;
 
-            font-size: 17px;
-
-            font-weight: 400;
-
-            color: #6b7280;
+            margin-bottom:
+                40px;
 
         }
 
+        .card {
 
-        /* ===============================
-           Invite Card
-        =============================== */
+            background:
+                white;
 
-        .invite-card {
+            padding:
+                40px;
 
-            background-color: white;
-
-            border: 1px solid #d1d5db;
-
-            border-radius: 15px;
-
-            padding: 40px;
+            border-radius:
+                16px;
 
             box-shadow:
-                0 4px 15px
-                rgba(0, 0, 0, 0.05);
+                0 10px 30px
+                rgba(0,0,0,0.08);
 
         }
-
-
-        /* ===============================
-           Label
-        =============================== */
 
         label {
 
-            display: block;
+            display:
+                block;
 
-            text-align: left;
+            text-align:
+                left;
 
-            margin-bottom: 8px;
+            margin-bottom:
+                8px;
 
-            font-size: 15px;
-
-            font-weight: 600;
-
-            color: #374151;
-
-        }
-
-
-        /* ===============================
-           Invite Code Input
-        =============================== */
-
-        #inviteCode {
-
-            width: 100%;
-
-            padding: 13px 15px;
-
-            margin-bottom: 15px;
-
-            border: 1px solid #d1d5db;
-
-            border-radius: 8px;
-
-            font-family: "Inter", sans-serif;
-
-            font-size: 16px;
-
-            outline: none;
+            font-weight:
+                600;
 
         }
 
+        input {
 
-        #inviteCode:focus {
+            width:
+                100%;
 
-            border-color: #007bff;
+            padding:
+                15px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                9px;
+
+            font-size:
+                20px;
+
+            text-align:
+                center;
+
+            letter-spacing:
+                3px;
+
+            text-transform:
+                uppercase;
+
+            outline:
+                none;
+
+        }
+
+        input:focus {
+
+            border-color:
+                #007bff;
 
             box-shadow:
                 0 0 0 3px
-                rgba(0, 123, 255, 0.1);
+                rgba(0,123,255,0.12);
 
         }
 
+        .verify-button {
 
-        /* ===============================
-           Continue Button
-        =============================== */
+            width:
+                100%;
 
-        #verifyCodeButton {
+            margin-top:
+                20px;
 
-            width: 100%;
+            padding:
+                14px;
 
-            padding: 13px 20px;
+            border:
+                none;
 
-            background-color: #007bff;
+            border-radius:
+                9px;
 
-            color: white;
+            background:
+                #007bff;
 
-            border: none;
+            color:
+                white;
 
-            border-radius: 8px;
+            font-size:
+                17px;
 
-            font-family: "Inter", sans-serif;
+            font-weight:
+                600;
 
-            font-size: 16px;
-
-            font-weight: 600;
-
-            cursor: pointer;
-
-            transition:
-                background-color 0.2s,
-                transform 0.2s;
-
-        }
-
-
-        #verifyCodeButton:hover {
-
-            background-color: #0056b3;
-
-            transform: translateY(-1px);
+            cursor:
+                pointer;
 
         }
 
+        .verify-button:hover {
 
-        #verifyCodeButton:active {
-
-            transform: translateY(0);
+            background:
+                #0056b3;
 
         }
 
+        .verify-button:disabled {
 
-        /* ===============================
-           Status Message
-        =============================== */
+            opacity:
+                0.6;
+
+            cursor:
+                not-allowed;
+
+        }
 
         #status {
 
-            min-height: 22px;
+            margin-top:
+                20px;
 
-            margin-top: 20px;
+            min-height:
+                24px;
 
-            font-size: 14px;
-
-            font-weight: 500;
-
-        }
-
-
-        .error {
-
-            color: #dc2626;
+            color:
+                #6b7280;
 
         }
-
 
         .success {
 
-            color: #16a34a;
+            color:
+                #15803d !important;
 
         }
 
+        .error {
 
-        /* ===============================
-           Mobile
-        =============================== */
-
-        @media (max-width: 700px) {
-
-            body {
-
-                padding: 20px;
-
-            }
-
-
-            .page-title {
-
-                font-size: 34px;
-
-            }
-
-
-            .subtitle {
-
-                font-size: 16px;
-
-            }
-
-
-            .invite-card {
-
-                padding: 30px 20px;
-
-            }
-
-
-            .back-button {
-
-                top: 15px;
-
-                left: 15px;
-
-            }
+            color:
+                #dc2626 !important;
 
         }
 
@@ -436,82 +276,47 @@
 <body>
 
 
-    <!-- ===============================
-         Back Button
-    =============================== -->
-
     <button
         id="backButton"
-        type="button"
         class="back-button"
     >
 
-        <span>←</span>
-
-        <span>Back</span>
+        ← Back
 
     </button>
 
 
-    <!-- ===============================
-         Main Container
-    =============================== -->
-
     <main class="container">
 
-
-        <!-- ===============================
-             Title
-        =============================== -->
-
-        <h1 class="page-title">
-
-            Enter Your
-
-            <span class="gradient-text">
-                Invite Code
-            </span>
-
+        <h1>
+            Join Interview
         </h1>
 
-
-        <!-- ===============================
-             Subtitle
-        =============================== -->
-
         <p class="subtitle">
-
-            Enter the invite code provided
-            by your interviewer.
-
+            Enter the invite code provided by your interviewer.
         </p>
 
 
-        <!-- ===============================
-             Invite Card
-        =============================== -->
-
-        <div class="invite-card">
+        <div class="card">
 
 
             <label for="inviteCode">
-
-                Invite Code
-
+                Interview Invite Code
             </label>
 
 
             <input
-                type="text"
                 id="inviteCode"
-                placeholder="Enter invite code"
+                type="text"
+                maxlength="9"
+                placeholder="XXXX-XXXX"
                 autocomplete="off"
             >
 
 
             <button
-                type="button"
                 id="verifyCodeButton"
+                class="verify-button"
             >
 
                 Continue
@@ -519,13 +324,18 @@
             </button>
 
 
-            <p id="status"></p>
-
+            <div id="status">
+                Enter your invite code to continue.
+            </div>
 
         </div>
 
-
     </main>
+
+
+    <script
+        src="../js/interviewee.js"
+    ></script>
 
 
 </body>
