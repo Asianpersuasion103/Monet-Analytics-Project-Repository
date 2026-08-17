@@ -1,6 +1,7 @@
 "use strict";
 
 
+
 // ==================================================
 // IMPORTS
 // ==================================================
@@ -14,12 +15,52 @@ const crypto =
 const WebSocket =
     require("ws");
 
+ const { MongoClient } =
+    require("mongodb");   
 
 // ==================================================
 // CONFIGURATION
 // ==================================================
 
-const PORT = 8080;
+
+//
+// MONGO STUFF 
+// 
+const PORT = 8080; 
+
+const MONGODB_URI =
+    "mongodb://127.0.0.1:27017";
+
+const MONGODB_DATABASE =
+    "ResumeDB";
+
+let mongoClient;
+let mongoDB;
+
+
+//
+//MONGO CONNECTION FUNCTION 
+// 
+
+async function connectToMongoDB() {
+
+    mongoClient =
+        new MongoClient(
+            MONGODB_URI
+        );
+
+    await mongoClient.connect();
+
+    mongoDB =
+        mongoClient.db(
+            MONGODB_DATABASE
+        );
+
+    console.log(
+        "MongoDB connected."
+    );
+
+}
 
 
 // ==================================================
@@ -871,36 +912,62 @@ wss.on(
 
 
 // ==================================================
-// START SERVER
+// START SERVER with wait for MongoDB
 // ==================================================
 
-server.listen(
-    PORT,
-    function () {
+async function startServer() {
 
-        console.log(
-            "======================================"
-        );
+    try {
 
-        console.log(
-            "WebRTC signaling server started."
-        );
+        await connectToMongoDB();
 
-        console.log(
-            `HTTP server: http://localhost:${PORT}`
-        );
+        server.listen(
+            PORT,
+            function () {
 
-        console.log(
-            `WebSocket server: ws://localhost:${PORT}`
-        );
+                console.log(
+                    "======================================"
+                );
 
-        console.log(
-            "======================================"
+                console.log(
+                    "WebRTC signaling server started."
+                );
+
+                console.log(
+                    `HTTP server: http://localhost:${PORT}`
+                );
+
+                console.log(
+                    `WebSocket server: ws://localhost:${PORT}`
+                );
+
+                console.log(
+                    "MongoDB connected."
+                );
+
+                console.log(
+                    "======================================"
+                );
+
+            }
         );
 
     }
-);
 
+    catch (error) {
+
+        console.error(
+            "Could not start server:",
+            error
+        );
+
+        process.exit(1);
+
+    }
+
+}
+
+startServer();
 
 // ==================================================
 // CLEAN EXPIRED ROOMS
