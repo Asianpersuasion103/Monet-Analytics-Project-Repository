@@ -68,6 +68,8 @@ const expirationElement =
         "expiration"
     );
 
+const applicantEmailInput =
+    document.getElementById("applicantEmail");
 
 // ==================================================
 // CURRENT MEETING
@@ -84,7 +86,21 @@ let currentInviteCode =
 generateCodeButton.addEventListener(
     "click",
     async function () {
-
+        const applicantEmail = applicantEmailInput.value.trim();
+        if(!applicantEmail){
+            statusElement.textContent = 
+            "Please enter the applicant's email."; 
+            statusElement.className = "error";
+            applicantEmailInput.focus();
+            return;
+        }
+        if(!applicantEmailInput.checkValidity()){
+            statusElement.textContent =
+            "Please enter a valid email address."; 
+            statusElement.className = "error";
+            applicantEmailInput.focus(); 
+            return; 
+        }
         console.log(
             "Generate Meeting Code clicked."
         );
@@ -138,7 +154,10 @@ generateCodeButton.addEventListener(
                         headers: {
                             "Content-Type":
                                 "application/json"
-                        }
+                        }, 
+                        body: JSON.stringify({
+                            applicantEmail: applicantEmail
+                        })
                     }
                 );
 
@@ -170,6 +189,12 @@ generateCodeButton.addEventListener(
 
             const data =
                 await response.json();
+            
+                if (!response.ok){
+                    throw new Error(
+                        data.message || `Server returned HTTP ${response.status}`
+                    );
+                }
 
 
             console.log(

@@ -1,6 +1,6 @@
 "use strict";
 
-
+require("dotenv").config(); 
 
 // ==================================================
 // IMPORTS
@@ -18,6 +18,45 @@ const WebSocket =
  const { MongoClient } =
     require("mongodb");   
 
+const {
+    sendInterviewInvitation
+} = require("./email.js"); 
+
+// READ JSON REQUEST BODY 
+function readJSONBody(request) {
+    return new Promise((resolve, reject) => {
+        let body = "";
+
+        request.on("data", (chunk) => {
+            body += chunk.toString();
+
+            if (body.length > 100000) {
+                reject(
+                    new Error("Request body too large.")
+                );
+
+                request.destroy();
+            }
+        });
+
+        request.on("end", () => {
+            try {
+                const parsedBody =
+                    JSON.parse(body || "{}");
+
+                resolve(parsedBody);
+            } catch (error) {
+                reject(
+                    new Error("Invalid JSON.")
+                );
+            }
+        });
+
+        request.on("error", (error) => {
+            reject(error);
+        });
+    });
+}
 // ==================================================
 // CONFIGURATION
 // ==================================================
@@ -139,10 +178,8 @@ function generateInviteCode() {
 // CREATE ROOM
 // ==================================================
 
-function createMeetingRoom() {
-
+function createMeetingRoom(applicantEmail) {
     let inviteCode;
-
 
     do {
 
@@ -165,6 +202,8 @@ function createMeetingRoom() {
 
         inviteCode:
             inviteCode,
+        
+        applicantEmail: applicantEmail, 
 
         createdAt:
             now,
@@ -286,7 +325,6 @@ function sendJSON(
             data
         )
     );
-
 }
 
 
@@ -294,9 +332,10 @@ function sendJSON(
 // HTTP SERVER
 // ==================================================
 
+
 const server =
     http.createServer(
-        function (
+        async function (
             request,
             response
         ) {
@@ -343,34 +382,68 @@ const server =
                 request.url ===
                     "/api/create-room"
             ) {
-
-                const room =
-                    createMeetingRoom();
-
+            try {
+                const body = await readJSONBody(request); 
+                const applicantEmail = 
+                    String(
+                        body.applicantEmail || ""
+                    )
+                        .trim()
+                        .toLowerCase();
+                if (!applicantEmail) {
+                    sendJSON(
+                        response, 400,  {
+                            success: false,
+                            message: "Applicant email is required."
+                        }
+                    ); 
+                    return; 
+                }
+                const room = createMeetingRoom(
+                    applicantEmail
+                ); 
+                try {
+                    await sendInterviewInvitation(
+                        applicantEmail, 
+                        room.inviteCode
+                    ); 
+                } catch (emailError) {
+                    meetingRooms.delete(room.inviteCode); 
+                    throw emailError; 
+                }
+                console.log(
+                    "Invitation sent:",
+                    applicantEmail,
+                    room.inviteCode
+                ); 
 
                 sendJSON(
                     response,
                     200,
                     {
-                        success:
-                            true,
-
-                        inviteCode:
-                            room.inviteCode,
-
-                        room:
-                            room.inviteCode,
-
-                        expiresAt:
-                            room.expiresAt
+                        success: true,
+                        inviteCode: room.inviteCode,
+                        room: room.inviteCode,
+                        expiresAt: room.expiresAt, 
+                        invitationSent: true
                     }
                 );
-
-
-                return;
-
+            } catch (error) {
+                console.error(
+                    "Create room error:", 
+                    error
+                ); 
+                sendJSON(
+                    response, 
+                    500,
+                    {
+                        success: false,
+                        message: "Could not create and send the interview invitation."
+                    }
+                );
             }
-
+            return; 
+        }
 
             // ======================================
             // VERIFY INVITE
@@ -916,55 +989,27 @@ wss.on(
 // ==================================================
 
 async function startServer() {
-
     try {
-
         await connectToMongoDB();
-
-        server.listen(
-            PORT,
-            function () {
-
-                console.log(
-                    "======================================"
-                );
-
-                console.log(
-                    "WebRTC signaling server started."
-                );
-
-                console.log(
-                    `HTTP server: http://localhost:${PORT}`
-                );
-
-                console.log(
-                    `WebSocket server: ws://localhost:${PORT}`
-                );
-
-                console.log(
-                    "MongoDB connected."
-                );
-
-                console.log(
-                    "======================================"
-                );
-
-            }
-        );
-
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error(
-            "Could not start server:",
-            error
+            "MongoDB unavailable:",
+            error.message
         );
 
-        process.exit(1);
-
+        console.warn(
+            "Continuing without MongoDB for development."
+        );
     }
 
+    server.listen(
+        PORT,
+        function () {
+            console.log(
+                `Server running on port ${PORT}`
+            );
+        }
+    );
 }
 
 startServer();
