@@ -5,9 +5,11 @@
 // CONFIGURATION
 // ==================================================
 
-const SERVER_URL =
-    "http://localhost:8080";
+const SERVER_HOST =
+    window.location.hostname;
 
+const SERVER_URL =
+    `http://${SERVER_HOST}:8080`;
 
 // ==================================================
 // HTML ELEMENTS

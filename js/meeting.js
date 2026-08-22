@@ -200,7 +200,7 @@ let remoteAudioSource =
 // ==================================================
 
 const SIGNALING_SERVER =
-    "ws://localhost:8080";
+    `ws://${window.location.hostname}:8080`;
 
 
 // ==================================================

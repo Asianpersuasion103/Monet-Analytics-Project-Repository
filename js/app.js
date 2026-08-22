@@ -244,9 +244,9 @@ async function processResume(
         resumeText.value =
             extractedText;
 
-
         textContainer.style.display =
             "block";
+
 
 
         // ==========================================
@@ -467,10 +467,7 @@ if (uploadBox) {
 
         }
     );
-
 }
-
-
 // ==================================================
 // EXTRACT PDF
 // ==================================================

@@ -5,6 +5,8 @@ require("dotenv").config();
 // ==================================================
 // IMPORTS
 // ==================================================
+const fs = require ("fs");
+const path = require ("path");
 
 const http =
     require("http");
@@ -332,7 +334,59 @@ function sendJSON(
 // HTTP SERVER
 // ==================================================
 
+function serveStaticFile(request, response) {
+    const projectRoot =
+        path.resolve(__dirname, "..");
 
+    const requestPath =
+        request.url.split("?")[0];
+
+    const filePath =
+        path.resolve(
+            projectRoot,
+            "." + requestPath
+        );
+
+    // Prevent requests from escaping the project folder.
+    if (!filePath.startsWith(projectRoot)) {
+        return false;
+    }
+
+    if (
+        !fs.existsSync(filePath) ||
+        !fs.statSync(filePath).isFile()
+    ) {
+        return false;
+    }
+
+    const extension =
+        path.extname(filePath).toLowerCase();
+
+    const contentTypes = {
+        ".html": "text/html; charset=utf-8",
+        ".js": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+        ".json": "application/json; charset=utf-8",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".svg": "image/svg+xml"
+    };
+
+    response.writeHead(
+        200,
+        {
+            "Content-Type":
+                contentTypes[extension] ||
+                "application/octet-stream"
+        }
+    );
+
+    fs.createReadStream(filePath)
+        .pipe(response);
+
+    return true;
+}
 const server =
     http.createServer(
         async function (
@@ -612,7 +666,15 @@ const server =
                 return;
 
             }
-
+            if (
+                request.method === "GET" &&
+                serveStaticFile(
+                    request,
+                    response
+                )
+            ) {
+                return;
+            }
 
             // ======================================
             // NOT FOUND

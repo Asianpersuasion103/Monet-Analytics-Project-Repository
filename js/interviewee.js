@@ -5,10 +5,12 @@
 // SERVER
 // ==================================================
 
+const SERVER_HOST =
+    window.location.hostname;
+
 const SERVER_URL =
-    "http://localhost:8080";
-
-
+    `http://${SERVER_HOST}:8080`;
+    
 // ==================================================
 // HTML ELEMENTS
 // ==================================================
@@ -24,6 +26,18 @@ const inviteCodeInput =
         "inviteCode"
     );
 
+const urlParams = 
+    new URLSearchParams(
+        window.location.search
+    );
+
+const codeFromURL = 
+    urlParams.get("code");
+
+if(codeFromURL) {
+    inviteCodeInput.value = 
+        codeFromURL.trim().toUpperCase(); 
+}
 
 const verifyCodeButton =
     document.getElementById(
