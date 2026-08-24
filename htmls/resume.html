@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Resume Upload</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            background:
+                #f5f7fa;
+
+            color:
+                #1f2937;
+
+        }
+
+        .back-button {
+
+            position: fixed;
+
+            top: 25px;
+            left: 25px;
+
+            padding:
+                10px 16px;
+
+            background:
+                white;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                8px;
+
+            cursor:
+                pointer;
+
+            z-index:
+                1000;
+
+        }
+
+        .next-button {
+
+            display:
+                none;
+
+            position:
+                fixed;
+
+            top: 25px;
+            right: 25px;
+
+            padding:
+                10px 18px;
+
+            background:
+                #007bff;
+
+            color:
+                white;
+
+            text-decoration:
+                none;
+
+            border-radius:
+                8px;
+
+            font-weight:
+                600;
+
+            z-index:
+                1000;
+
+        }
+
+        .container {
+
+            width:
+                1200px;
+
+            max-width:
+                90%;
+
+            margin:
+                100px auto 60px;
+
+        }
+
+        .page-title {
+
+            text-align:
+                center;
+
+            font-size:
+                44px;
+
+            margin:
+                0 0 10px;
+
+        }
+
+        .upload-note {
+
+            text-align:
+                center;
+
+            color:
+                #6b7280;
+
+            margin-bottom:
+                40px;
+
+        }
+
+        .content {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap:
+                40px;
+
+        }
+
+        .left-column,
+        .right-column {
+
+            min-width:
+                0;
+
+        }
+
+        .upload-box {
+
+            min-height:
+                260px;
+
+            padding:
+                45px 25px;
+
+            background:
+                white;
+
+            border:
+                3px dashed #007bff;
+
+            border-radius:
+                15px;
+
+            text-align:
+                center;
+
+            cursor:
+                pointer;
+
+        }
+
+        .upload-icon {
+
+            font-size:
+                50px;
+
+            margin-bottom:
+                15px;
+
+        }
+
+        .upload-title {
+
+            font-size:
+                23px;
+
+            font-weight:
+                600;
+
+            margin-bottom:
+                10px;
+
+        }
+
+        .upload-subtitle {
+
+            color:
+                #6b7280;
+
+            margin-bottom:
+                20px;
+
+        }
+
+        #pdf-input {
+
+            display:
+                none;
+
+        }
+
+        .upload-button {
+
+            display:
+                inline-block;
+
+            padding:
+                12px 24px;
+
+            background:
+                #007bff;
+
+            color:
+                white;
+
+            border-radius:
+                8px;
+
+            font-weight:
+                600;
+
+            cursor:
+                pointer;
+
+        }
+
+        #file-name {
+
+            margin:
+                18px 0 25px;
+
+            text-align:
+                center;
+
+            color:
+                #6b7280;
+
+        }
+
+        h3 {
+
+            font-size:
+                24px;
+
+            margin-top:
+                0;
+
+        }
+
+        iframe {
+
+            width:
+                100%;
+
+            height:
+                500px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                10px;
+
+        }
+
+        textarea {
+
+            width:
+                100%;
+
+            height:
+                500px;
+
+            padding:
+                18px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                10px;
+
+            resize:
+                vertical;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            line-height:
+                1.6;
+
+        }
+
+        @media (max-width: 800px) {
+
+            .content {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <button
+        class="back-button"
+        onclick="history.back()"
+    >
+
+        ← Back
+
+    </button>
+
+
+    <a
+        href="#"
+        id="next-button"
+        class="next-button"
+    >
+
+        Next →
+
+    </a>
+
+
+    <main class="container">
+
+
+        <h1 class="page-title">
+            Upload Resume
+        </h1>
+
+
+        <p class="upload-note">
+            Upload your resume to get started
+        </p>
+
+
+        <div class="content">
+
+
+            <section class="left-column">
+
+
+                <input
+                    type="file"
+                    id="pdf-input"
+                    accept=".pdf,.docx"
+                >
+
+
+                <div
+                    id="upload-box"
+                    class="upload-box"
+                >
+
+                    <div class="upload-icon">
+                        📄
+                    </div>
+
+                    <div class="upload-title">
+                        Drag & Drop your resume here
+                    </div>
+
+                    <div class="upload-subtitle">
+                        or click the button below
+                    </div>
+
+                    <label
+                        for="pdf-input"
+                        class="upload-button"
+                    >
+
+                        Choose Resume
+
+                    </label>
+
+                    <div class="upload-subtitle">
+                        PDF or DOCX
+                    </div>
+
+                </div>
+
+
+                <div id="file-name">
+                    No file selected
+                </div>
+
+
+                <div
+                    id="preview-container"
+                    style="display:none;"
+                >
+
+                    <h3>
+                        PDF Preview
+                    </h3>
+
+                    <iframe
+                        id="pdf-viewer"
+                    ></iframe>
+
+                </div>
+
+
+            </section>
+
+
+            <section
+                class="right-column"
+                id="text-container"
+                style="display:none;"
+            >
+
+                <h3>
+                    Extracted Resume Text
+                </h3>
+
+                <textarea
+                    id="resume-text"
+                    readonly
+                ></textarea>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <script
+        src="https://unpkg.com/mammoth/mammoth.browser.min.js"
+    ></script>
+
+
+    <script
+        src="../js/database.js"
+    ></script>
+
+
+    <script
+        type="module"
+        src="../js/app.js"
+    ></script>
+
+
+</body>
+
+</html>

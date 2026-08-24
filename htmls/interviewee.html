@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Join Interview</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            background:
+                #f5f7fa;
+
+            color:
+                #111827;
+
+        }
+
+        .back-button {
+
+            position: fixed;
+
+            top: 25px;
+            left: 25px;
+
+            padding:
+                10px 16px;
+
+            background:
+                white;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                8px;
+
+            cursor:
+                pointer;
+
+            font-size:
+                15px;
+
+        }
+
+        .container {
+
+            width:
+                600px;
+
+            max-width:
+                90%;
+
+            margin:
+                140px auto;
+
+            text-align:
+                center;
+
+        }
+
+        h1 {
+
+            font-size:
+                42px;
+
+            margin-bottom:
+                12px;
+
+        }
+
+        .subtitle {
+
+            color:
+                #6b7280;
+
+            margin-bottom:
+                40px;
+
+        }
+
+        .card {
+
+            background:
+                white;
+
+            padding:
+                40px;
+
+            border-radius:
+                16px;
+
+            box-shadow:
+                0 10px 30px
+                rgba(0,0,0,0.08);
+
+        }
+
+        label {
+
+            display:
+                block;
+
+            text-align:
+                left;
+
+            margin-bottom:
+                8px;
+
+            font-weight:
+                600;
+
+        }
+
+        input {
+
+            width:
+                100%;
+
+            padding:
+                15px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                9px;
+
+            font-size:
+                20px;
+
+            text-align:
+                center;
+
+            letter-spacing:
+                3px;
+
+            text-transform:
+                uppercase;
+
+            outline:
+                none;
+
+        }
+
+        input:focus {
+
+            border-color:
+                #007bff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(0,123,255,0.12);
+
+        }
+
+        .verify-button {
+
+            width:
+                100%;
+
+            margin-top:
+                20px;
+
+            padding:
+                14px;
+
+            border:
+                none;
+
+            border-radius:
+                9px;
+
+            background:
+                #007bff;
+
+            color:
+                white;
+
+            font-size:
+                17px;
+
+            font-weight:
+                600;
+
+            cursor:
+                pointer;
+
+        }
+
+        .verify-button:hover {
+
+            background:
+                #0056b3;
+
+        }
+
+        .verify-button:disabled {
+
+            opacity:
+                0.6;
+
+            cursor:
+                not-allowed;
+
+        }
+
+        #status {
+
+            margin-top:
+                20px;
+
+            min-height:
+                24px;
+
+            color:
+                #6b7280;
+
+        }
+
+        .success {
+
+            color:
+                #15803d !important;
+
+        }
+
+        .error {
+
+            color:
+                #dc2626 !important;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <button
+        id="backButton"
+        class="back-button"
+    >
+
+        ← Back
+
+    </button>
+
+
+    <main class="container">
+
+        <h1>
+            Join Interview
+        </h1>
+
+        <p class="subtitle">
+            Enter the invite code provided by your interviewer.
+        </p>
+
+
+        <div class="card">
+
+
+            <label for="inviteCode">
+                Interview Invite Code
+            </label>
+
+
+            <input
+                id="inviteCode"
+                type="text"
+                maxlength="9"
+                placeholder="XXXX-XXXX"
+                autocomplete="off"
+            >
+
+
+            <button
+                id="verifyCodeButton"
+                class="verify-button"
+            >
+
+                Continue
+
+            </button>
+
+
+            <div id="status">
+                Enter your invite code to continue.
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script
+        src="../js/interviewee.js"
+    ></script>
+
+
+</body>
+
+</html>

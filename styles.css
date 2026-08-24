@@ -1,0 +1,100 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+
+    margin: 0;
+
+    background-color: #f5f7fa;
+
+    color: #1f2937;
+}
+
+
+/* ==========================================
+   BACK BUTTON
+   ========================================== */
+
+.back-button {
+
+    position: fixed;
+
+    top: 25px;
+
+    left: 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 10px 16px;
+
+    background-color: white;
+
+    color: #374151;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    z-index: 1000;
+}
+
+
+.back-button:hover {
+
+    background-color: #f3f4f6;
+
+    border-color: #9ca3af;
+
+    color: #111827;
+}
+
+
+/* ==========================================
+   GENERAL BUTTONS
+   ========================================== */
+
+button {
+
+    font-family: "Inter", sans-serif;
+}
+
+
+/* ==========================================
+   PAGE CONTAINER
+   ========================================== */
+
+.container {
+
+    width: 1200px;
+
+    max-width: 90%;
+
+    margin: 100px auto 60px;
+}
+
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 800px) {
+
+    .container {
+        max-width: 90%;
+    }
+
+}

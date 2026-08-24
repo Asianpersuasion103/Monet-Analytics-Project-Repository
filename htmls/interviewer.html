@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Interviewer - Dashboard (Meeting & Resume)</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            background:
+                #f5f7fa;
+
+            color:
+                #1f2937;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+        }
+
+
+        /* ==============================
+           BACK BUTTON
+        ============================== */
+
+        .back-button {
+
+            position: fixed;
+
+            top: 25px;
+
+            left: 25px;
+
+            padding:
+                10px 16px;
+
+            background:
+                white;
+
+            color:
+                #374151;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius:
+                8px;
+
+            font-family:
+                Arial,
+                sans-serif;
+
+            font-size:
+                15px;
+
+            font-weight:
+                500;
+
+            cursor:
+                pointer;
+
+            z-index:
+                1000;
+
+        }
+
+
+        .back-button:hover {
+
+            background:
+                #f3f4f6;
+
+            border-color:
+                #9ca3af;
+
+            color:
+                #111827;
+
+        }
+
+
+        .container {
+
+            width: 90%;
+
+            max-width: 650px;
+
+            background:
+                white;
+
+            padding:
+                45px;
+
+            border-radius:
+                16px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+            text-align:
+                center;
+
+        }
+
+
+        h1 {
+
+            margin:
+                0 0 12px;
+
+            font-size:
+                36px;
+
+            color:
+                #111827;
+
+        }
+
+
+        .description {
+
+            color:
+                #6b7280;
+
+            font-size:
+                16px;
+
+            line-height:
+                1.6;
+
+            margin-bottom:
+                30px;
+
+        }
+
+
+        /* ==============================
+           CODE BOX
+        ============================== */
+
+        .code-label {
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+
+            color:
+                #6b7280;
+
+            margin-bottom:
+                10px;
+
+        }
+
+
+        #inviteCode {
+
+            font-size:
+                42px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                6px;
+
+            color:
+                #007bff;
+
+            background:
+                #f8fbff;
+
+            border:
+                2px solid
+                #dbeafe;
+
+            border-radius:
+                12px;
+
+            padding:
+                20px;
+
+            margin-bottom:
+                25px;
+
+            min-height:
+                88px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .button-row {
+
+            display:
+                flex;
+
+            justify-content:
+                center;
+
+            gap:
+                10px;
+
+            flex-wrap:
+                wrap;
+
+        }
+
+
+        button,
+        .meeting-button {
+
+            border:
+                none;
+
+            border-radius:
+                8px;
+
+            padding:
+                12px 22px;
+
+            font-size:
+                16px;
+
+            font-weight:
+                600;
+
+            cursor:
+                pointer;
+
+            text-decoration:
+                none;
+
+            display:
+                inline-block;
+
+        }
+
+
+        #generateCodeButton {
+
+            background:
+                #007bff;
+
+            color:
+                white;
+
+        }
+
+
+        #generateCodeButton:hover {
+
+            background:
+                #0056b3;
+
+        }
+
+
+        #copyCodeButton {
+
+            background:
+                #374151;
+
+            color:
+                white;
+
+        }
+
+
+        #copyCodeButton:hover {
+
+            background:
+                #1f2937;
+
+        }
+
+
+        #copyCodeButton:disabled,
+        #generateCodeButton:disabled {
+
+            opacity:
+                0.6;
+
+            cursor:
+                not-allowed;
+
+        }
+
+
+        .meeting-button {
+
+            background:
+                #16a34a;
+
+            color:
+                white;
+
+            display:
+                none;
+
+        }
+
+
+        .meeting-button:hover {
+
+            background:
+                #15803d;
+
+        }
+
+
+        /* ==============================
+           STATUS
+        ============================== */
+
+        #status {
+
+            margin-top:
+                25px;
+
+            font-size:
+                15px;
+
+            color:
+                #6b7280;
+
+            min-height:
+                24px;
+
+        }
+
+
+        #status.success {
+
+            color:
+                #15803d;
+
+        }
+
+
+        #status.error {
+
+            color:
+                #dc2626;
+
+        }
+
+
+        /* ==============================
+           EXPIRATION
+        ============================== */
+
+        #expiration {
+
+            display:
+                none;
+
+            margin-top:
+                10px;
+
+            font-size:
+                13px;
+
+            color:
+                #9ca3af;
+
+        }
+
+
+        /* ==============================
+           MOBILE
+        ============================== */
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .container {
+
+                padding:
+                    30px 20px;
+
+            }
+
+
+            h1 {
+
+                font-size:
+                    30px;
+
+            }
+
+
+            #inviteCode {
+
+                font-size:
+                    30px;
+
+                letter-spacing:
+                    4px;
+
+            }
+
+
+            .back-button {
+
+                top: 15px;
+
+                left: 15px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ==============================
+         BACK BUTTON
+    ============================== -->
+
+    <button
+        id="backButton"
+        class="back-button"
+        type="button"
+    >
+
+        ← Back
+
+    </button>
+
+
+    <div class="container">
+
+
+        <h1>
+            Interviewer Dashboard
+        </h1>
+
+
+        <p class="description">
+
+            Generate a secure meeting code
+            and give it to your interviewee.
+
+            The interviewee will use the code
+            to enter the interview process.
+
+        </p>
+
+
+        <!-- ==============================
+             CODE LABEL
+        ============================== -->
+
+        <div class="code-label">
+
+            MEETING CODE
+
+        </div>
+
+
+        <!-- ==============================
+             RANDOM CODE
+        ============================== -->
+
+        <div
+            id="inviteCode"
+        >
+
+            ----
+
+        </div>
+
+
+        <!-- ==============================
+             BUTTONS
+        ============================== -->
+
+        <div class="button-row">
+
+
+            <button
+                id="generateCodeButton"
+                type="button"
+            >
+
+                Generate Meeting Code
+
+            </button>
+
+
+            <button
+                id="copyCodeButton"
+                type="button"
+                disabled
+            >
+
+                Copy Code
+
+            </button>
+
+
+            <a
+                id="meetingLink"
+                class="meeting-button"
+                href="#"
+            >
+
+                Enter Meeting →
+
+            </a>
+
+
+        </div>
+
+
+        <!-- ==============================
+             STATUS
+        ============================== -->
+
+        <div
+            id="status"
+        >
+
+            No meeting created yet.
+
+        </div>
+
+
+        <!-- ==============================
+             EXPIRATION
+        ============================== -->
+
+        <div
+            id="expiration"
+        >
+
+            This meeting code expires
+            after 30 minutes.
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ==============================
+         INTERVIEWER JAVASCRIPT
+    ============================== -->
+
+    <script
+        src="../js/interviewer.js"
+    ></script>
+
+
+    <!-- ==============================
+         BACK BUTTON
+    ============================== -->
+
+    <script>
+
+        const backButton =
+            document.getElementById(
+                "backButton"
+            );
+
+
+        backButton.addEventListener(
+            "click",
+            function () {
+
+                window.history.back();
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "interview-platform",
+  "version": "1.0.0",
+  "description": "Browser-based interview platform",
+  "type": "commonjs",
+  "scripts": {
+    "server": "node js/server.js"
+  },
+  "dependencies": {
+    "mongodb": "^7.5.0",
+    "ws": "^8.18.3"
+  }
+}
