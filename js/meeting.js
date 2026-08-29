@@ -159,6 +159,8 @@ let peerConnected =
 let meetingStarted =
     false;
 
+let pendingIceCandidates =
+    [];
 
 // ==================================================
 // RECORDING VARIABLES
@@ -507,31 +509,42 @@ async function handleSignalingMessage(
     ) {
 
         if (
-            peerConnection
+            !message.candidate
+        ) {
+            return;
+        }
+
+        // The candidate may arrive before
+        // the remote SDP is installed.
+        if (
+            !peerConnection ||
+            !peerConnection.remoteDescription
         ) {
 
-            try {
+            pendingIceCandidates.push(
+                message.candidate
+            );
 
-                await peerConnection
-                    .addIceCandidate(
-                        message.candidate
-                    );
+            return;
+        }
 
-            }
+        try {
 
-            catch (error) {
-
-                console.error(
-                    "ICE error:",
-                    error
+            await peerConnection
+                .addIceCandidate(
+                    message.candidate
                 );
 
-            }
+        }
+        catch (error) {
 
+            console.error(
+                "ICE error:",
+                error
+            );
         }
 
         return;
-
     }
 
 
@@ -924,7 +937,39 @@ function createPeerConnection() {
 
 }
 
+async function flushPendingIceCandidates() {
 
+    if (
+        !peerConnection ||
+        !peerConnection.remoteDescription
+    ) {
+        return;
+    }
+
+    while (
+        pendingIceCandidates.length > 0
+    ) {
+
+        const candidate =
+            pendingIceCandidates.shift();
+
+        try {
+
+            await peerConnection
+                .addIceCandidate(
+                    candidate
+                );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Queued ICE candidate error:",
+                error
+            );
+        }
+    }
+}
 // ==================================================
 // CREATE OFFER
 // ==================================================
@@ -1074,6 +1119,7 @@ async function handleOffer(
                 offer
             );
 
+        await flushPendingIceCandidates();
 
         const answer =
             await peerConnection
@@ -1143,7 +1189,8 @@ async function handleAnswer(
             .setRemoteDescription(
                 answer
             );
-
+        
+        await flushPendingIceCandidates();
 
         status.textContent =
             "Answer received. Connecting...";

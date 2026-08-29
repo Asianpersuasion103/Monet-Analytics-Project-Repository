@@ -1193,35 +1193,44 @@ wss.on(
 
 
         // ==========================================
-        // NOTIFY OTHER PARTICIPANT
+        // NOTIFY BOTH PARTICIPANTS
         // ==========================================
 
-        const otherSocket =
-            role ===
-                "interviewer"
-                ? room.interviewee
-                : room.interviewer;
+        const interviewerConnected =
+            room.interviewer &&
+            room.interviewer.readyState ===
+                WebSocket.OPEN;
 
+        const intervieweeConnected =
+            room.interviewee &&
+            room.interviewee.readyState ===
+                WebSocket.OPEN;
 
         if (
-            otherSocket &&
-            otherSocket.readyState ===
-                WebSocket.OPEN
+            interviewerConnected &&
+            intervieweeConnected
         ) {
 
-            otherSocket.send(
+            room.interviewer.send(
                 JSON.stringify({
                     type:
                         "peer-joined",
 
                     role:
-                        role
+                        "interviewee"
                 })
             );
 
+            room.interviewee.send(
+                JSON.stringify({
+                    type:
+                        "peer-joined",
+
+                    role:
+                        "interviewer"
+                })
+            );
         }
-
-
         // ==========================================
         // RELAY SIGNALING MESSAGES
         // ==========================================
