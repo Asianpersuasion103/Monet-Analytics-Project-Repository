@@ -199,8 +199,13 @@ let remoteAudioSource =
 // SIGNALING SERVER
 // ==================================================
 
+const WS_PROTOCOL =
+    window.location.protocol === "https:"
+        ? "wss:"
+        : "ws:";
+
 const SIGNALING_SERVER =
-    `ws://${window.location.hostname}:8080`;
+    `${WS_PROTOCOL}//${window.location.host}`;
 
 
 // ==================================================

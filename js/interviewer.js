@@ -5,11 +5,7 @@
 // CONFIGURATION
 // ==================================================
 
-const SERVER_HOST =
-    window.location.hostname;
-
-const SERVER_URL =
-    `http://${SERVER_HOST}:8080`;
+const SERVER_URL = window.location.origin; 
 
 // ==================================================
 // HTML ELEMENTS

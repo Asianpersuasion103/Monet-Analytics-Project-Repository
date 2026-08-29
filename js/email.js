@@ -35,8 +35,8 @@ async function sendInterviewInvitation(
         );
     }
 
-    const applicantLink =
-    `${process.env.APP_BASE_URL}/htmls/interviewee.html?code=${encodeURIComponent(inviteCode)}`;
+   const applicantLink =
+    `${appBaseURL.replace(/\/$/, "")}/index.html?code=${encodeURIComponent(inviteCode)}`;
 
     const { data, error } =
         await resend.emails.send({

@@ -275,9 +275,74 @@ async function processResume(
 
             uploadedAt:
                 new Date().toISOString()
-
         };
+        // ==========================================
+        // SEND ORIGINAL RESUME TO SERVER
+        // ==========================================
 
+        if (
+            !meetingRoom ||
+            !meetingRole
+        ) {
+            throw new Error(
+                "Meeting information is missing."
+            );
+        }
+
+        const uploadURL =
+            new URL(
+                "/api/upload-resume",
+                window.location.origin
+            );
+
+        uploadURL.searchParams.set(
+            "room",
+            meetingRoom
+        );
+
+        uploadURL.searchParams.set(
+            "filename",
+            file.name
+        );
+
+        const uploadResponse =
+            await fetch(
+                uploadURL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/octet-stream"
+                    },
+
+                    body:
+                        file
+                }
+            );
+
+        const uploadResult =
+            await uploadResponse.json();
+
+        if (
+            !uploadResponse.ok ||
+            !uploadResult.success
+        ) {
+
+            throw new Error(
+                uploadResult.message ||
+                "Resume upload failed."
+            );
+        }
+
+        resume.serverFileName =
+            uploadResult.fileName;
+
+        console.log(
+            "Resume uploaded to server:",
+            uploadResult.fileName
+        );
 
         if (
             typeof savePDF ===
@@ -330,7 +395,7 @@ async function processResume(
 
 
             nextButton.style.display =
-                "block";
+                "inline-block";
 
         }
         else {
@@ -403,8 +468,21 @@ if (uploadBox) {
 
         }
     );
+        uploadBox.addEventListener(
+        "click",
+        function (event) {
 
+            if (
+                event.target.closest(
+                    ".upload-button"
+                )
+            ) {
+                return;
+            }
 
+            fileInput.click();
+        }
+    );
     // ==============================================
     // DRAG LEAVE
     // ==============================================

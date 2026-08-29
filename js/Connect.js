@@ -34,8 +34,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 console.log("Interviewer button clicked.");
 
-                window.location.href =
-                    "./htmls/interviewer.html";
+                const params = 
+                new URLSearchParams(window.location.search);
+
+                const inviteCode = params.get("code");
+
+                if (inviteCode) {
+                    window.location.href =
+                        `./htmls/interviewer.html?code=${inviteCode}`;
+                        encodeURIComponent(inviteCode);
+                }
+
+                else {
+                    window.location.href = 
+                        "./htmls/interviewer.html";
+                }
 
             }
         );

@@ -59,6 +59,70 @@ function readJSONBody(request) {
         });
     });
 }
+
+// ==================================================
+// READ BINARY FILE BODY
+// ==================================================
+
+function readBinaryBody(
+    request,
+    maxBytes = 10 * 1024 * 1024
+) {
+    return new Promise(
+        (resolve, reject) => {
+
+            const chunks = [];
+            let totalBytes = 0;
+            let rejected = false;
+
+            request.on(
+                "data",
+                function (chunk) {
+
+                    if (rejected) {
+                        return;
+                    }
+
+                    totalBytes += chunk.length;
+
+                    if (totalBytes > maxBytes) {
+
+                        rejected = true;
+
+                        reject(
+                            new Error(
+                                "Resume is too large. Maximum size is 10 MB."
+                            )
+                        );
+
+                        return;
+                    }
+
+                    chunks.push(chunk);
+                }
+            );
+
+            request.on(
+                "end",
+                function () {
+
+                    if (rejected) {
+                        return;
+                    }
+
+                    resolve(
+                        Buffer.concat(chunks)
+                    );
+                }
+            );
+
+            request.on(
+                "error",
+                reject
+            );
+        }
+    );
+}
 // ==================================================
 // CONFIGURATION
 // ==================================================
@@ -365,6 +429,7 @@ function serveStaticFile(request, response) {
     const contentTypes = {
         ".html": "text/html; charset=utf-8",
         ".js": "text/javascript; charset=utf-8",
+        ".mjs": "text/javascript; charset=utf-8",
         ".css": "text/css; charset=utf-8",
         ".json": "application/json; charset=utf-8",
         ".png": "image/png",
@@ -637,7 +702,228 @@ const server =
                 return;
 
             }
+            // ======================================
+// UPLOAD RESUME
+// ======================================
 
+if (
+    request.method === "POST" &&
+    request.url.startsWith(
+        "/api/upload-resume"
+    )
+) {
+
+    try {
+
+        const uploadURL =
+            new URL(
+                request.url,
+                `http://localhost:${PORT}`
+            );
+
+        const roomCode =
+            String(
+                uploadURL.searchParams.get(
+                    "room"
+                ) || ""
+            )
+            .trim()
+            .toUpperCase();
+
+        const originalFileName =
+            path.basename(
+                uploadURL.searchParams.get(
+                    "filename"
+                ) || ""
+            );
+
+        // ------------------------------
+        // Validate meeting
+        // ------------------------------
+
+        const room =
+            getValidRoom(
+                roomCode
+            );
+
+        if (!room) {
+
+            sendJSON(
+                response,
+                400,
+                {
+                    success: false,
+                    message:
+                        "Invalid or expired meeting room."
+                }
+            );
+
+            return;
+        }
+
+        // ------------------------------
+        // Validate filename
+        // ------------------------------
+
+        if (!originalFileName) {
+
+            sendJSON(
+                response,
+                400,
+                {
+                    success: false,
+                    message:
+                        "Resume filename is missing."
+                }
+            );
+
+            return;
+        }
+
+        const extension =
+            path.extname(
+                originalFileName
+            )
+            .toLowerCase();
+
+        if (
+            extension !== ".pdf" &&
+            extension !== ".docx"
+        ) {
+
+            sendJSON(
+                response,
+                400,
+                {
+                    success: false,
+                    message:
+                        "Only PDF and DOCX resumes are allowed."
+                }
+            );
+
+            return;
+        }
+
+        // ------------------------------
+        // Read file
+        // ------------------------------
+
+        const fileBuffer =
+            await readBinaryBody(
+                request
+            );
+
+        if (
+            !fileBuffer ||
+            fileBuffer.length === 0
+        ) {
+
+            sendJSON(
+                response,
+                400,
+                {
+                    success: false,
+                    message:
+                        "The uploaded resume is empty."
+                }
+            );
+
+            return;
+        }
+
+        // ------------------------------
+        // Create upload folder
+        // ------------------------------
+
+        const uploadDirectory =
+            path.resolve(
+                __dirname,
+                "..",
+                "uploads",
+                "resumes"
+            );
+
+        fs.mkdirSync(
+            uploadDirectory,
+            {
+                recursive: true
+            }
+        );
+
+        // ------------------------------
+        // Safe filename
+        // ------------------------------
+
+        const baseName =
+            path.basename(
+                originalFileName,
+                extension
+            )
+            .replace(
+                /[^a-zA-Z0-9_-]/g,
+                "_"
+            );
+
+        const savedFileName =
+            `${roomCode}_${Date.now()}_${baseName}${extension}`;
+
+        const savedPath =
+            path.join(
+                uploadDirectory,
+                savedFileName
+            );
+
+        // ------------------------------
+        // Save
+        // ------------------------------
+
+        fs.writeFileSync(
+            savedPath,
+            fileBuffer
+        );
+
+        room.resumeFile =
+            savedFileName;
+
+        console.log(
+            "Resume received:",
+            savedFileName
+        );
+
+        sendJSON(
+            response,
+            200,
+            {
+                success: true,
+                fileName:
+                    savedFileName,
+                room:
+                    roomCode
+            }
+        );
+    }
+
+    catch (error) {
+
+        console.error(
+            "Resume upload error:",
+            error
+        );
+
+        sendJSON(
+            response,
+            500,
+            {
+                success: false,
+                message:
+                    error.message ||
+                    "Could not upload resume."
+            }
+        );
+    }
+
+    return;
+}
 
             // ======================================
             // STATUS
