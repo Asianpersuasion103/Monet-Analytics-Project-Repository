@@ -1,13 +1,24 @@
 import * as pdfjsLib
     from "../pdfjs/pdf.mjs";
 
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "../pdfjs/pdf.worker.mjs";
+
 
 // ==================================================
 // PDF.JS WORKER
 // ==================================================
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "../pdfjs/pdf.worker.mjs";
+    "./pdfjs/pdf.worker.mjs";
+
+
+// ==================================================
+// PYTHON BACKEND
+// ==================================================
+
+const API_URL =
+    "http://127.0.0.1:8000";
 
 
 // ==================================================
@@ -19,42 +30,35 @@ const fileInput =
         "pdf-input"
     );
 
-
 const fileNameDiv =
     document.getElementById(
         "file-name"
     );
-
 
 const previewContainer =
     document.getElementById(
         "preview-container"
     );
 
-
 const pdfViewer =
     document.getElementById(
         "pdf-viewer"
     );
-
 
 const textContainer =
     document.getElementById(
         "text-container"
     );
 
-
 const resumeText =
     document.getElementById(
         "resume-text"
     );
 
-
 const uploadBox =
     document.getElementById(
         "upload-box"
     );
-
 
 const nextButton =
     document.getElementById(
@@ -71,27 +75,10 @@ const meetingRole =
         "meetingRole"
     );
 
-
 const meetingRoom =
     sessionStorage.getItem(
         "meetingRoom"
     );
-
-
-// ==================================================
-// CHECK MEETING INFORMATION
-// ==================================================
-
-if (
-    !meetingRole ||
-    !meetingRoom
-) {
-
-    console.warn(
-        "Meeting information is missing."
-    );
-
-}
 
 
 // ==================================================
@@ -110,9 +97,7 @@ if (nextButton) {
 // PROCESS RESUME
 // ==================================================
 
-async function processResume(
-    file
-) {
+async function processResume(file) {
 
     if (!file) {
 
@@ -122,7 +107,7 @@ async function processResume(
 
 
     // ==============================================
-    // EXTENSION
+    // GET FILE EXTENSION
     // ==============================================
 
     const extension =
@@ -133,7 +118,7 @@ async function processResume(
 
 
     // ==============================================
-    // FILE TYPE
+    // CHECK FILE TYPE
     // ==============================================
 
     if (
@@ -151,19 +136,47 @@ async function processResume(
 
 
     // ==============================================
-    // RESET
+    // RESET UI
     // ==============================================
 
-    nextButton.style.display =
-        "none";
+    if (nextButton) {
+
+        nextButton.style.display =
+            "none";
+
+    }
 
 
-    textContainer.style.display =
-        "none";
+    if (textContainer) {
+
+        textContainer.style.display =
+            "none";
+
+    }
 
 
-    fileNameDiv.textContent =
-        `Selected: ${file.name}`;
+    if (previewContainer) {
+
+        previewContainer.style.display =
+            "none";
+
+    }
+
+
+    if (resumeText) {
+
+        resumeText.value =
+            "";
+
+    }
+
+
+    if (fileNameDiv) {
+
+        fileNameDiv.textContent =
+            `Selected: ${file.name}`;
+
+    }
 
 
     try {
@@ -185,12 +198,20 @@ async function processResume(
                 );
 
 
-            pdfViewer.src =
-                fileURL;
+            if (pdfViewer) {
+
+                pdfViewer.src =
+                    fileURL;
+
+            }
 
 
-            previewContainer.style.display =
-                "block";
+            if (previewContainer) {
+
+                previewContainer.style.display =
+                    "block";
+
+            }
 
 
             extractedText =
@@ -207,10 +228,6 @@ async function processResume(
 
         else {
 
-            previewContainer.style.display =
-                "none";
-
-
             extractedText =
                 await extractDOCXText(
                     file
@@ -220,7 +237,7 @@ async function processResume(
 
 
         // ==========================================
-        // EXTRACTION FAILED
+        // CHECK EXTRACTED TEXT
         // ==========================================
 
         if (
@@ -238,79 +255,80 @@ async function processResume(
 
 
         // ==========================================
-        // DISPLAY
+        // CLEAN TEXT
         // ==========================================
 
-        resumeText.value =
-            extractedText;
-
-
-        textContainer.style.display =
-            "block";
+        extractedText =
+            extractedText.trim();
 
 
         // ==========================================
-        // SAVE
+        // DISPLAY EXTRACTED TEXT
         // ==========================================
 
-        const resume = {
+        if (resumeText) {
 
-            id:
-                crypto.randomUUID(),
-
-            fileName:
-                file.name,
-
-            fileType:
-                extension,
-
-            extractedText:
-                extractedText,
-
-            meetingRoom:
-                meetingRoom,
-
-            meetingRole:
-                meetingRole,
-
-            uploadedAt:
-                new Date().toISOString()
-
-        };
-
-
-        if (
-            typeof savePDF ===
-            "function"
-        ) {
-
-            await savePDF(
-                resume
-            );
-
-        }
-        else {
-
-            console.warn(
-                "savePDF() was not found."
-            );
+            resumeText.value =
+                extractedText;
 
         }
 
+
+        if (textContainer) {
+
+            textContainer.style.display =
+                "block";
+
+        }
+
+
+        // ==========================================
+        // DEBUG
+        // ==========================================
 
         console.log(
-            "Resume saved:",
-            resume
+            "Resume processed successfully."
+        );
+
+        console.log(
+            "Filename:",
+            file.name
+        );
+
+        console.log(
+            "Extracted text length:",
+            extractedText.length
         );
 
 
         // ==========================================
-        // PREPARE MEETING URL
+        // SAVE TO PYTHON DATABASE
+        // ==========================================
+
+        const savedResume =
+            await saveResume(
+                file,
+                extractedText
+            );
+
+
+        console.log(
+            "Resume saved to Python database:"
+        );
+
+        console.log(
+            savedResume
+        );
+
+
+        // ==========================================
+        // CREATE MEETING URL
         // ==========================================
 
         if (
             meetingRole &&
-            meetingRoom
+            meetingRoom &&
+            savedResume.id
         ) {
 
             const meetingURL =
@@ -322,21 +340,30 @@ async function processResume(
                 "&room=" +
                 encodeURIComponent(
                     meetingRoom
+                ) +
+                "&resumeId=" +
+                encodeURIComponent(
+                    savedResume.id
                 );
 
 
-            nextButton.href =
-                meetingURL;
+            if (nextButton) {
+
+                nextButton.href =
+                    meetingURL;
 
 
-            nextButton.style.display =
-                "block";
+                nextButton.style.display =
+                    "block";
+
+            }
 
         }
+
         else {
 
-            alert(
-                "Resume processed, but meeting information is missing."
+            console.log(
+                "Resume saved, but meeting information is not available."
             );
 
         }
@@ -352,6 +379,7 @@ async function processResume(
 
 
         alert(
+            error.message ||
             "There was a problem processing the resume."
         );
 
@@ -361,7 +389,185 @@ async function processResume(
 
 
 // ==================================================
-// FILE SELECTION
+// SAVE RESUME TO PYTHON
+// ==================================================
+
+async function saveResume(
+    file,
+    extractedText
+) {
+
+    // ==============================================
+    // CREATE FORM DATA
+    // ==============================================
+
+    const formData =
+        new FormData();
+
+
+    // ==============================================
+    // ORIGINAL FILE
+    // ==============================================
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    // ==============================================
+    // EXTRACTED RESUME TEXT
+    // ==============================================
+
+    formData.append(
+        "extracted_text",
+        extractedText
+    );
+
+
+    // ==============================================
+    // MEETING ROOM
+    // ==============================================
+
+    if (meetingRoom) {
+
+        formData.append(
+            "meeting_room",
+            meetingRoom
+        );
+
+    }
+
+
+    // ==============================================
+    // MEETING ROLE
+    // ==============================================
+
+    if (meetingRole) {
+
+        formData.append(
+            "meeting_role",
+            meetingRole
+        );
+
+    }
+
+
+    // ==============================================
+    // DEBUG
+    // ==============================================
+
+    console.log(
+        "======================================"
+    );
+
+    console.log(
+        "Uploading resume to Python API..."
+    );
+
+    console.log(
+        "Filename:",
+        file.name
+    );
+
+    console.log(
+        "Extracted text length:",
+        extractedText.length
+    );
+
+    console.log(
+        "Meeting room:",
+        meetingRoom
+    );
+
+    console.log(
+        "Meeting role:",
+        meetingRole
+    );
+
+    console.log(
+        "======================================"
+    );
+
+
+    // ==============================================
+    // SEND TO FASTAPI
+    // ==============================================
+
+    const response =
+        await fetch(
+            `${API_URL}/resumes`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+
+    // ==============================================
+    // CHECK RESPONSE
+    // ==============================================
+
+    if (!response.ok) {
+
+        let message =
+            "Could not save resume.";
+
+
+        try {
+
+            const error =
+                await response.json();
+
+
+            message =
+                error.detail ||
+                message;
+
+        }
+
+        catch {
+
+            // Keep default error message.
+
+        }
+
+
+        throw new Error(
+            message
+        );
+
+    }
+
+
+    // ==============================================
+    // READ PYTHON RESPONSE
+    // ==============================================
+
+    const result =
+        await response.json();
+
+
+    // ==============================================
+    // DEBUG
+    // ==============================================
+
+    console.log(
+        "Python API response:"
+    );
+
+    console.log(
+        result
+    );
+
+
+    return result;
+
+}
+
+
+// ==================================================
+// FILE INPUT
 // ==================================================
 
 if (fileInput) {
@@ -448,6 +654,10 @@ if (uploadBox) {
             }
 
 
+            // ======================================
+            // UPDATE FILE INPUT
+            // ======================================
+
             const dataTransfer =
                 new DataTransfer();
 
@@ -461,6 +671,10 @@ if (uploadBox) {
                 dataTransfer.files;
 
 
+            // ======================================
+            // PROCESS
+            // ======================================
+
             processResume(
                 file
             );
@@ -472,12 +686,10 @@ if (uploadBox) {
 
 
 // ==================================================
-// EXTRACT PDF
+// EXTRACT PDF TEXT
 // ==================================================
 
-async function extractPDFText(
-    file
-) {
+async function extractPDFText(file) {
 
     const arrayBuffer =
         await file.arrayBuffer();
@@ -492,13 +704,17 @@ async function extractPDFText(
             .promise;
 
 
-    let fullText = "";
+    let fullText =
+        "";
 
+
+    // ==============================================
+    // LOOP THROUGH EVERY PAGE
+    // ==============================================
 
     for (
         let pageNumber = 1;
-        pageNumber <=
-        pdf.numPages;
+        pageNumber <= pdf.numPages;
         pageNumber++
     ) {
 
@@ -534,23 +750,19 @@ async function extractPDFText(
 
 
 // ==================================================
-// EXTRACT DOCX
+// EXTRACT DOCX TEXT
 // ==================================================
 
-async function extractDOCXText(
-    file
-) {
+async function extractDOCXText(file) {
 
     if (
         typeof mammoth ===
         "undefined"
     ) {
 
-        console.error(
-            "Mammoth is not loaded."
+        throw new Error(
+            "Mammoth is not loaded. Make sure resume.html loads mammoth.browser.min.js."
         );
-
-        return "";
 
     }
 

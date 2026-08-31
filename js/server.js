@@ -1,7 +1,6 @@
 "use strict";
 
 
-
 // ==================================================
 // IMPORTS
 // ==================================================
@@ -15,52 +14,13 @@ const crypto =
 const WebSocket =
     require("ws");
 
- const { MongoClient } =
-    require("mongodb");   
 
 // ==================================================
 // CONFIGURATION
 // ==================================================
 
-
-//
-// MONGO STUFF 
-// 
-const PORT = 8080; 
-
-const MONGODB_URI =
-    "mongodb://127.0.0.1:27017";
-
-const MONGODB_DATABASE =
-    "ResumeDB";
-
-let mongoClient;
-let mongoDB;
-
-
-//
-//MONGO CONNECTION FUNCTION 
-// 
-
-async function connectToMongoDB() {
-
-    mongoClient =
-        new MongoClient(
-            MONGODB_URI
-        );
-
-    await mongoClient.connect();
-
-    mongoDB =
-        mongoClient.db(
-            MONGODB_DATABASE
-        );
-
-    console.log(
-        "MongoDB connected."
-    );
-
-}
+const PORT =
+    8080;
 
 
 // ==================================================
@@ -88,9 +48,17 @@ function generateInviteCode() {
     const characters =
         "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-    let firstPart = "";
-    let secondPart = "";
 
+    let firstPart =
+        "";
+
+    let secondPart =
+        "";
+
+
+    // ==============================================
+    // FIRST FOUR CHARACTERS
+    // ==============================================
 
     for (
         let i = 0;
@@ -108,6 +76,10 @@ function generateInviteCode() {
 
     }
 
+
+    // ==============================================
+    // SECOND FOUR CHARACTERS
+    // ==============================================
 
     for (
         let i = 0;
@@ -136,13 +108,17 @@ function generateInviteCode() {
 
 
 // ==================================================
-// CREATE ROOM
+// CREATE MEETING ROOM
 // ==================================================
 
 function createMeetingRoom() {
 
     let inviteCode;
 
+
+    // ==============================================
+    // MAKE SURE CODE IS UNIQUE
+    // ==============================================
 
     do {
 
@@ -156,6 +132,10 @@ function createMeetingRoom() {
         )
     );
 
+
+    // ==============================================
+    // CREATE ROOM
+    // ==============================================
 
     const now =
         Date.now();
@@ -182,6 +162,10 @@ function createMeetingRoom() {
     };
 
 
+    // ==============================================
+    // SAVE ROOM
+    // ==============================================
+
     meetingRooms.set(
         inviteCode,
         room
@@ -207,12 +191,20 @@ function getValidRoom(
     inviteCode
 ) {
 
+    // ==============================================
+    // CHECK CODE
+    // ==============================================
+
     if (!inviteCode) {
 
         return null;
 
     }
 
+
+    // ==============================================
+    // FIND ROOM
+    // ==============================================
 
     const room =
         meetingRooms.get(
@@ -226,6 +218,10 @@ function getValidRoom(
 
     }
 
+
+    // ==============================================
+    // CHECK EXPIRATION
+    // ==============================================
 
     if (
         Date.now() >
@@ -254,7 +250,7 @@ function getValidRoom(
 
 
 // ==================================================
-// SEND JSON
+// SEND JSON RESPONSE
 // ==================================================
 
 function sendJSON(
@@ -303,7 +299,7 @@ const server =
 
 
             // ======================================
-            // CORS
+            // CORS PREFLIGHT
             // ======================================
 
             if (
@@ -383,8 +379,13 @@ const server =
                     "/api/verify-invite"
             ) {
 
-                let body = "";
+                let body =
+                    "";
 
+
+                // ==================================
+                // RECEIVE REQUEST BODY
+                // ==================================
 
                 request.on(
                     "data",
@@ -396,6 +397,10 @@ const server =
                     }
                 );
 
+
+                // ==================================
+                // PROCESS REQUEST
+                // ==================================
 
                 request.on(
                     "end",
@@ -424,6 +429,10 @@ const server =
                                 );
 
 
+                            // ======================
+                            // INVALID ROOM
+                            // ======================
+
                             if (!room) {
 
                                 sendJSON(
@@ -442,6 +451,10 @@ const server =
 
                             }
 
+
+                            // ======================
+                            // INTERVIEWEE EXISTS
+                            // ======================
 
                             if (
                                 room.interviewee
@@ -463,6 +476,10 @@ const server =
 
                             }
 
+
+                            // ======================
+                            // VALID
+                            // ======================
 
                             sendJSON(
                                 response,
@@ -513,7 +530,7 @@ const server =
 
 
             // ======================================
-            // STATUS
+            // SERVER STATUS
             // ======================================
 
             if (
@@ -549,7 +566,10 @@ const server =
                 404,
                 {
                     "Content-Type":
-                        "text/plain"
+                        "text/plain",
+
+                    "Access-Control-Allow-Origin":
+                        "*"
                 }
             );
 
@@ -589,12 +609,20 @@ wss.on(
         );
 
 
+        // ==========================================
+        // GET URL
+        // ==========================================
+
         const url =
             new URL(
                 request.url,
                 `http://localhost:${PORT}`
             );
 
+
+        // ==========================================
+        // GET ROOM CODE
+        // ==========================================
 
         const roomCode =
             (
@@ -605,6 +633,10 @@ wss.on(
             .trim()
             .toUpperCase();
 
+
+        // ==========================================
+        // GET ROLE
+        // ==========================================
 
         const role =
             (
@@ -630,11 +662,13 @@ wss.on(
 
             socket.send(
                 JSON.stringify({
+
                     type:
                         "error",
 
                     message:
                         "Invalid or expired meeting room."
+
                 })
             );
 
@@ -659,11 +693,13 @@ wss.on(
 
             socket.send(
                 JSON.stringify({
+
                     type:
                         "error",
 
                     message:
                         "Invalid meeting role."
+
                 })
             );
 
@@ -676,7 +712,7 @@ wss.on(
 
 
         // ==========================================
-        // CHECK DUPLICATE PARTICIPANT
+        // CHECK DUPLICATE INTERVIEWER
         // ==========================================
 
         if (
@@ -687,11 +723,13 @@ wss.on(
 
             socket.send(
                 JSON.stringify({
+
                     type:
                         "error",
 
                     message:
                         "An interviewer is already connected."
+
                 })
             );
 
@@ -703,6 +741,10 @@ wss.on(
         }
 
 
+        // ==========================================
+        // CHECK DUPLICATE INTERVIEWEE
+        // ==========================================
+
         if (
             role ===
                 "interviewee" &&
@@ -711,11 +753,13 @@ wss.on(
 
             socket.send(
                 JSON.stringify({
+
                     type:
                         "error",
 
                     message:
                         "An interviewee is already connected."
+
                 })
             );
 
@@ -740,6 +784,7 @@ wss.on(
                 socket;
 
         }
+
         else {
 
             room.interviewee =
@@ -759,6 +804,7 @@ wss.on(
 
         socket.send(
             JSON.stringify({
+
                 type:
                     "joined-room",
 
@@ -767,6 +813,7 @@ wss.on(
 
                 role:
                     role
+
             })
         );
 
@@ -790,11 +837,13 @@ wss.on(
 
             otherSocket.send(
                 JSON.stringify({
+
                     type:
                         "peer-joined",
 
                     role:
                         role
+
                 })
             );
 
@@ -802,7 +851,7 @@ wss.on(
 
 
         // ==========================================
-        // RELAY SIGNALING MESSAGES
+        // RELAY WEBRTC SIGNALING
         // ==========================================
 
         socket.on(
@@ -848,6 +897,10 @@ wss.on(
                 );
 
 
+                // ==================================
+                // REMOVE SOCKET FROM ROOM
+                // ==================================
+
                 if (
                     role ===
                     "interviewer"
@@ -864,6 +917,7 @@ wss.on(
                     }
 
                 }
+
                 else {
 
                     if (
@@ -879,12 +933,20 @@ wss.on(
                 }
 
 
+                // ==================================
+                // FIND OTHER PARTICIPANT
+                // ==================================
+
                 const other =
                     role ===
                         "interviewer"
                         ? room.interviewee
                         : room.interviewer;
 
+
+                // ==================================
+                // NOTIFY OTHER PARTICIPANT
+                // ==================================
 
                 if (
                     other &&
@@ -894,15 +956,34 @@ wss.on(
 
                     other.send(
                         JSON.stringify({
+
                             type:
                                 "peer-left",
 
                             role:
                                 role
+
                         })
                     );
 
                 }
+
+            }
+        );
+
+
+        // ==========================================
+        // SOCKET ERROR
+        // ==========================================
+
+        socket.on(
+            "error",
+            function (error) {
+
+                console.error(
+                    `WebSocket error for ${role}:`,
+                    error
+                );
 
             }
         );
@@ -912,62 +993,44 @@ wss.on(
 
 
 // ==================================================
-// START SERVER with wait for MongoDB
+// START SERVER
 // ==================================================
 
-async function startServer() {
+server.listen(
+    PORT,
+    function () {
 
-    try {
+        console.log(
+            "======================================"
+        );
 
-        await connectToMongoDB();
+        console.log(
+            "WebRTC signaling server started."
+        );
 
-        server.listen(
-            PORT,
-            function () {
+        console.log(
+            `HTTP server: http://localhost:${PORT}`
+        );
 
-                console.log(
-                    "======================================"
-                );
+        console.log(
+            `WebSocket server: ws://localhost:${PORT}`
+        );
 
-                console.log(
-                    "WebRTC signaling server started."
-                );
+        console.log(
+            "Resume API: http://127.0.0.1:8000"
+        );
 
-                console.log(
-                    `HTTP server: http://localhost:${PORT}`
-                );
+        console.log(
+            "Resume database: Python / SQLite"
+        );
 
-                console.log(
-                    `WebSocket server: ws://localhost:${PORT}`
-                );
-
-                console.log(
-                    "MongoDB connected."
-                );
-
-                console.log(
-                    "======================================"
-                );
-
-            }
+        console.log(
+            "======================================"
         );
 
     }
+);
 
-    catch (error) {
-
-        console.error(
-            "Could not start server:",
-            error
-        );
-
-        process.exit(1);
-
-    }
-
-}
-
-startServer();
 
 // ==================================================
 // CLEAN EXPIRED ROOMS
@@ -992,6 +1055,36 @@ setInterval(
                 now >
                 room.expiresAt
             ) {
+
+                // ==============================
+                // CLOSE PARTICIPANTS
+                // ==============================
+
+                if (
+                    room.interviewer &&
+                    room.interviewer.readyState ===
+                        WebSocket.OPEN
+                ) {
+
+                    room.interviewer.close();
+
+                }
+
+
+                if (
+                    room.interviewee &&
+                    room.interviewee.readyState ===
+                        WebSocket.OPEN
+                ) {
+
+                    room.interviewee.close();
+
+                }
+
+
+                // ==============================
+                // DELETE ROOM
+                // ==============================
 
                 meetingRooms.delete(
                     inviteCode

@@ -30,7 +30,7 @@ const request = indexedDB.open(
 
 request.onupgradeneeded = function (event) {
 
-    db = event.target.result;
+    db = event.target.result; 
 
 
     if (
@@ -193,4 +193,7 @@ function getPDF(
 
         };
 
-}
+} 
+
+
+
