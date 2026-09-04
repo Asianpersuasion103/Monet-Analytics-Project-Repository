@@ -92,6 +92,10 @@ const downloadRecording =
         "downloadRecording"
     );
 
+const recordingPreviewTitle =
+    document.getElementById(
+        "recordingPreviewTitle"
+    );
 
 // ==================================================
 // VALIDATE
@@ -159,6 +163,9 @@ let peerConnected =
 let meetingStarted =
     false;
 
+let localMediaPromise =
+    null;
+
 let pendingIceCandidates =
     [];
 
@@ -196,7 +203,6 @@ let localAudioSource =
 let remoteAudioSource =
     null;
 
-
 // ==================================================
 // SIGNALING SERVER
 // ==================================================
@@ -231,36 +237,182 @@ const ICE_SERVERS = {
 // ==================================================
 // INITIALIZE
 // ==================================================
+async function prepareLocalMedia() {
+
+    if (localStream) {
+        return localStream;
+    }
+
+    if (localMediaPromise) {
+        return localMediaPromise;
+    }
+
+    localMediaPromise =
+        (async function () {
+
+            status.textContent =
+                "Requesting camera and microphone...";
+
+            const stream =
+                await navigator.mediaDevices
+                    .getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+
+            localStream =
+                stream;
+
+            if (localVideo) {
+
+                localVideo.srcObject =
+                    localStream;
+
+                try {
+                    await localVideo.play();
+                }
+                catch (error) {
+                    console.warn(
+                        "Local video playback:",
+                        error
+                    );
+                }
+            }
+
+            createPeerConnection();
+
+            const existingTracks =
+                peerConnection
+                    .getSenders()
+                    .map(
+                        function (sender) {
+                            return sender.track
+                                ? sender.track.id
+                                : null;
+                        }
+                    );
+
+            localStream
+                .getTracks()
+                .forEach(
+                    function (track) {
+
+                        if (
+                            !existingTracks.includes(
+                                track.id
+                            )
+                        ) {
+
+                            peerConnection.addTrack(
+                                track,
+                                localStream
+                            );
+                        }
+                    }
+                );
+
+            return localStream;
+
+        })();
+
+    try {
+        return await localMediaPromise;
+    }
+    finally {
+        localMediaPromise =
+            null;
+    }
+}
+function configureRoleUI() {
+
+    if (
+        role !==
+        "interviewee"
+    ) {
+        return;
+    }
+
+    const interviewerOnlyElements = [
+        startMeetingButton,
+        startRecordingButton,
+        stopRecordingButton,
+        endMeetingButton,
+        recordingPreview,
+        recordingPreviewTitle,
+        downloadRecording
+    ];
+
+    interviewerOnlyElements.forEach(
+        function (element) {
+
+            if (element) {
+                element.style.display =
+                    "none";
+            }
+        }
+    );
+
+    if (backButton) {
+        backButton.textContent =
+            "Leave Meeting";
+    }
+}
 
 initialize();
 
-
-function initialize() {
+async function initialize() {
 
     if (
         !role ||
         !room
     ) {
-
         return;
-
     }
-
 
     console.log(
         "Role:",
         role
     );
 
-
     console.log(
         "Room:",
         room
     );
 
+    configureRoleUI();
+
+    // ==========================================
+    // APPLICANT PREPARES MEDIA AUTOMATICALLY
+    // ==========================================
+
+    if (
+        role ===
+        "interviewee"
+    ) {
+
+        try {
+
+            await prepareLocalMedia();
+
+            status.textContent =
+                "Camera and microphone ready. Joining meeting...";
+
+        }
+        catch (error) {
+
+            console.error(
+                "Camera/microphone error:",
+                error
+            );
+
+            status.textContent =
+                "Camera and microphone permission is required.";
+
+            return;
+        }
+    }
 
     connectToSignalingServer();
-
 }
 
 
@@ -601,58 +753,7 @@ if (
 
             try {
 
-                status.textContent =
-                    "Requesting camera and microphone...";
-
-
-                localStream =
-                    await navigator.mediaDevices
-                        .getUserMedia({
-
-                            video:
-                                true,
-
-                            audio:
-                                true
-
-                        });
-
-
-                // ==================================
-                // LOCAL VIDEO
-                // ==================================
-
-                if (
-                    localVideo
-                ) {
-
-                    localVideo.srcObject =
-                        localStream;
-
-                }
-
-
-                // ==================================
-                // PEER CONNECTION
-                // ==================================
-
-                createPeerConnection();
-
-
-                localStream
-                    .getTracks()
-                    .forEach(
-                        function (
-                            track
-                        ) {
-
-                            peerConnection.addTrack(
-                                track,
-                                localStream
-                            );
-
-                        }
-                    );
+                await prepareLocalMedia();
 
 
                 meetingStarted =
@@ -778,19 +879,31 @@ function createPeerConnection() {
     // ==============================================
 
     peerConnection.ontrack =
-        function (
-            event
+    async function (
+        event
+    ) {
+
+        console.log(
+            "Remote track received:",
+            event.track.kind
+        );
+
+
+        // ======================================
+        // USE THE REMOTE WEBRTC STREAM
+        // ======================================
+
+        if (
+            event.streams &&
+            event.streams[0]
         ) {
 
-            console.log(
-                "Remote track received:",
-                event.track.kind
-            );
+            remoteStream =
+                event.streams[0];
 
+        }
 
-            // ======================================
-            // CREATE REMOTE STREAM
-            // ======================================
+        else {
 
             if (
                 !remoteStream
@@ -802,14 +915,6 @@ function createPeerConnection() {
             }
 
 
-            const track =
-                event.track;
-
-
-            // ======================================
-            // PREVENT DUPLICATE TRACK
-            // ======================================
-
             const trackAlreadyExists =
                 remoteStream
                     .getTracks()
@@ -820,7 +925,7 @@ function createPeerConnection() {
 
                             return (
                                 existingTrack.id ===
-                                track.id
+                                event.track.id
                             );
 
                         }
@@ -832,51 +937,62 @@ function createPeerConnection() {
             ) {
 
                 remoteStream.addTrack(
-                    track
+                    event.track
                 );
 
             }
 
-
-            // ======================================
-            // REMOTE VIDEO
-            // ======================================
-
-            if (
-                remoteVideo
-            ) {
-
-                remoteVideo.srcObject =
-                    remoteStream;
+        }
 
 
-                remoteVideo.play()
-                    .catch(
-                        function () {}
-                    );
+        // ======================================
+        // SHOW REMOTE PARTICIPANT
+        // ======================================
 
-            }
+        if (
+            remoteVideo
+        ) {
+
+            remoteVideo.srcObject =
+                remoteStream;
 
 
-            // ======================================
-            // IMPORTANT:
-            // ADD REMOTE AUDIO TO ACTIVE RECORDING
-            // ======================================
+            try {
 
-            if (
-                track.kind ===
-                "audio"
-            ) {
-
-                addRemoteAudioToRecording();
+                await remoteVideo.play();
 
             }
 
+            catch (error) {
 
-            status.textContent =
-                "Connected to the other participant.";
+                console.warn(
+                    "Remote video playback:",
+                    error
+                );
 
-        };
+            }
+
+        }
+
+
+        // ======================================
+        // REMOTE AUDIO FOR RECORDING
+        // ======================================
+
+        if (
+            event.track.kind ===
+            "audio"
+        ) {
+
+            addRemoteAudioToRecording();
+
+        }
+
+
+        status.textContent =
+            "Connected to the other participant.";
+
+    };
 
 
     // ==============================================
@@ -935,7 +1051,25 @@ function createPeerConnection() {
 
         };
 
-}
+} 
+    peerConnection.oniceconnectionstatechange =
+        function () {
+
+            if (
+                !peerConnection
+            ) {
+
+                return;
+
+            }
+
+
+            console.log(
+                "ICE connection state:",
+                peerConnection.iceConnectionState
+            );
+
+        };
 
 async function flushPendingIceCandidates() {
 
@@ -1039,79 +1173,10 @@ async function handleOffer(
 
     try {
 
-        if (
-            !peerConnection
-        ) {
-
-            createPeerConnection();
-
-        }
-
-
-        if (
-            !localStream
-        ) {
-
-            localStream =
-                await navigator.mediaDevices
-                    .getUserMedia({
-
-                        video:
-                            true,
-
-                        audio:
-                            true
-
-                    });
-
-
-            if (
-                localVideo
-            ) {
-
-                localVideo.srcObject =
-                    localStream;
-
-            }
-
-
-            localStream
-                .getTracks()
-                .forEach(
-                    function (
-                        track
-                    ) {
-
-                        peerConnection.addTrack(
-                            track,
-                            localStream
-                        );
-
-                    }
-                );
-
-
-            meetingStarted =
-                true;
-
-
-            startMeetingButton.disabled =
-                true;
-
-
-            endMeetingButton.disabled =
-                false;
-
-
-            /*
-             * The participant who receives the offer
-             * can also record immediately.
-             */
-
-            startRecordingButton.disabled =
-                false;
-
-        }
+        // Interviewee media should normally
+        // already be prepared, but this makes
+        // the function safe either way.
+        await prepareLocalMedia();
 
 
         await peerConnection
@@ -1119,7 +1184,9 @@ async function handleOffer(
                 offer
             );
 
+
         await flushPendingIceCandidates();
+
 
         const answer =
             await peerConnection
@@ -1146,7 +1213,7 @@ async function handleOffer(
 
 
         status.textContent =
-            "Answer sent. Connecting...";
+            "Connecting to interviewer...";
 
     }
 
@@ -1159,12 +1226,11 @@ async function handleOffer(
 
 
         status.textContent =
-            "Could not accept the meeting connection.";
+            "Could not connect to the interview.";
 
     }
 
 }
-
 
 // ==================================================
 // HANDLE ANSWER
