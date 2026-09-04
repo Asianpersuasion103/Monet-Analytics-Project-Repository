@@ -1235,9 +1235,52 @@ wss.on(
         // RELAY SIGNALING MESSAGES
         // ==========================================
 
+        // ==========================================
+
         socket.on(
             "message",
             function (message) {
+
+                // Convert incoming WebSocket data
+                // into JSON text before forwarding it.
+                const textMessage =
+                    Buffer.isBuffer(message)
+                        ? message.toString("utf8")
+                        : String(message);
+
+
+                let parsedMessage;
+
+                try {
+
+                    parsedMessage =
+                        JSON.parse(
+                            textMessage
+                        );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Invalid signaling message:",
+                        error
+                    );
+
+                    return;
+                }
+
+
+                const otherRole =
+                    role ===
+                        "interviewer"
+                        ? "interviewee"
+                        : "interviewer";
+
+
+                console.log(
+                    `SIGNAL ${roomCode}: ${role} -> ${otherRole}: ${parsedMessage.type}`
+                );
+
 
                 const other =
                     role ===
@@ -1249,16 +1292,25 @@ wss.on(
                 if (
                     !other ||
                     other.readyState !==
-                        WebSocket.OPEN
+                    WebSocket.OPEN
                 ) {
 
-                    return;
+                    console.log(
+                        `SIGNAL NOT DELIVERED: ${otherRole} is not connected.`
+                    );
 
+                    return;
                 }
 
 
+                // IMPORTANT:
+                // explicitly forward as TEXT
                 other.send(
-                    message
+                    textMessage,
+                    {
+                        binary:
+                            false
+                    }
                 );
 
             }

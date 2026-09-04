@@ -471,9 +471,36 @@ function connectToSignalingServer() {
 
             try {
 
+                let rawMessage =
+                    event.data;
+
+
+                if (
+                    rawMessage instanceof Blob
+                ) {
+
+                    rawMessage =
+                        await rawMessage.text();
+
+                }
+
+
+                else if (
+                    rawMessage instanceof ArrayBuffer
+                ) {
+
+                    rawMessage =
+                        new TextDecoder()
+                            .decode(
+                                rawMessage
+                            );
+
+                }
+
+
                 const message =
                     JSON.parse(
-                        event.data
+                        rawMessage
                     );
 
 
@@ -879,10 +906,17 @@ function createPeerConnection() {
     // ==============================================
 
     peerConnection.ontrack =
-    async function (
-        event
-    ) {
-
+    async function (event) {
+        console.log(
+            "REMOTE TRACK:",
+            event.track.kind,
+            "readyState:",
+            event.track.readyState,
+            "muted:",
+            event.track.muted,
+            "streams:",
+            event.streams.length
+        );
         console.log(
             "Remote track received:",
             event.track.kind
@@ -956,6 +990,17 @@ function createPeerConnection() {
             remoteVideo.srcObject =
                 remoteStream;
 
+            remoteVideo.muted = true;
+
+            console.log(
+                "Remote stream video tracks:",
+                remoteStream.getVideoTracks().length
+            );
+
+            console.log(
+                "Remote stream audio tracks:",
+                remoteStream.getAudioTracks().length
+            );
 
             try {
 
@@ -1049,6 +1094,48 @@ function createPeerConnection() {
 
             }
 
+        };
+    peerConnection.oniceconnectionstatechange =
+    function () {
+
+        console.log(
+            "ICE connection state:",
+            peerConnection.iceConnectionState
+        );
+
+        if (
+            peerConnection.iceConnectionState ===
+            "checking"
+        ) {
+            status.textContent =
+                "Connecting media...";
+        }
+
+        if (
+            peerConnection.iceConnectionState ===
+            "connected" ||
+            peerConnection.iceConnectionState ===
+            "completed"
+        ) {
+            status.textContent =
+                "🟢 Media connection established.";
+        }
+
+        if (
+            peerConnection.iceConnectionState ===
+            "failed"
+        ) {
+            status.textContent =
+                "Media connection failed.";
+        }
+    };
+        peerConnection.onicegatheringstatechange =
+        function () {
+
+            console.log(
+                "ICE gathering state:",
+                peerConnection.iceGatheringState
+            );
         };
 
 } 
