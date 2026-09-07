@@ -34,6 +34,105 @@ app = FastAPI(
 )
 
 
+#=================================================
+#FOR POLLINATION AI STUFF , SETUP AND ANALYSIS
+
+@app.post("/resumes/{resume_id}/analyze")
+def analyze_resume(
+    resume_id: int,
+    description: str = Form(...)
+):
+
+    db = SessionLocal()
+
+    try:
+
+        # Find resume in SQLite
+        resume = (
+            db.query(Resume)
+            .filter(Resume.id == resume_id)
+            .first()
+        )
+
+        if not resume:
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found."
+            )
+
+        # Get extracted resume text
+        resume_text = resume.extracted_text
+
+        # Send resume + job description to Pollinations
+        response = client.chat.completions.create(
+
+            model="openai",
+
+            messages=[
+
+                {
+                    "role": "system",
+                    "content": """
+You are a resume matching assistant.
+
+Compare the resume against the job description.
+
+Analyze:
+1. Overall match
+2. Matching skills
+3. Missing skills
+4. Relevant experience
+5. Weaknesses
+6. Overall explanation
+
+Only use information present in the resume.
+Do not invent qualifications.
+"""
+                },
+
+                {
+                    "role": "user",
+                    "content": f"""
+RESUME:
+
+{resume_text}
+
+
+JOB DESCRIPTION:
+
+{description}
+"""
+                }
+
+            ]
+
+        )
+
+        analysis = (
+            response
+            .choices[0]
+            .message
+            .content
+        )
+
+        return {
+
+            "success": True,
+
+            "resume_id": resume.id,
+
+            "filename": resume.filename,
+
+            "analysis": analysis
+
+        }
+
+    finally:
+
+        db.close()
+
+#=================================================
+
 # ==================================================
 # CORS
 # ==================================================
