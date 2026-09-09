@@ -1,1 +1,5 @@
 htmls/node_modules
+.venv
+_pycache__ 
+node_modules
+
