@@ -1,4 +1,10 @@
 .env
 node_modules/
 .venv/
-/uploads/
+.venv311/
+venv/
+__pycache__/
+*.pyc
+Backend/api/uploads/
+*.db
+uploads/
