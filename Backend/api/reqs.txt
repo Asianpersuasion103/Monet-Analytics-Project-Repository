@@ -2,9 +2,8 @@
 uvicorn
 sqlalchemy
 python-multipart
-
-
-
+openai
+python-dotenv
 
 
 
