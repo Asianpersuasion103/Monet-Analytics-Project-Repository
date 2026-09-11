@@ -2,3 +2,7 @@
 node_modules/
 .venv/
 /uploads/
+.venv311/
+*.pyc
+__pycache__/
+venc/
