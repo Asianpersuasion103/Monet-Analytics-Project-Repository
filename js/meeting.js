@@ -1139,24 +1139,6 @@ function createPeerConnection() {
         };
 
 } 
-    peerConnection.oniceconnectionstatechange =
-        function () {
-
-            if (
-                !peerConnection
-            ) {
-
-                return;
-
-            }
-
-
-            console.log(
-                "ICE connection state:",
-                peerConnection.iceConnectionState
-            );
-
-        };
 
 async function flushPendingIceCandidates() {
 
@@ -2549,7 +2531,79 @@ if (
         "click",
         function () {
 
-            window.history.back();
+            // ======================================
+            // STOP CAMERA + MICROPHONE
+            // ======================================
+
+            if (
+                localStream
+            ) {
+
+                localStream
+                    .getTracks()
+                    .forEach(
+                        function (track) {
+
+                            track.stop();
+
+                        }
+                    );
+
+            }
+
+
+            // ======================================
+            // CLOSE WEBRTC
+            // ======================================
+
+            if (
+                peerConnection
+            ) {
+
+                peerConnection.close();
+
+                peerConnection =
+                    null;
+
+            }
+
+
+            // ======================================
+            // CLOSE SIGNALING
+            // ======================================
+
+            if (
+                socket
+            ) {
+
+                socket.close();
+
+                socket =
+                    null;
+
+            }
+
+
+            // ======================================
+            // NAVIGATE BASED ON ROLE
+            // ======================================
+
+            if (
+                role ===
+                "interviewer"
+            ) {
+
+                window.location.href =
+                    "interviewer.html";
+
+            }
+
+            else {
+
+                window.location.href =
+                    "../index.html";
+
+            }
 
         }
     );
