@@ -10,7 +10,7 @@ const DB_NAME = "ResumeDB";
 const DB_VERSION = 1;
 
 const STORE_NAME = "pdfs";
-
+ 
 let db = null;
 
 

@@ -1,24 +1,13 @@
 import * as pdfjsLib
     from "../pdfjs/pdf.mjs";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "../pdfjs/pdf.worker.mjs";
-
 
 // ==================================================
 // PDF.JS WORKER
 // ==================================================
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "./pdfjs/pdf.worker.mjs";
-
-
-// ==================================================
-// PYTHON BACKEND
-// ==================================================
-
-const API_URL =
-    "http://127.0.0.1:8000";
+    "../pdfjs/pdf.worker.mjs";
 
 
 // ==================================================
@@ -30,35 +19,42 @@ const fileInput =
         "pdf-input"
     );
 
+
 const fileNameDiv =
     document.getElementById(
         "file-name"
     );
+
 
 const previewContainer =
     document.getElementById(
         "preview-container"
     );
 
+
 const pdfViewer =
     document.getElementById(
         "pdf-viewer"
     );
+
 
 const textContainer =
     document.getElementById(
         "text-container"
     );
 
+
 const resumeText =
     document.getElementById(
         "resume-text"
     );
 
+
 const uploadBox =
     document.getElementById(
         "upload-box"
     );
+
 
 const nextButton =
     document.getElementById(
@@ -75,10 +71,27 @@ const meetingRole =
         "meetingRole"
     );
 
+
 const meetingRoom =
     sessionStorage.getItem(
         "meetingRoom"
     );
+
+
+// ==================================================
+// CHECK MEETING INFORMATION
+// ==================================================
+
+if (
+    !meetingRole ||
+    !meetingRoom
+) {
+
+    console.warn(
+        "Meeting information is missing."
+    );
+
+}
 
 
 // ==================================================
@@ -97,7 +110,9 @@ if (nextButton) {
 // PROCESS RESUME
 // ==================================================
 
-async function processResume(file) {
+async function processResume(
+    file
+) {
 
     if (!file) {
 
@@ -107,7 +122,7 @@ async function processResume(file) {
 
 
     // ==============================================
-    // GET FILE EXTENSION
+    // EXTENSION
     // ==============================================
 
     const extension =
@@ -118,7 +133,7 @@ async function processResume(file) {
 
 
     // ==============================================
-    // CHECK FILE TYPE
+    // FILE TYPE
     // ==============================================
 
     if (
@@ -136,47 +151,19 @@ async function processResume(file) {
 
 
     // ==============================================
-    // RESET UI
+    // RESET
     // ==============================================
 
-    if (nextButton) {
-
-        nextButton.style.display =
-            "none";
-
-    }
+    nextButton.style.display =
+        "none";
 
 
-    if (textContainer) {
-
-        textContainer.style.display =
-            "none";
-
-    }
+    textContainer.style.display =
+        "none";
 
 
-    if (previewContainer) {
-
-        previewContainer.style.display =
-            "none";
-
-    }
-
-
-    if (resumeText) {
-
-        resumeText.value =
-            "";
-
-    }
-
-
-    if (fileNameDiv) {
-
-        fileNameDiv.textContent =
-            `Selected: ${file.name}`;
-
-    }
+    fileNameDiv.textContent =
+        `Selected: ${file.name}`;
 
 
     try {
@@ -198,20 +185,12 @@ async function processResume(file) {
                 );
 
 
-            if (pdfViewer) {
-
-                pdfViewer.src =
-                    fileURL;
-
-            }
+            pdfViewer.src =
+                fileURL;
 
 
-            if (previewContainer) {
-
-                previewContainer.style.display =
-                    "block";
-
-            }
+            previewContainer.style.display =
+                "block";
 
 
             extractedText =
@@ -228,6 +207,10 @@ async function processResume(file) {
 
         else {
 
+            previewContainer.style.display =
+                "none";
+
+
             extractedText =
                 await extractDOCXText(
                     file
@@ -237,7 +220,7 @@ async function processResume(file) {
 
 
         // ==========================================
-        // CHECK EXTRACTED TEXT
+        // EXTRACTION FAILED
         // ==========================================
 
         if (
@@ -255,80 +238,144 @@ async function processResume(file) {
 
 
         // ==========================================
-        // CLEAN TEXT
+        // DISPLAY
         // ==========================================
 
-        extractedText =
-            extractedText.trim();
+        resumeText.value =
+            extractedText;
+
+        textContainer.style.display =
+            "block";
+
 
 
         // ==========================================
-        // DISPLAY EXTRACTED TEXT
+        // SAVE
         // ==========================================
 
-        if (resumeText) {
+        const resume = {
 
-            resumeText.value =
-                extractedText;
+            id:
+                crypto.randomUUID(),
 
+            fileName:
+                file.name,
+
+            fileType:
+                extension,
+
+            extractedText:
+                extractedText,
+
+            meetingRoom:
+                meetingRoom,
+
+            meetingRole:
+                meetingRole,
+
+            uploadedAt:
+                new Date().toISOString()
+        };
+        // ==========================================
+        // SEND ORIGINAL RESUME TO SERVER
+        // ==========================================
+
+        if (
+            !meetingRoom ||
+            !meetingRole
+        ) {
+            throw new Error(
+                "Meeting information is missing."
+            );
         }
 
+        const uploadURL =
+            new URL(
+                "/api/upload-resume",
+                window.location.origin
+            );
 
-        if (textContainer) {
-
-            textContainer.style.display =
-                "block";
-
-        }
-
-
-        // ==========================================
-        // DEBUG
-        // ==========================================
-
-        console.log(
-            "Resume processed successfully."
+        uploadURL.searchParams.set(
+            "room",
+            meetingRoom
         );
 
-        console.log(
-            "Filename:",
+        uploadURL.searchParams.set(
+            "filename",
             file.name
         );
 
-        console.log(
-            "Extracted text length:",
-            extractedText.length
-        );
+        const uploadResponse =
+            await fetch(
+                uploadURL,
+                {
+                    method:
+                        "POST",
 
+                    headers: {
+                        "Content-Type":
+                            "application/octet-stream"
+                    },
 
-        // ==========================================
-        // SAVE TO PYTHON DATABASE
-        // ==========================================
-
-        const savedResume =
-            await saveResume(
-                file,
-                extractedText
+                    body:
+                        file
+                }
             );
 
+        const uploadResult =
+            await uploadResponse.json();
+
+        if (
+            !uploadResponse.ok ||
+            !uploadResult.success
+        ) {
+
+            throw new Error(
+                uploadResult.message ||
+                "Resume upload failed."
+            );
+        }
+
+        resume.serverFileName =
+            uploadResult.fileName;
 
         console.log(
-            "Resume saved to Python database:"
+            "Resume uploaded to server:",
+            uploadResult.fileName
         );
 
+        if (
+            typeof savePDF ===
+            "function"
+        ) {
+
+            await savePDF(
+                resume
+            );
+
+        }
+        else {
+
+            console.warn(
+                "savePDF() was not found."
+            );
+
+        }
+
+
         console.log(
-            savedResume
+            "Resume saved:",
+            resume
         );
 
 
         // ==========================================
-        // CREATE MEETING URL
+        // PREPARE MEETING URL
         // ==========================================
 
         if (
             meetingRole &&
-            meetingRoom &&
-            savedResume.id
+            meetingRoom
         ) {
 
             const meetingURL =
@@ -340,30 +387,21 @@ async function processResume(file) {
                 "&room=" +
                 encodeURIComponent(
                     meetingRoom
-                ) +
-                "&resumeId=" +
-                encodeURIComponent(
-                    savedResume.id
                 );
 
 
-            if (nextButton) {
-
-                nextButton.href =
-                    meetingURL;
+            nextButton.href =
+                meetingURL;
 
 
-                nextButton.style.display =
-                    "block";
-
-            }
+            nextButton.style.display =
+                "inline-block";
 
         }
-
         else {
 
-            console.log(
-                "Resume saved, but meeting information is not available."
+            alert(
+                "Resume processed, but meeting information is missing."
             );
 
         }
@@ -379,7 +417,6 @@ async function processResume(file) {
 
 
         alert(
-            error.message ||
             "There was a problem processing the resume."
         );
 
@@ -389,185 +426,7 @@ async function processResume(file) {
 
 
 // ==================================================
-// SAVE RESUME TO PYTHON
-// ==================================================
-
-async function saveResume(
-    file,
-    extractedText
-) {
-
-    // ==============================================
-    // CREATE FORM DATA
-    // ==============================================
-
-    const formData =
-        new FormData();
-
-
-    // ==============================================
-    // ORIGINAL FILE
-    // ==============================================
-
-    formData.append(
-        "file",
-        file
-    );
-
-
-    // ==============================================
-    // EXTRACTED RESUME TEXT
-    // ==============================================
-
-    formData.append(
-        "extracted_text",
-        extractedText
-    );
-
-
-    // ==============================================
-    // MEETING ROOM
-    // ==============================================
-
-    if (meetingRoom) {
-
-        formData.append(
-            "meeting_room",
-            meetingRoom
-        );
-
-    }
-
-
-    // ==============================================
-    // MEETING ROLE
-    // ==============================================
-
-    if (meetingRole) {
-
-        formData.append(
-            "meeting_role",
-            meetingRole
-        );
-
-    }
-
-
-    // ==============================================
-    // DEBUG
-    // ==============================================
-
-    console.log(
-        "======================================"
-    );
-
-    console.log(
-        "Uploading resume to Python API..."
-    );
-
-    console.log(
-        "Filename:",
-        file.name
-    );
-
-    console.log(
-        "Extracted text length:",
-        extractedText.length
-    );
-
-    console.log(
-        "Meeting room:",
-        meetingRoom
-    );
-
-    console.log(
-        "Meeting role:",
-        meetingRole
-    );
-
-    console.log(
-        "======================================"
-    );
-
-
-    // ==============================================
-    // SEND TO FASTAPI
-    // ==============================================
-
-    const response =
-        await fetch(
-            `${API_URL}/resumes`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-
-    // ==============================================
-    // CHECK RESPONSE
-    // ==============================================
-
-    if (!response.ok) {
-
-        let message =
-            "Could not save resume.";
-
-
-        try {
-
-            const error =
-                await response.json();
-
-
-            message =
-                error.detail ||
-                message;
-
-        }
-
-        catch {
-
-            // Keep default error message.
-
-        }
-
-
-        throw new Error(
-            message
-        );
-
-    }
-
-
-    // ==============================================
-    // READ PYTHON RESPONSE
-    // ==============================================
-
-    const result =
-        await response.json();
-
-
-    // ==============================================
-    // DEBUG
-    // ==============================================
-
-    console.log(
-        "Python API response:"
-    );
-
-    console.log(
-        result
-    );
-
-
-    return result;
-
-}
-
-
-// ==================================================
-// FILE INPUT
+// FILE SELECTION
 // ==================================================
 
 if (fileInput) {
@@ -609,8 +468,21 @@ if (uploadBox) {
 
         }
     );
+        uploadBox.addEventListener(
+        "click",
+        function (event) {
 
+            if (
+                event.target.closest(
+                    ".upload-button"
+                )
+            ) {
+                return;
+            }
 
+            fileInput.click();
+        }
+    );
     // ==============================================
     // DRAG LEAVE
     // ==============================================
@@ -654,10 +526,6 @@ if (uploadBox) {
             }
 
 
-            // ======================================
-            // UPDATE FILE INPUT
-            // ======================================
-
             const dataTransfer =
                 new DataTransfer();
 
@@ -671,25 +539,20 @@ if (uploadBox) {
                 dataTransfer.files;
 
 
-            // ======================================
-            // PROCESS
-            // ======================================
-
             processResume(
                 file
             );
 
         }
     );
-
 }
-
-
 // ==================================================
-// EXTRACT PDF TEXT
+// EXTRACT PDF
 // ==================================================
 
-async function extractPDFText(file) {
+async function extractPDFText(
+    file
+) {
 
     const arrayBuffer =
         await file.arrayBuffer();
@@ -704,17 +567,13 @@ async function extractPDFText(file) {
             .promise;
 
 
-    let fullText =
-        "";
+    let fullText = "";
 
-
-    // ==============================================
-    // LOOP THROUGH EVERY PAGE
-    // ==============================================
 
     for (
         let pageNumber = 1;
-        pageNumber <= pdf.numPages;
+        pageNumber <=
+        pdf.numPages;
         pageNumber++
     ) {
 
@@ -750,19 +609,23 @@ async function extractPDFText(file) {
 
 
 // ==================================================
-// EXTRACT DOCX TEXT
+// EXTRACT DOCX
 // ==================================================
 
-async function extractDOCXText(file) {
+async function extractDOCXText(
+    file
+) {
 
     if (
         typeof mammoth ===
         "undefined"
     ) {
 
-        throw new Error(
-            "Mammoth is not loaded. Make sure resume.html loads mammoth.browser.min.js."
+        console.error(
+            "Mammoth is not loaded."
         );
+
+        return "";
 
     }
 

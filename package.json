@@ -4,12 +4,13 @@
   "description": "Browser-based interview platform",
   "type": "commonjs",
   "scripts": {
-  "server": "node js/server.js",
-  "dev": "node js/server.js"
-},
-
+    "server": "node js/server.js",
+    "dev": "node js/server.js"
+  },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "mongodb": "^7.5.0",
+    "resend": "^6.27.0",
     "ws": "^8.18.3"
   }
 }

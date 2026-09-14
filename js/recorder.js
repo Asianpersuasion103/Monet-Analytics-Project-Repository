@@ -591,6 +591,24 @@ function createRecording() {
 
 
     // =============================================
+    // MAKING RECORDING formDATA FOR WHISPER USE 
+    // =============================================    
+async function handleUpload() {
+  const formData = new FormData();
+  formData.append('file', recordingBlob, 'recording.webm');
+
+  const response = await fetch('http://localhost:8000/transcribe', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await response.json();
+  console.log(data.transcript);
+}
+
+
+
+    // =============================================
     // CREATE DOWNLOAD URL
     // =============================================
 
