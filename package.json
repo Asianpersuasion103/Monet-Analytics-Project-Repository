@@ -9,8 +9,20 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "mongodb": "^7.5.0",
+    "mongodb": "^7.6.0",
     "resend": "^6.27.0",
     "ws": "^8.18.3"
-  }
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anshulbadoni360/monet-intern-2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anshulbadoni360/monet-intern-2026/issues"
+  },
+  "homepage": "https://github.com/anshulbadoni360/monet-intern-2026#readme"
 }
