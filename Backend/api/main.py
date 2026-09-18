@@ -1,4 +1,8 @@
-﻿from pathlib import Path
+﻿import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
 
 from fastapi import FastAPI
 from fastapi import File
@@ -14,7 +18,50 @@ from database import SessionLocal
 from database import engine
 
 from models import Resume
+# ==================================================
+# ENVIRONMENT VARIABLES
+# ==================================================
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
+load_dotenv(
+    ROOT_DIR / ".env",
+    override=True
+)
+POLLINATIONS_API_KEY = os.getenv(
+    "POLLINATIONS_API_KEY"
+)
+print(
+    "Pollinations key loaded:",
+    bool(POLLINATIONS_API_KEY),
+    "prefix:",
+    POLLINATIONS_API_KEY[:3]
+        if POLLINATIONS_API_KEY
+        else "none",
+    "length:",
+    len(POLLINATIONS_API_KEY)
+        if POLLINATIONS_API_KEY
+        else 0
+)
+
+# ==================================================
+# POLLINATIONS CLIENT
+# ==================================================
+
+POLLINATIONS_API_KEY = os.getenv(
+    "POLLINATIONS_API_KEY"
+)
+
+if not POLLINATIONS_API_KEY:
+    raise RuntimeError(
+        "POLLINATIONS_API_KEY is missing from .env"
+    )
+
+
+client = OpenAI(
+    base_url="https://gen.pollinations.ai/v1",
+    api_key=POLLINATIONS_API_KEY
+)
 
 # ==================================================
 # CREATE DATABASE TABLES
@@ -66,7 +113,7 @@ def analyze_resume(
         # Send resume + job description to Pollinations
         response = client.chat.completions.create(
 
-            model="openai",
+            model="gpt-5.4-mini",
 
             messages=[
 
