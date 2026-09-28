@@ -12,7 +12,7 @@ async function main() {
         console.log("Successfully connected to MongoDB!");
         
         // Specify the database name you want to use
-        const db = client.db('myDatabase');
+        const db = client.db('resumes.db');
         
     } catch (e) {
         console.error("Connection error:", e);

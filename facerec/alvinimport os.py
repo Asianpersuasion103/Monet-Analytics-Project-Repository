@@ -15,13 +15,15 @@ OUT_TITLES = r"C:\Users\allisongalon\Downloads\titleoutput"
 
 API_ENDPOINT = "https://metrics.monetanalytics.com/FaceReaderPOSTv8/api/facereaderservice/PostImage"
 
+api_key = os.getenv("API_KEY") #os library..
 
 
 MAX_THREADS = 15
 counter = 1
 
+
 HEADERS = {
-    "Authorization": f"Bearer {API_KEY}",
+    "Authorization": f"Bearer {api_key}",
     "Content-Type": "application/json"
 }
 

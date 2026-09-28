@@ -11,6 +11,7 @@ emotion_counts = {
     "Surprised": 0,
     "Scared": 0,
     "Disgusted": 0
+    
 }
 
 def parse_txt_file(path):
